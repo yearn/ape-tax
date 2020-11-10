@@ -1,28 +1,41 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+<template lang="pug">
+  div(v-if="isDrizzleInitialized", id="app")
+    .logo 🐳🧙‍♂️
+    .section
+      yHegicVault
+  div(v-else)
+    div Loading yApp...
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import yHegicVault from './yHegicVault'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: 'App',
+  name: 'app',
   components: {
-    HelloWorld
-  }
+    yHegicVault,
+  },
+
+  computed: mapGetters('drizzle', ['isDrizzleInitialized'])
 }
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&display=swap');
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  text-align: left;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.logo {
+  font-size: 100px;
 }
 </style>
