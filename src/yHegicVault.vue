@@ -2,7 +2,7 @@
   div(v-if="isDrizzleInitialized", id="app")
     h1 Hegic Vault aka "El Calfos"
     div Lots: {{ lots || fromWei(2) }}
-    div Hegic price (CoinGecko 🦎): {{ hegic_price | fromWei(2) | toCurrency(2) }}
+    div Hegic price (CoinGecko 🦎): {{ hegic_price | fromWei(4) | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}
