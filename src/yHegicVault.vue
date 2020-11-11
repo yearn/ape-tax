@@ -22,6 +22,15 @@
     button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : 'Approve Vault' }}
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 💸 Deposit All
+    p
+      div.muted
+        span Made with 💙  
+        span yVault:  
+        a(href='https://twitter.com/macarse', target='_blank') Carlos
+        span  & 
+        a(href='https://twitter.com/mattdwest', target='_blank') Matt
+        span  - UI:  
+        a(href='https://twitter.com/fameal', target='_blank') fameal
   div(v-else)
     div Loading yApp...
 
