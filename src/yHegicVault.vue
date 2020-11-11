@@ -19,9 +19,9 @@
     label Amount 
     input(size="is-small" v-model.number="amount" type="number" min=0)
     p
-    button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : 'Approve Vault' }}
-    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit
-    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 💸 Deposit All
+    button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
+    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 🏦 Deposit
+    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 🏦 Deposit All
     button(:disabled='!has_yhegic_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
     div.red(v-if="error")
       span {{ error }}
