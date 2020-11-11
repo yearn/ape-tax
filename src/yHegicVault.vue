@@ -3,12 +3,13 @@
     h1 Hegic Vault aka "El Calfos"
     div Lots: {{ lots || fromWei(2) }}
     div Hegic price (CoinGecko 🦎): {{ hegic_price | fromWei(2) | toCurrency(2) }}
+    div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}
     p
-    div Account: <strong>{{ username || activeAccount }}</strong>
-    div Vault shares: {{ yhegic_balance | fromWei(2) }}
-    div Hegic Balance: {{ hegic_balance | fromWei(2) }}
+    div Your Account: <strong>{{ username || activeAccount }}</strong>
+    div Your Vault shares: {{ yhegic_balance | fromWei(2) }}
+    div Your Hegic Balance: {{ hegic_balance | fromWei(2) }}
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
     div Hegic Future Profit: {{ strategy_future_profits | fromWei(8) }}
@@ -74,7 +75,7 @@ export default {
       this.drizzleInstance.contracts['HEGIC'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
-      this.drizzleInstance.contracts['yHegicVault'].methods['depositAll'].cacheSend({from: this.activeAccount})
+      this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + '.addr.reverse'
@@ -121,6 +122,9 @@ export default {
     },
     vault_supply() {
       return this.call('yHegicVault', 'totalSupply', [])
+    },
+    vault_deposit_limit() {
+      return this.call('yHegicVault', 'depositLimit', [])
     },
     vault_total_assets() {
       return this.call('yHegicVault', 'totalAssets', [])
