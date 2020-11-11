@@ -22,6 +22,7 @@
     button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : 'Approve Vault' }}
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 💸 Deposit All
+    button(:disabled='!has_yhegic_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
     div.red(v-if="error")
       span {{ error }}
     p
@@ -51,6 +52,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
+const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
 
 export default {
   name: 'yHegicVault',
@@ -111,6 +113,14 @@ export default {
         return
       }
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
+    },
+    on_withdraw_all() {
+      if (this.yhegic_balance <= 0) {
+        this.error = ERROR_NEGATIVE_WITHDRAW
+        this.amount = 0
+        return
+      }
+      this.drizzleInstance.contracts['yHegicVault'].methods['withdraw'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + '.addr.reverse'
@@ -195,6 +205,9 @@ export default {
     },
     has_allowance_vault() {
       return !this.call('HEGIC', 'allowance', [this.activeAccount, this.vault]).isZero()
+    },
+    has_yhegic_balance() {
+      return (this.yhegic_balance > 0)
     },
   },
   created() {
