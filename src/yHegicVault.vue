@@ -17,11 +17,13 @@
     div Your Hegic Balance: {{ hegic_balance | fromWei(2) }}
     p
     label Amount 
-    input(size="is-small" v-model.number="amount" type="number")
+    input(size="is-small" v-model.number="amount" type="number" min=0)
     p
     button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : 'Approve Vault' }}
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit
     button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 💸 Deposit All
+    div.red(v-if="error")
+      span {{ error }}
     p
       div.muted
         span Made with 💙  
@@ -48,6 +50,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 */
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
+const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
 
 export default {
   name: 'yHegicVault',
@@ -55,7 +58,8 @@ export default {
     return {
       username: null,
       hegic_price: 0,
-      amount: 0
+      amount: 0,
+      error: null
     }
   },
   filters: {
@@ -90,10 +94,22 @@ export default {
       this.drizzleInstance.contracts['HEGIC'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
+      this.error = null
+
+      if (this.amount <= 0) {
+        this.error = ERROR_NEGATIVE
+        this.amount = 0
+        return
+      }
+
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
-      
     },
     on_deposit_all() {
+      if (this.hegic_balance <= 0) {
+        this.error = ERROR_NEGATIVE
+        this.amount = 0
+        return
+      }
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
@@ -203,6 +219,10 @@ button {
 .muted {
   color: gray;
   font-size: 0.8em;
+}
+.red{
+  color: red;
+  font-weight: 700;
 }
 a, a:visited, a:hover {
   color: gray;
