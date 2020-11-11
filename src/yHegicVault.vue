@@ -5,18 +5,23 @@
     div Hegic price (CoinGecko 🦎): {{ hegic_price | fromWei(4) | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
-    div Total AUM: {{ vault_total_aum | toCurrency(2) }}
+    div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
+    p
+    div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
+    div Hegic Future Profit: {{ strategy_future_profits | fromWei(8) }}
+    p
+    div Available limit: {{ vault_available_limit | fromWei(2) }} HEGIC
     p
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yhegic_balance | fromWei(2) }}
     div Your Hegic Balance: {{ hegic_balance | fromWei(2) }}
     p
-    div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-    div Hegic Future Profit: {{ strategy_future_profits | fromWei(8) }}
+    label Amount 
+    input(size="is-small" v-model.number="amount" type="number")
     p
-    p Deposit <strong>ALL</strong> your HEGIC into the yVault
     button(:disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : 'Approve Vault' }}
-    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit {{ hegic_balance | fromWei(2) }} HEGIC
+    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit') 💸 Deposit
+    button(:disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 💸 Deposit All
   div(v-else)
     div Loading yApp...
 
@@ -41,6 +46,7 @@ export default {
     return {
       username: null,
       hegic_price: 0,
+      amount: 0
     }
   },
   filters: {
@@ -75,6 +81,10 @@ export default {
       this.drizzleInstance.contracts['HEGIC'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
+      this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+      
+    },
+    on_deposit_all() {
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
@@ -128,6 +138,9 @@ export default {
     },
     vault_total_assets() {
       return this.call('yHegicVault', 'totalAssets', [])
+    },
+    vault_available_limit() {
+      return this.vault_deposit_limit.sub(this.vault_total_assets)
     },
     vault_total_aum() {
       const toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
