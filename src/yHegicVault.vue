@@ -197,7 +197,7 @@ export default {
       return this.call('yHegicVault', 'pricePerShare', [])
     },
     strategy_future_profits() {
-      return this.call('yHegicStrategyETH', 'hegicFutureProfit', []) + this.call('yHegicStrategyWBTC', 'hegicFutureProfit', [])
+      return this.call('yHegicStrategyETH', 'hegicFutureProfit', []).add(this.call('yHegicStrategyWBTC', 'hegicFutureProfit', []))
     },
     lots() {
       console.log("lots")
