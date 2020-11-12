@@ -118,7 +118,7 @@ export default {
               this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(this.vault_available_limit.toString(),{from: this.activeAccount})
               return
       }
-      
+
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     on_withdraw_all() {
@@ -170,7 +170,12 @@ export default {
     strategy() {
       console.log("Strat")
       console.log(this.drizzleInstance.store.getState())
-      return this.drizzleInstance.contracts['yHegicStrategy'].address
+      return this.drizzleInstance.contracts['yHegicStrategyETH'].address
+    },
+    strategy_wbtc() {
+      console.log("Strat")
+      console.log(this.drizzleInstance.store.getState())
+      return this.drizzleInstance.contracts['yHegicStrategyWBTC'].address
     },
     vault_supply() {
       return this.call('yHegicVault', 'totalSupply', [])
@@ -192,11 +197,11 @@ export default {
       return this.call('yHegicVault', 'pricePerShare', [])
     },
     strategy_future_profits() {
-      return this.call('yHegicStrategy', 'hegicFutureProfit', [])
+      return this.call('yHegicStrategyETH', 'hegicFutureProfit', []) + this.call('yHegicStrategyWBTC', 'hegicFutureProfit', [])
     },
     lots() {
       console.log("lots")
-      return this.call('HegicStaking', 'balanceOf', [this.strategy])
+      return this.call('HegicStakingETH', 'balanceOf', [this.strategy]).toNumber() + this.call('HegicStakingWBTC', 'balanceOf', [this.strategy_wbtc]).toNumber()
     },
     yhegic_balance() {
       console.log("yHegic bal")

@@ -24,12 +24,20 @@ const options = {
       web3Contract: new web3.eth.Contract(ERC20, "0x584bc13c7d411c00c01a62e8019472de68768430")
     },
     {
-      contractName: 'yHegicStrategy',
+      contractName: 'yHegicStrategyETH',
       web3Contract: new web3.eth.Contract(yHegicStrategy, "0x4141b5e7b687a89d994bff1b35c8082404ca70a7")
     },
     {
-      contractName: 'HegicStaking',
+      contractName: 'yHegicStrategyWBTC',
+      web3Contract: new web3.eth.Contract(yHegicStrategy, "0xaE466D9Cb123E26b369C63ba89F8588be5f19E5b")
+    },
+    {
+      contractName: 'HegicStakingETH',
       web3Contract: new web3.eth.Contract(HegicStaking, "0x1Ef61E3E5676eC182EED6F052F8920fD49C7f69a")
+    },
+    {
+      contractName: 'HegicStakingWBTC',
+      web3Contract: new web3.eth.Contract(HegicStaking, "0x840a1AE46B7364855206Eb5b7286Ab7E207e515b")
     },
   ],
   events: {
