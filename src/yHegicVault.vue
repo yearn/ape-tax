@@ -46,6 +46,7 @@ import ethers from 'ethers'
 import axios from 'axios'
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
+const BN_ZERO = new ethers.BigNumber.from(0)
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
 
@@ -176,11 +177,11 @@ export default {
       return this.call('yHegicVault', 'totalAssets', [])
     },
     vault_available_limit() {
-      var limit = this.vault_deposit_limit.sub(this.vault_total_assets);
-      return limit.lt(0)?0:limit.lt(0)
+      let limit = this.vault_deposit_limit.sub(this.vault_total_assets);
+      return limit.lt(0)?BN_ZERO:limit
     },
     vault_total_aum() {
-      const toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
+      let toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
       return this.vault_total_assets.mul(this.hegic_price).div(toInt)
     },
     vault_price_per_share() {
