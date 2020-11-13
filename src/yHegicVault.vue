@@ -182,7 +182,8 @@ export default {
       return this.call('yHegicVault', 'totalAssets', [])
     },
     vault_available_limit() {
-      return this.vault_deposit_limit.sub(this.vault_total_assets)
+      var limit = this.vault_deposit_limit.sub(this.vault_total_assets);
+      return limit.lt(0)?0:limit.lt(0)
     },
     vault_total_aum() {
       const toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
