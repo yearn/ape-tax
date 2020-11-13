@@ -115,9 +115,8 @@ export default {
       }
 
       if (this.hegic_balance < this.vault_available_limit) {
-          var limit = this.vault_available_limit.lt(0) ? "0" : this.vault_available_limit.toString()
-          this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(limit,{from: this.activeAccount})
-          return
+              this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(this.vault_available_limit.toString(),{from: this.activeAccount})
+              return
       }
 
       this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
