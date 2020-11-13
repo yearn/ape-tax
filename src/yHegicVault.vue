@@ -45,12 +45,6 @@ import { mapGetters } from 'vuex'
 import ethers from 'ethers'
 import axios from 'axios'
 
-/*
-import ethers, { BigNumber } from 'ethers'
-
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-*/
-
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
