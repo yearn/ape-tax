@@ -1,39 +1,41 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    h1 Hegic Vault aka "El Calfos"
-    div Lots: {{ lots }}
-    div Hegic price (CoinGecko 🦎): {{ hegic_price | fromWei(4) | toCurrency(4) }}
+    h1 WETH Citadel
+    div WETH price (CoinGecko 🦎): {{ weth_price | fromWei(4) | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-    div Hegic Future Profit: {{ strategy_future_profits | fromWei(8) }}
-    p
-    div Available limit: {{ vault_available_limit | fromWei(2) }} HEGIC
+    div Available limit: {{ vault_available_limit | fromWei(2) }} WETH
     p
     div Your Account: <strong>{{ username || activeAccount }}</strong>
-    div Your Vault shares: {{ yhegic_balance | fromWei(2) }}
-    div Your Hegic Balance: {{ hegic_balance | fromWei(2) }}
+    div Your Vault shares: {{ yvweth_balance | fromWei(2) }}
+    div Your WETH Balance: {{ weth_balance | fromWei(2) }}
     p
-    label(v-if="vault_available_limit > 0") Amount 
-    input(v-if="vault_available_limit > 0" size="is-small" v-model.number="amount" type="number" min=0)
-    span(v-if="vault_available_limit <= 0") Deposits closed. 
-    p
-    button(v-if="vault_available_limit > 0" :disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
-    button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit') 🏦 Deposit
-    button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 🏦 Deposit All
-    button(:disabled='!has_yhegic_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
+    div(v-if="is_guest")
+      span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
+      p
+      label(v-if="vault_available_limit > 0") Amount 
+      input(v-if="vault_available_limit > 0" size="is-small" v-model.number="amount" type="number" min=0)
+      span(v-if="vault_available_limit <= 0") Deposits closed. 
+      p
+      button(v-if="vault_available_limit > 0" :disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
+      button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit') 🏦 Deposit
+      button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 🏦 Deposit All
+      button(:disabled='!has_weth_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
+    div.red(v-else)
+      span You are not yet allowed into the Citadel ⛔
     div.red(v-if="error")
       span {{ error }}
     p
       div.muted
         span Made with 💙  
-        span yVault:  
-        a(href='https://twitter.com/macarse', target='_blank') Carlos
-        span  & 
-        a(href='https://twitter.com/mattdwest', target='_blank') Matt
-        span  - UI:  
+        span yVault:
+        | 
+        a(href='https://twitter.com/arbingsam' target='_blank') arbingsam
+        span  - UI:
+        | 
         a(href='https://twitter.com/fameal', target='_blank') fameal
   div(v-else)
     div Loading yApp...
@@ -46,16 +48,17 @@ import ethers from 'ethers'
 import axios from 'axios'
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
-const BN_ZERO = new ethers.BigNumber.from(0)
+//const BN_ZERO = new ethers.BigNumber.from(0)
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
+const ERROR_GUEST_LIMIT = "That would exceed your guest limit. Try less."
 
 export default {
-  name: 'yHegicVault',
+  name: 'WETHVault',
   data() {
     return {
       username: null,
-      hegic_price: 0,
+      weth_price: 0,
       amount: 0,
       error: null
     }
@@ -63,7 +66,7 @@ export default {
   filters: {
     fromWei(data, precision) {
       if (data === 'loading') return data
-      if (data > 2**255) return '�~H~^'
+      if (data > 2**255) return '♾️'
       let value = ethers.utils.commify(ethers.utils.formatEther(data))
       let parts = value.split('.')
 
@@ -72,7 +75,7 @@ export default {
       return parts[0] + '.' + parts[1].slice(0, precision)
     },
     toPct(data, precision) {
-      if (isNaN(data)) return '?'
+      if (isNaN(data)) return '-'
       return `${(data * 100).toFixed(precision)}%`
     },
     toCurrency(data, precision) {
@@ -89,7 +92,7 @@ export default {
   },
   methods: {
     on_approve_vault() {
-      this.drizzleInstance.contracts['HEGIC'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
+      this.drizzleInstance.contracts['WETH'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
       this.error = null
@@ -100,29 +103,34 @@ export default {
         return
       }
 
-      this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+      if (!this.call('GuestList', 'authorized', [this.activeAccount, this.amount])) {
+        this.error = ERROR_GUEST_LIMIT
+        return
+      }
+
+      this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
     },
     on_deposit_all() {
-      if (this.hegic_balance <= 0) {
+      if (this.weth_balance <= 0) {
         this.error = ERROR_NEGATIVE
         this.amount = 0
         return
       }
 
-      if (this.hegic_balance < this.vault_available_limit) {
-              this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend(this.vault_available_limit.toString(),{from: this.activeAccount})
+      if (!this.call('GuestList', 'authorized', [this.activeAccount, this.weth_balance])) {
+              this.error = ERROR_GUEST_LIMIT
               return
       }
 
-      this.drizzleInstance.contracts['yHegicVault'].methods['deposit'].cacheSend({from: this.activeAccount})
+      this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     on_withdraw_all() {
-      if (this.yhegic_balance <= 0) {
+      if (this.yvweth_balance <= 0) {
         this.error = ERROR_NEGATIVE_WITHDRAW
         this.amount = 0
         return
       }
-      this.drizzleInstance.contracts['yHegicVault'].methods['withdraw'].cacheSend({from: this.activeAccount})
+      this.drizzleInstance.contracts['WETHVault'].methods['withdraw'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + '.addr.reverse'
@@ -130,7 +138,6 @@ export default {
       let namehash = ethers.utils.namehash(lookup)
       this.username = await resolver.methods.name(namehash).call()
     },
-
     call(contract, method, args, out='number') {
       let key = this.drizzleInstance.contracts[contract].methods[method].cacheCall(...args)
       let value
@@ -144,6 +151,8 @@ export default {
           if (value === null) value = 0
           return new ethers.BigNumber.from(value)
         case 'address':
+          console.log(method)
+          console.log(value)
           return value
         default:
           return value
@@ -159,67 +168,67 @@ export default {
       return this.activeAccount
     },
     vault() {
-      return this.drizzleInstance.contracts['yHegicVault'].address
+      return this.drizzleInstance.contracts['WETHVault'].address
     },
-    strategy() {
-      return this.drizzleInstance.contracts['yHegicStrategyETH'].address
-    },
-    strategy_wbtc() {
-      return this.drizzleInstance.contracts['yHegicStrategyWBTC'].address
+    strategy_01() {
+      return this.drizzleInstance.contracts['yDaiStrategy'].address
     },
     vault_supply() {
-      return this.call('yHegicVault', 'totalSupply', [])
+      console.log("tot supply")
+      return this.call('WETHVault', 'totalSupply', [])
     },
     vault_deposit_limit() {
-      return this.call('yHegicVault', 'depositLimit', [])
+      console.log("dep limit")
+      return this.call('WETHVault', 'depositLimit', [])
     },
     vault_total_assets() {
-      return this.call('yHegicVault', 'totalAssets', [])
+      console.log("tot assets")
+      return this.call('WETHVault', 'totalAssets', [])
     },
     vault_available_limit() {
-      let limit = this.vault_deposit_limit.sub(this.vault_total_assets);
-      return limit.lt(0)?BN_ZERO:limit
+      console.log("av limit")
+      return this.call('WETHVault', 'availableDepositLimit', [])
     },
     vault_total_aum() {
+      console.log("total aum")
       let toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
-      return this.vault_total_assets.mul(this.hegic_price).div(toInt)
+      return this.vault_total_assets.mul(this.weth_price).div(toInt)
     },
     vault_price_per_share() {
-      return this.call('yHegicVault', 'pricePerShare', [])
+      console.log("pps")
+      return this.call('WETHVault', 'pricePerShare', [])
     },
-    strategy_future_profits() {
-      return this.call('yHegicStrategyETH', 'hegicFutureProfit', []).add(this.call('yHegicStrategyWBTC', 'hegicFutureProfit', []))
+    yvweth_balance() {
+      console.log("yvweth bal")
+      return this.call('WETHVault', 'balanceOf', [this.activeAccount])
     },
-    lots() {
-      return this.call('HegicStakingETH', 'balanceOf', [this.strategy]).toNumber() + this.call('HegicStakingWBTC', 'balanceOf', [this.strategy_wbtc]).toNumber()
+    weth_balance() {
+      console.log("weth balance")
+      return this.call('WETH', 'balanceOf', [this.activeAccount])
     },
-    yhegic_balance() {
-      return this.call('yHegicVault', 'balanceOf', [this.activeAccount])
-    },
-    hegic_balance() {
-      return this.call('HEGIC', 'balanceOf', [this.activeAccount])
-    },
-    vault_balance() {
-      return this.call('yHegicVault', 'balanceOf', [this.activeAccount])
+    is_guest() {
+      console.log("is_guest")
+      return this.call('GuestList', 'guests', [this.activeAccount], 'bool')
     },
     has_allowance_vault() {
-      return !this.call('HEGIC', 'allowance', [this.activeAccount, this.vault]).isZero()
+      console.log("allow")
+      return !this.call('WETH', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
-    has_yhegic_balance() {
-      return (this.yhegic_balance > 0)
+    has_weth_balance() {
+      console.log("has weth")
+      return (this.weth_balance > 0)
     },
   },
   created() {
 
-    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=hegic&vs_currencies=usd')
+    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd')
       .then(response => {
-        this.hegic_price = ethers.utils.parseUnits(String(response.data.hegic.usd),18)
+        this.weth_price = ethers.utils.parseUnits(String(response.data.weth.usd),18)
       })
 
     //active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
 
-    
   }
 }
 </script>
@@ -234,6 +243,10 @@ button {
 }
 .red{
   color: red;
+  font-weight: 700;
+}
+.blue{
+  color: blue;
   font-weight: 700;
 }
 a, a:visited, a:hover {
