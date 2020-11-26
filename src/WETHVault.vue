@@ -46,6 +46,10 @@
 import { mapGetters } from 'vuex'
 import ethers from 'ethers'
 import axios from 'axios'
+import GuestList from './abi/GuestList.json'
+import yVaultV2 from './abi/yVaultV2.json'
+import Web3 from 'web3'
+let web3 = new Web3(Web3.givenProvider);
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
 //const BN_ZERO = new ethers.BigNumber.from(0)
@@ -60,7 +64,8 @@ export default {
       username: null,
       weth_price: 0,
       amount: 0,
-      error: null
+      error: null,
+      is_guest: false
     }
   },
   filters: {
@@ -138,6 +143,14 @@ export default {
       let namehash = ethers.utils.namehash(lookup)
       this.username = await resolver.methods.name(namehash).call()
     },
+    async get_guest_list() {
+      let guest_list = await this.getContractData({
+        contract: 'WETHVault',
+        method: 'guestList'
+      })
+      console.log(guest_list)
+      this.guest_list = guest_list
+    },
     call(contract, method, args, out='number') {
       let key = this.drizzleInstance.contracts[contract].methods[method].cacheCall(...args)
       let value
@@ -151,8 +164,6 @@ export default {
           if (value === null) value = 0
           return new ethers.BigNumber.from(value)
         case 'address':
-          console.log(method)
-          console.log(value)
           return value
         default:
           return value
@@ -174,52 +185,38 @@ export default {
       return this.drizzleInstance.contracts['yDaiStrategy'].address
     },
     vault_supply() {
-      console.log("tot supply")
       return this.call('WETHVault', 'totalSupply', [])
     },
     vault_deposit_limit() {
-      console.log("dep limit")
       return this.call('WETHVault', 'depositLimit', [])
     },
     vault_total_assets() {
-      console.log("tot assets")
       return this.call('WETHVault', 'totalAssets', [])
     },
     vault_available_limit() {
-      console.log("av limit")
       return this.call('WETHVault', 'availableDepositLimit', [])
     },
     vault_total_aum() {
-      console.log("total aum")
       let toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
       return this.vault_total_assets.mul(this.weth_price).div(toInt)
     },
     vault_price_per_share() {
-      console.log("pps")
       return this.call('WETHVault', 'pricePerShare', [])
     },
     yvweth_balance() {
-      console.log("yvweth bal")
       return this.call('WETHVault', 'balanceOf', [this.activeAccount])
     },
     weth_balance() {
-      console.log("weth balance")
       return this.call('WETH', 'balanceOf', [this.activeAccount])
     },
-    is_guest() {
-      console.log("is_guest")
-      return this.call('GuestList', 'guests', [this.activeAccount], 'bool')
-    },
     has_allowance_vault() {
-      console.log("allow")
       return !this.call('WETH', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
     has_weth_balance() {
-      console.log("has weth")
       return (this.weth_balance > 0)
     },
   },
-  created() {
+  async created() {
 
     axios.get('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd')
       .then(response => {
@@ -228,8 +225,18 @@ export default {
 
     //active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
+    
+    let WETHVault = new web3.eth.Contract(yVaultV2, "0x18c447b7Ad755379B8800F1Ef5165E8542946Afd")
+    WETHVault.methods.guestList().call().then( response => {
+      let contractGuestList = new web3.eth.Contract(GuestList, response)
+      
+      this.is_guest = contractGuestList.methods.guests(this.activeAccount).call().then( response => {
+        this.is_guest = response
+      })
+    })
 
-  }
+  },
+
 }
 </script>
 
@@ -241,11 +248,11 @@ button {
   color: gray;
   font-size: 0.8em;
 }
-.red{
+.red {
   color: red;
   font-weight: 700;
 }
-.blue{
+.blue {
   color: blue;
   font-weight: 700;
 }
