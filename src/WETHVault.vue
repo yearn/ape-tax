@@ -18,7 +18,6 @@
     | 
     button(:disabled="!eth_balance > 0" , @click.prevent='on_wrap_eth') 🍬 Wrap
     div.spacer
-    p
     div(v-if="total_yfi >= entrance_cost")
       span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
       p
@@ -33,10 +32,10 @@
     div(v-else)
       div.red
         span ⛔ You need {{ entrance_cost - total_yfi }} YFI more to enter the Citadel ⛔
-      div
-        span If you still want to join the party...
-        | 
-        button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
+      //div
+        //span If you still want to join the party...
+        //| 
+        //button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
     div.red(v-if="error")
       span {{ error }}
     p
@@ -83,7 +82,7 @@ export default {
       contractGuestList: null,
       is_guest: false,
       entrance_cost: 1,
-      total_yfi: 1
+      total_yfi: 0.5
     }
   },
   filters: {
