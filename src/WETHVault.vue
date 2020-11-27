@@ -12,8 +12,14 @@
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yvweth_balance | fromWei(2) }}
     div Your WETH Balance: {{ weth_balance | fromWei(2) }}
+    div Your ETH Balance: {{ eth_balance | fromWei(2) }}
+    label(v-if="vault_available_limit > 0") Wrap ETH 
+    input(v-if="vault_available_limit > 0" size="is-small" v-model.number="amount_wrap" type="number" min=0)
+    | 
+    button(:disabled="!eth_balance > 0" , @click.prevent='on_wrap_eth') 🍬 Wrap
+    div.spacer
     p
-    div(v-if="is_guest")
+    div(v-if="total_yfi >= entrance_cost")
       span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
       p
       label(v-if="vault_available_limit > 0") Amount 
@@ -24,8 +30,13 @@
       button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit') 🏦 Deposit
       button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 🏦 Deposit All
       button(:disabled='!has_weth_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
-    div.red(v-else)
-      span You are not yet allowed into the Citadel ⛔
+    div(v-else)
+      div.red
+        span ⛔ You need {{ entrance_cost - total_yfi }} YFI more to enter the Citadel ⛔
+      div
+        span If you still want to join the party...
+        | 
+        button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
     div.red(v-if="error")
       span {{ error }}
     p
@@ -54,8 +65,11 @@ let web3 = new Web3(Web3.givenProvider);
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
 //const BN_ZERO = new ethers.BigNumber.from(0)
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
+const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀"
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
 const ERROR_GUEST_LIMIT = "That would exceed your guest limit. Try less."
+const ERROR_GUEST_LIMIT_ALL = "That would exceed your guest limit. Try not doing all in."
+
 
 export default {
   name: 'WETHVault',
@@ -64,8 +78,12 @@ export default {
       username: null,
       weth_price: 0,
       amount: 0,
+      amount_wrap: 0,
       error: null,
-      is_guest: false
+      contractGuestList: null,
+      is_guest: false,
+      entrance_cost: 1,
+      total_yfi: 1
     }
   },
   filters: {
@@ -99,6 +117,17 @@ export default {
     on_approve_vault() {
       this.drizzleInstance.contracts['WETH'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
+    on_wrap_eth() {
+      this.error = null
+
+      if (this.amount_wrap <= 0) {
+        this.error = ERROR_NEGATIVE
+        this.amount_wrap = 0
+        return
+      }
+    
+    this.drizzleInstance.contracts['WETH'].methods['deposit'].cacheSend({from: this.activeAccount, value: ethers.utils.parseEther(this.amount_wrap.toString()).toString()})
+    },
     on_deposit() {
       this.error = null
 
@@ -108,26 +137,31 @@ export default {
         return
       }
 
-      if (!this.call('GuestList', 'authorized', [this.activeAccount, this.amount])) {
-        this.error = ERROR_GUEST_LIMIT
-        return
-      }
+      this.contractGuestList.methods.authorized(this.activeAccount, this.amount).call().then( response => {
+        if (response === true) {
+          this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+        } else {
+          this.error = ERROR_GUEST_LIMIT
+        }
+      })
 
-      this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
     },
     on_deposit_all() {
       if (this.weth_balance <= 0) {
-        this.error = ERROR_NEGATIVE
+        this.error = ERROR_NEGATIVE_ALL
         this.amount = 0
         return
       }
+      
+      
+      this.contractGuestList.methods.authorized(this.activeAccount, this.weth_balance).call().then( response => {
+        if (response === true) {
+          this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend({from: this.activeAccount})
+        } else {
+          this.error = ERROR_GUEST_LIMIT_ALL
+        }
+      })
 
-      if (!this.call('GuestList', 'authorized', [this.activeAccount, this.weth_balance])) {
-              this.error = ERROR_GUEST_LIMIT
-              return
-      }
-
-      this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend({from: this.activeAccount})
     },
     on_withdraw_all() {
       if (this.yvweth_balance <= 0) {
@@ -142,14 +176,6 @@ export default {
       let resolver = await this.drizzleInstance.web3.eth.ens.resolver(lookup)
       let namehash = ethers.utils.namehash(lookup)
       this.username = await resolver.methods.name(namehash).call()
-    },
-    async get_guest_list() {
-      let guest_list = await this.getContractData({
-        contract: 'WETHVault',
-        method: 'guestList'
-      })
-      console.log(guest_list)
-      this.guest_list = guest_list
     },
     call(contract, method, args, out='number') {
       let key = this.drizzleInstance.contracts[contract].methods[method].cacheCall(...args)
@@ -209,6 +235,9 @@ export default {
     weth_balance() {
       return this.call('WETH', 'balanceOf', [this.activeAccount])
     },
+    eth_balance(){
+      return this.activeBalance
+    },
     has_allowance_vault() {
       return !this.call('WETH', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
@@ -223,16 +252,26 @@ export default {
         this.weth_price = ethers.utils.parseUnits(String(response.data.weth.usd),18)
       })
 
-    //active account is defined?
+    //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
     
-    let WETHVault = new web3.eth.Contract(yVaultV2, "0x18c447b7Ad755379B8800F1Ef5165E8542946Afd")
+    // Get GuestList contract and use it :)
+    let WETHVault = new web3.eth.Contract(yVaultV2, this.vault)
     WETHVault.methods.guestList().call().then( response => {
-      let contractGuestList = new web3.eth.Contract(GuestList, response)
-      
-      this.is_guest = contractGuestList.methods.guests(this.activeAccount).call().then( response => {
+      this.contractGuestList = new web3.eth.Contract(GuestList, response)
+
+      this.contractGuestList.methods.guests(this.activeAccount).call().then( response => {
         this.is_guest = response
       })
+
+      /*this.contractGuestList.methods.total_yfi(this.activeAccount).call().then( response => {
+        this.total_yfi = response
+      })*/
+
+      /*this.contractGuestList.methods.entrance_cost().call().then( response => {
+        this.entrance_cost = response
+      })*/
+
     })
 
   },
@@ -255,6 +294,10 @@ button {
 .blue {
   color: blue;
   font-weight: 700;
+}
+.spacer {
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 a, a:visited, a:hover {
   color: gray;
