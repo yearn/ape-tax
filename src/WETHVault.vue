@@ -32,10 +32,13 @@
     div(v-else)
       div.red
         span ⛔ You need {{ entrance_cost - total_yfi }} YFI more to enter the Citadel ⛔
-      //div
-        //span If you still want to join the party...
-        //| 
-        //button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
+      <div v-konami @konami="bribe_unlocked = !bribe_unlocked"></div>
+      div(v-if="bribe_unlocked")
+        span If you still want to join the party...
+        | 
+        button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
+      div(v-else)
+        span Remember Konami 🎮
     div.red(v-if="error")
       span {{ error }}
     p
@@ -82,7 +85,8 @@ export default {
       contractGuestList: null,
       is_guest: false,
       entrance_cost: 1,
-      total_yfi: 0.5
+      total_yfi: 0.5,
+      bribe_unlocked: false
     }
   },
   filters: {
