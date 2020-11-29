@@ -1,4 +1,4 @@
-import WETH from './abi/WETH.json'
+import ERC20 from './abi/ERC20.json'
 import yVaultV2 from './abi/yVaultV2.json'
 import yStrategy from './abi/yStrategy.json'
 
@@ -12,20 +12,16 @@ const options = {
   syncAlways: true,
   contracts: [
     {
-      contractName: 'WETHVault',
-      web3Contract: new web3.eth.Contract(yVaultV2, "0x18c447b7Ad755379B8800F1Ef5165E8542946Afd")
+      contractName: 'Vault', //nTrumpVault
+      web3Contract: new web3.eth.Contract(yVaultV2, "0xba81fb02d5e7b94b341e82d1959c372590b852be")
     },
     {
-      contractName: 'WETH',
-      web3Contract: new web3.eth.Contract(WETH, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
+      contractName: 'WANT', //DAI
+      web3Contract: new web3.eth.Contract(ERC20, "0x6B175474E89094C44Da98b954EedeAC495271d0F")
     },
     {
-      contractName: 'StrategyLenderYieldOptimiser',
-      web3Contract: new web3.eth.Contract(yStrategy, "0x520a45E22B1eB5D7bDe09A445e70708d2957B365")
-    },
-    {
-      contractName: 'yvDAI',
-      web3Contract: new web3.eth.Contract(yVaultV2, "0x1b048bA60b02f36a7b48754f4edf7E1d9729eBc9")
+      contractName: 'Strategy',
+      web3Contract: new web3.eth.Contract(yStrategy, "0xAD97639b0a94549E9391C20D5cAD0d52be96A383")
     },
   ],
   events: {

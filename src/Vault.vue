@@ -1,23 +1,19 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    h1 WETH Citadel
-    div WETH price (CoinGecko 🦎): {{ weth_price | fromWei(4) | toCurrency(4) }}
+    h1 apeTrump
+    div DAI price (CoinGecko 🦎): {{ want_price }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-    div Available limit: {{ vault_available_limit | fromWei(2) }} WETH
+    div Available limit: {{ vault_available_limit | fromWei(2) }} DAI
     p
     div Your Account: <strong>{{ username || activeAccount }}</strong>
-    div Your Vault shares: {{ yvweth_balance | fromWei(2) }}
-    div Your WETH Balance: {{ weth_balance | fromWei(2) }}
+    div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
+    div Your DAI Balance: {{ want_balance | fromWei(2) }}
     div Your ETH Balance: {{ eth_balance | fromWei(2) }}
-    label(v-if="vault_available_limit > 0") Wrap ETH 
-    input(v-if="vault_available_limit > 0" size="is-small" v-model.number="amount_wrap" type="number" min=0)
-    | 
-    button(:disabled="!eth_balance > 0" , @click.prevent='on_wrap_eth') 🍬 Wrap
-    div.spacer
+    p
     div(v-if="total_yfi >= entrance_cost")
       span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
       p
@@ -28,7 +24,7 @@
       button(v-if="vault_available_limit > 0" :disabled='has_allowance_vault', @click.prevent='on_approve_vault') {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
       button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit') 🏦 Deposit
       button(v-if="vault_available_limit > 0" :disabled='!has_allowance_vault', @click.prevent='on_deposit_all') 🏦 Deposit All
-      button(:disabled='!has_weth_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
+      button(:disabled='!has_want_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
     div(v-else)
       div.red
         span ⛔ You need {{ entrance_cost - total_yfi }} YFI more to enter the Citadel ⛔
@@ -66,6 +62,8 @@ let web3 = new Web3(Web3.givenProvider);
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
 //const BN_ZERO = new ethers.BigNumber.from(0)
+const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀"
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares"
@@ -74,11 +72,11 @@ const ERROR_GUEST_LIMIT_ALL = "That would exceed your guest limit. Try not doing
 
 
 export default {
-  name: 'WETHVault',
+  name: 'Vault',
   data() {
     return {
       username: null,
-      weth_price: 0,
+      want_price: 0,
       amount: 0,
       amount_wrap: 0,
       error: null,
@@ -118,18 +116,7 @@ export default {
   },
   methods: {
     on_approve_vault() {
-      this.drizzleInstance.contracts['WETH'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
-    },
-    on_wrap_eth() {
-      this.error = null
-
-      if (this.amount_wrap <= 0) {
-        this.error = ERROR_NEGATIVE
-        this.amount_wrap = 0
-        return
-      }
-    
-    this.drizzleInstance.contracts['WETH'].methods['deposit'].cacheSend({from: this.activeAccount, value: ethers.utils.parseEther(this.amount_wrap.toString()).toString()})
+      this.drizzleInstance.contracts['WANT'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
       this.error = null
@@ -142,7 +129,7 @@ export default {
 
       this.contractGuestList.methods.authorized(this.activeAccount, this.amount).call().then( response => {
         if (response === true) {
-          this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+          this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
         } else {
           this.error = ERROR_GUEST_LIMIT
         }
@@ -150,16 +137,16 @@ export default {
 
     },
     on_deposit_all() {
-      if (this.weth_balance <= 0) {
+      if (this.want_balance <= 0) {
         this.error = ERROR_NEGATIVE_ALL
         this.amount = 0
         return
       }
       
       
-      this.contractGuestList.methods.authorized(this.activeAccount, this.weth_balance).call().then( response => {
+      this.contractGuestList.methods.authorized(this.activeAccount, this.want_balance).call().then( response => {
         if (response === true) {
-          this.drizzleInstance.contracts['WETHVault'].methods['deposit'].cacheSend({from: this.activeAccount})
+          this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
         } else {
           this.error = ERROR_GUEST_LIMIT_ALL
         }
@@ -167,12 +154,12 @@ export default {
 
     },
     on_withdraw_all() {
-      if (this.yvweth_balance <= 0) {
+      if (this.yvtoken_balance <= 0) {
         this.error = ERROR_NEGATIVE_WITHDRAW
         this.amount = 0
         return
       }
-      this.drizzleInstance.contracts['WETHVault'].methods['withdraw'].cacheSend({from: this.activeAccount})
+      this.drizzleInstance.contracts['Vault'].methods['withdraw'].cacheSend({from: this.activeAccount})
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + '.addr.reverse'
@@ -208,64 +195,73 @@ export default {
       return this.activeAccount
     },
     vault() {
-      return this.drizzleInstance.contracts['WETHVault'].address
+      return this.drizzleInstance.contracts['Vault'].address
     },
     strategy_01() {
-      return this.drizzleInstance.contracts['yDaiStrategy'].address
+      return this.drizzleInstance.contracts['Strategy'].address
     },
     vault_supply() {
-      return this.call('WETHVault', 'totalSupply', [])
+      return this.call('Vault', 'totalSupply', [])
     },
     vault_deposit_limit() {
-      return this.call('WETHVault', 'depositLimit', [])
+      return this.call('Vault', 'depositLimit', [])
     },
     vault_total_assets() {
-      return this.call('WETHVault', 'totalAssets', [])
+      return this.call('Vault', 'totalAssets', [])
     },
     vault_available_limit() {
-      return this.call('WETHVault', 'availableDepositLimit', [])
+      return this.call('Vault', 'availableDepositLimit', [])
     },
     vault_total_aum() {
       let toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
-      return this.vault_total_assets.mul(this.weth_price).div(toInt)
+      return this.vault_total_assets.mul(this.want_price).div(toInt)
     },
     vault_price_per_share() {
-      return this.call('WETHVault', 'pricePerShare', [])
+      return this.call('Vault', 'pricePerShare', [])
     },
-    yvweth_balance() {
-      return this.call('WETHVault', 'balanceOf', [this.activeAccount])
+    yvtoken_balance() {
+      return this.call('Vault', 'balanceOf', [this.activeAccount])
     },
-    weth_balance() {
-      return this.call('WETH', 'balanceOf', [this.activeAccount])
+    want_balance() {
+      return this.call('WANT', 'balanceOf', [this.activeAccount])
     },
     eth_balance(){
       return this.activeBalance
     },
     has_allowance_vault() {
-      return !this.call('WETH', 'allowance', [this.activeAccount, this.vault]).isZero()
+      return !this.call('WANT', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
-    has_weth_balance() {
-      return (this.weth_balance > 0)
+    has_want_balance() {
+      return (this.want_balance > 0)
     },
   },
   async created() {
 
-    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd')
+    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=dai&vs_currencies=usd') //TODO
       .then(response => {
-        this.weth_price = ethers.utils.parseUnits(String(response.data.weth.usd),18)
+        this.want_price = response.data.dai.usd //TODO
       })
 
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
     
     // Get GuestList contract and use it :)
-    let WETHVault = new web3.eth.Contract(yVaultV2, this.vault)
-    WETHVault.methods.guestList().call().then( response => {
-      this.contractGuestList = new web3.eth.Contract(GuestList, response)
+    let Vault = new web3.eth.Contract(yVaultV2, this.vault)
+    Vault.methods.guestList().call().then( response => {
+      console.log("Guest list")
+      console.log(response)
 
-      this.contractGuestList.methods.guests(this.activeAccount).call().then( response => {
-        this.is_guest = response
-      })
+      if (response == ADDRESS_ZERO) { //if there's not guest list, everyone is a guest ;)
+        console.log("No guest list")
+        this.is_guest = true
+        this.total_yfi = this.entrance_cost
+      } else {
+        this.contractGuestList = new web3.eth.Contract(GuestList, response)
+
+        this.contractGuestList.methods.guests(this.activeAccount).call().then( response => {
+          this.is_guest = response
+        })
+      }
 
       /*this.contractGuestList.methods.total_yfi(this.activeAccount).call().then( response => {
         this.total_yfi = response

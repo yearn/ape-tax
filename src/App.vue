@@ -1,20 +1,20 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    .logo 🦧🏰
+    .logo 🦧👱‍♂️
     .section
-      WETHVault
+      Vault
   div(v-else)
     div Loading yApp...
 </template>
 
 <script>
-import WETHVault from './WETHVault'
+import Vault from './Vault'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'app',
   components: {
-    WETHVault,
+    Vault,
   },
 
   computed: mapGetters('drizzle', ['isDrizzleInitialized'])
