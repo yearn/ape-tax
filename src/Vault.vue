@@ -1,7 +1,7 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
     h1 apeTrump(et)
-    div DAI price (CoinGecko 🦎): {{ want_price | fromWei(4) }}
+    div DAI price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
