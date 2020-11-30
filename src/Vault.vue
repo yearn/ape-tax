@@ -1,7 +1,7 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    h1 apeTrump
-    div DAI price (CoinGecko 🦎): {{ want_price }}
+    h1 apeTrump(et)
+    div DAI price (CoinGecko 🦎): {{ want_price | fromWei(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
@@ -127,13 +127,17 @@ export default {
         return
       }
 
-      this.contractGuestList.methods.authorized(this.activeAccount, this.amount).call().then( response => {
-        if (response === true) {
-          this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
-        } else {
-          this.error = ERROR_GUEST_LIMIT
-        }
-      })
+      if (this.contractGuestList !== null) {
+        this.contractGuestList.methods.authorized(this.activeAccount, this.amount).call().then( response => {
+          if (response === true) {
+            this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+          } else {
+            this.error = ERROR_GUEST_LIMIT
+          }
+        })
+      } else {
+        this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
+      }
 
     },
     on_deposit_all() {
@@ -143,14 +147,17 @@ export default {
         return
       }
       
-      
-      this.contractGuestList.methods.authorized(this.activeAccount, this.want_balance).call().then( response => {
-        if (response === true) {
-          this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
-        } else {
-          this.error = ERROR_GUEST_LIMIT_ALL
-        }
-      })
+      if (this.contractGuestList !== null) {
+        this.contractGuestList.methods.authorized(this.activeAccount, this.want_balance).call().then( response => {
+          if (response === true) {
+            this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
+          } else {
+            this.error = ERROR_GUEST_LIMIT_ALL
+          }
+        })
+      } else {
+        this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
+      }
 
     },
     on_withdraw_all() {
@@ -213,8 +220,9 @@ export default {
       return this.call('Vault', 'availableDepositLimit', [])
     },
     vault_total_aum() {
-      let toInt = new ethers.BigNumber.from(10).pow(18).pow(2).toString()
-      return this.vault_total_assets.mul(this.want_price).div(toInt)
+      let toFloat = new ethers.BigNumber.from(10).pow(16).toString()
+      let numAum = this.vault_total_assets.div(toFloat).toNumber()
+      return numAum/100*this.want_price
     },
     vault_price_per_share() {
       return this.call('Vault', 'pricePerShare', [])
@@ -248,11 +256,9 @@ export default {
     // Get GuestList contract and use it :)
     let Vault = new web3.eth.Contract(yVaultV2, this.vault)
     Vault.methods.guestList().call().then( response => {
-      console.log("Guest list")
-      console.log(response)
 
       if (response == ADDRESS_ZERO) { //if there's not guest list, everyone is a guest ;)
-        console.log("No guest list")
+        console.log("No guest list. Everyone is invited!")
         this.is_guest = true
         this.total_yfi = this.entrance_cost
       } else {
