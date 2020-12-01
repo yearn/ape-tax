@@ -1,16 +1,17 @@
 <template lang="pug">
-  div(v-if="isDrizzleInitialized", id="app")
+  div(v-if="isDrizzleInitialized", id="vault")
     h1 apeTrump(et)
     div DAI price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}
     p
-    div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
-    p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
     div Available limit: {{ vault_available_limit | fromWei(2) }} DAI
-    p
+    h2 <strong>Strategies</strong>
+    div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
+    div Avg. Price: {{ average_price | fromWei(4) }}
+    h2 <strong>Wallet</strong>
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
     div Your DAI Balance: {{ want_balance | fromWei(2) }}
@@ -59,7 +60,7 @@ import ethers from 'ethers'
 import axios from 'axios'
 import GuestList from './abi/GuestList.json'
 import yVaultV2 from './abi/yVaultV2.json'
-import yStrategy from './abi/yStrategy.json'
+import yStrategyNTrump from './abi/yStrategyNTrump.json'
 import ERC20 from './abi/ERC20.json'
 
 import Web3 from 'web3'
@@ -86,6 +87,7 @@ export default {
       amount: 0,
       amount_wrap: 0,
       ntrump_owned: 0,
+      average_price: 0,
       error: null,
       contractGuestList: null,
       is_guest: false,
@@ -303,6 +305,10 @@ export default {
     for (let i = 0, p = Promise.resolve(); i < 20; i++) {
       p = p.then(_ => new Promise(resolve =>
         Vault.methods.withdrawalQueue(i).call().then( response => {
+          let Strategy = new web3.eth.Contract(yStrategyNTrump, response)
+          Strategy.methods.averagePrice().call().then( response => {
+            this.average_price = new ethers.BigNumber.from(response)
+          })
           if (response !== ADDRESS_ZERO) {
             nTrump.methods.balanceOf(response).call().then( response => {
               let amount = new ethers.BigNumber.from(response.toString())
