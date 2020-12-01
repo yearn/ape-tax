@@ -1,20 +1,20 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="vault")
-    h1 apeTrump(et)
-    div DAI price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
+    h1 zLOT Vault
+    div zLOT price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-    div Available limit: {{ vault_available_limit | fromWei(2) }} DAI
-    h2 <strong>Strategies</strong>
-    div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
-    div Avg. Price: {{ average_price | fromWei(4) }}
+    div Available limit: {{ vault_available_limit | fromWei(2) }} zLOT
+    //h2 <strong>Strategies</strong>
+    //div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
+    //div Avg. Price: {{ average_price | fromWei(4) }}
     h2 <strong>Wallet</strong>
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
-    div Your DAI Balance: {{ want_balance | fromWei(2) }}
+    div Your zLOT Balance: {{ want_balance | fromWei(2) }}
     div Your ETH Balance: {{ eth_balance | fromWei(2) }}
     p
     div(v-if="total_yfi >= entrance_cost")
@@ -30,12 +30,12 @@
       button(:disabled='!has_want_balance', @click.prevent='on_withdraw_all') 💸 Withdraw All
     div(v-else)
       div.red
-        span ⛔ You need {{ entrance_cost - total_yfi }} YFI more to enter the Citadel ⛔
+        span ⛔ You need {{ yfi_needed | fromWei(4)}} YFI more to enter the Citadel ⛔
       <div v-konami @konami="bribe_unlocked = !bribe_unlocked"></div>
       div(v-if="bribe_unlocked")
         span If you still want to join the party...
         | 
-        button(@click.prevent='on_approve_vault') 💰 Bribe the bouncer
+        button(@click.prevent='on_bribe_the_bouncer') 💰 Bribe the bouncer
       div(v-else)
         span Remember Konami 🎮
     div.red(v-if="error")
@@ -45,7 +45,7 @@
         span Made with 💙  
         span yVault:
         | 
-        a(href='https://twitter.com/arbingsam' target='_blank') arbingsam
+        a(href='https://twitter.com/macarse' target='_blank') Macarse
         span  - UI:
         | 
         a(href='https://twitter.com/fameal', target='_blank') fameal
@@ -60,7 +60,7 @@ import ethers from 'ethers'
 import axios from 'axios'
 import GuestList from './abi/GuestList.json'
 import yVaultV2 from './abi/yVaultV2.json'
-import yStrategyNTrump from './abi/yStrategyNTrump.json'
+import yStrategy from './abi/yStrategy.json'
 import ERC20 from './abi/ERC20.json'
 
 import Web3 from 'web3'
@@ -91,8 +91,8 @@ export default {
       error: null,
       contractGuestList: null,
       is_guest: false,
-      entrance_cost: 1,
-      total_yfi: 0.5,
+      entrance_cost: new ethers.BigNumber.from("1"),
+      total_yfi: new ethers.BigNumber.from("0"),
       bribe_unlocked: false
     }
   },
@@ -179,6 +179,9 @@ export default {
       }
 
     },
+    on_bribe_the_bouncer() {
+      this.contractGuestList.methods.bribe_the_bouncer().call()
+    },
     on_withdraw_all() {
       if (this.yvtoken_balance <= 0) {
         this.error = ERROR_NEGATIVE_WITHDRAW
@@ -223,9 +226,6 @@ export default {
     vault() {
       return this.drizzleInstance.contracts['Vault'].address
     },
-    strategy_01() {
-      return this.drizzleInstance.contracts['Strategy'].address
-    },
     vault_supply() {
       return this.call('Vault', 'totalSupply', [])
     },
@@ -255,6 +255,9 @@ export default {
     eth_balance(){
       return this.activeBalance
     },
+    yfi_needed() {
+      return this.entrance_cost.sub(this.total_yfi)
+    },
     has_allowance_vault() {
       return !this.call('WANT', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
@@ -264,9 +267,9 @@ export default {
   },
   async created() {
 
-    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=dai&vs_currencies=usd') //TODO
+    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=zlot&vs_currencies=usd') //TODO
       .then(response => {
-        this.want_price = response.data.dai.usd //TODO
+        this.want_price = response.data.zlot.usd //TODO
       })
 
     //Active account is defined?
@@ -274,7 +277,6 @@ export default {
     
     
     let Vault = new web3.eth.Contract(yVaultV2, this.vault)
-    let nTrump = new web3.eth.Contract(ERC20, "0x44Ea84a85616F8e9cD719Fc843DE31D852ad7240")
 
     // Get GuestList contract and use it :)
     Vault.methods.guestList().call().then( response => {
@@ -291,18 +293,20 @@ export default {
         })
       }
 
-      /*this.contractGuestList.methods.total_yfi(this.activeAccount).call().then( response => {
-        this.total_yfi = response
-      })*/
+      this.contractGuestList.methods.total_yfi(this.activeAccount).call().then( response => {
+        console.log("Total YFI: " + response.toString())
+        this.total_yfi = new ethers.BigNumber.from(response.toString())
+      })
 
-      /*this.contractGuestList.methods.entrance_cost().call().then( response => {
-        this.entrance_cost = response
-      })*/
+      this.contractGuestList.methods.entrance_cost("1606582475").call().then( response => {
+        console.log("Entrance cost: " + response.toString())
+        this.entrance_cost = new ethers.BigNumber.from(response.toString())
+      })
 
     })
 
     // Iterate through strats
-    for (let i = 0, p = Promise.resolve(); i < 20; i++) {
+    /*for (let i = 0, p = Promise.resolve(); i < 20; i++) {
       p = p.then(_ => new Promise(resolve =>
         Vault.methods.withdrawalQueue(i).call().then( response => {
           let Strategy = new web3.eth.Contract(yStrategyNTrump, response)
@@ -318,7 +322,7 @@ export default {
           resolve();
         })    
       ));
-    }
+    }*/
     
   },
 

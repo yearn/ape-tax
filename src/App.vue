@@ -1,6 +1,6 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    .logo 🦧🎺
+    .logo 💤🌖
     .section
       Vault
   div(v-else)

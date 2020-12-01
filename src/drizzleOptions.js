@@ -12,21 +12,17 @@ const options = {
   syncAlways: true,
   contracts: [
     {
-      contractName: 'Vault', //nTrumpVault
-      web3Contract: new web3.eth.Contract(yVaultV2, "0xba81fb02d5e7b94b341e82d1959c372590b852be")
+      contractName: 'Vault', //yvzLOT
+      web3Contract: new web3.eth.Contract(yVaultV2, "0xCA6C9fB742071044247298Ea0dBd60b77586e1E8")
     },
     {
-      contractName: 'WANT', //DAI
-      web3Contract: new web3.eth.Contract(ERC20, "0x6B175474E89094C44Da98b954EedeAC495271d0F")
+      contractName: 'WANT', //zLOT
+      web3Contract: new web3.eth.Contract(ERC20, "0xA8e7AD77C60eE6f30BaC54E2E7c0617Bd7B5A03E")
     },
-    {
+/*    {
       contractName: 'Strategy',
       web3Contract: new web3.eth.Contract(yStrategy, "0xAD97639b0a94549E9391C20D5cAD0d52be96A383")
-    },
-    {
-      contractName: 'nTRUMP',
-      web3Contract: new web3.eth.Contract(ERC20, "0x44Ea84a85616F8e9cD719Fc843DE31D852ad7240")
-    },
+    }, */
   ],
   events: {
   },
