@@ -1,4 +1,4 @@
-# yvWETH
+# yvToken
 
 ## Project setup
 ```
