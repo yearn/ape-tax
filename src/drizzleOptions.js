@@ -23,6 +23,10 @@ const options = {
       contractName: 'Strategy',
       web3Contract: new web3.eth.Contract(yStrategy, "0xAD97639b0a94549E9391C20D5cAD0d52be96A383")
     },
+    {
+      contractName: 'nTRUMP',
+      web3Contract: new web3.eth.Contract(ERC20, "0x44Ea84a85616F8e9cD719Fc843DE31D852ad7240")
+    },
   ],
   events: {
   },

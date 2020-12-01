@@ -4,7 +4,9 @@
     div DAI price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
-    div Total AUM: {{ vault_total_aum | toCurrency(2) }}  
+    div Total AUM: {{ vault_total_aum | toCurrency(2) }}
+    p
+    div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
     div Available limit: {{ vault_available_limit | fromWei(2) }} DAI
@@ -57,11 +59,15 @@ import ethers from 'ethers'
 import axios from 'axios'
 import GuestList from './abi/GuestList.json'
 import yVaultV2 from './abi/yVaultV2.json'
+import yStrategy from './abi/yStrategy.json'
+import ERC20 from './abi/ERC20.json'
+
 import Web3 from 'web3'
+
 let web3 = new Web3(Web3.givenProvider);
 
 const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString()
-//const BN_ZERO = new ethers.BigNumber.from(0)
+const BN_ZERO = new ethers.BigNumber.from(0)
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀"
@@ -79,6 +85,7 @@ export default {
       want_price: 0,
       amount: 0,
       amount_wrap: 0,
+      ntrump_owned: 0,
       error: null,
       contractGuestList: null,
       is_guest: false,
@@ -92,6 +99,16 @@ export default {
       if (data === 'loading') return data
       if (data > 2**255) return '♾️'
       let value = ethers.utils.commify(ethers.utils.formatEther(data))
+      let parts = value.split('.')
+
+      if (precision === 0) return parts[0]
+
+      return parts[0] + '.' + parts[1].slice(0, precision)
+    },
+    fromWei15(data, precision) {
+      if (data === 'loading') return data
+      if (data > 2**255) return '♾️'
+      let value = ethers.utils.commify(ethers.utils.formatUnits(data, 15))
       let parts = value.split('.')
 
       if (precision === 0) return parts[0]
@@ -253,8 +270,11 @@ export default {
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
     
-    // Get GuestList contract and use it :)
+    
     let Vault = new web3.eth.Contract(yVaultV2, this.vault)
+    let nTrump = new web3.eth.Contract(ERC20, "0x44Ea84a85616F8e9cD719Fc843DE31D852ad7240")
+
+    // Get GuestList contract and use it :)
     Vault.methods.guestList().call().then( response => {
 
       if (response == ADDRESS_ZERO) { //if there's not guest list, everyone is a guest ;)
@@ -279,6 +299,21 @@ export default {
 
     })
 
+    // Iterate through strats
+    for (let i = 0, p = Promise.resolve(); i < 20; i++) {
+      p = p.then(_ => new Promise(resolve =>
+        Vault.methods.withdrawalQueue(i).call().then( response => {
+          if (response !== ADDRESS_ZERO) {
+            nTrump.methods.balanceOf(response).call().then( response => {
+              let amount = new ethers.BigNumber.from(response.toString())
+              this.ntrump_owned = amount.add(this.ntrump_owned)
+            })
+          }
+          resolve();
+        })    
+      ));
+    }
+    
   },
 
 }
