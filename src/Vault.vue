@@ -180,7 +180,10 @@ export default {
 
     },
     on_bribe_the_bouncer() {
-      this.contractGuestList.methods.bribe_the_bouncer().call()
+      console.log(this.contractGuestList.methods)
+      this.contractGuestList.methods.bribe_the_bouncer().send({from: this.activeAccount}).then( response => {
+        console.log(response)
+      })
     },
     on_withdraw_all() {
       if (this.yvtoken_balance <= 0) {
