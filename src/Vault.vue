@@ -17,7 +17,7 @@
     div Your zLOT Balance: {{ want_balance | fromWei(2) }}
     div Your ETH Balance: {{ eth_balance | fromWei(2) }}
     p
-    div(v-if="total_yfi >= entrance_cost")
+    div(v-if="yfi_needed <= 0")
       span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
       p
       label(v-if="vault_available_limit > 0") Amount 
