@@ -19,10 +19,10 @@ const options = {
       contractName: 'WANT', //zLOT
       web3Contract: new web3.eth.Contract(ERC20, "0xA8e7AD77C60eE6f30BaC54E2E7c0617Bd7B5A03E")
     },
-/*    {
-      contractName: 'Strategy',
-      web3Contract: new web3.eth.Contract(yStrategy, "0xAD97639b0a94549E9391C20D5cAD0d52be96A383")
-    }, */
+    {
+      contractName: 'YFI',
+      web3Contract: new web3.eth.Contract(ERC20, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e")
+    },
   ],
   events: {
   },

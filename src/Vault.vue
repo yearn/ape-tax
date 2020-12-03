@@ -35,7 +35,8 @@
       div(v-if="bribe_unlocked")
         span If you still want to join the party...
         | 
-        button(@click.prevent='on_bribe_the_bouncer') 💰 Bribe the bouncer
+        button(v-if="has_allowance_bribe" @click.prevent='on_bribe_the_bouncer') 💰 Bribe the bouncer
+        button(v-if="!has_allowance_bribe" @click.prevent='on_approve_bribe') 🚀 Approve Bribe
       div(v-else)
         span Remember Konami 🎮
     div.red(v-if="error")
@@ -136,6 +137,9 @@ export default {
   methods: {
     on_approve_vault() {
       this.drizzleInstance.contracts['WANT'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
+    },
+    on_approve_bribe() {
+      this.drizzleInstance.contracts['YFI'].methods['approve'].cacheSend(this.vault, max_uint, {from: this.activeAccount})
     },
     on_deposit() {
       this.error = null
@@ -260,6 +264,9 @@ export default {
     },
     yfi_needed() {
       return this.entrance_cost.sub(this.total_yfi)
+    },
+    has_allowance_bribe() {
+      return !this.call('YFI', 'allowance', [this.activeAccount, this.vault]).isZero()
     },
     has_allowance_vault() {
       return !this.call('WANT', 'allowance', [this.activeAccount, this.vault]).isZero()
