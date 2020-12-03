@@ -1,6 +1,12 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="vault")
     h1 zLOT Vault
+    div 
+    span <strong>Contracts: </strong>
+    a(href='https://etherscan.io/address/0xca6c9fb742071044247298ea0dbd60b77586e1e8#code', target='_blank') Vault
+    | 
+    span - 
+    a(href='https://etherscan.io/address/0x4f8140Df266158d6D98Ae16B69ABcc8c17b9b79e#code', target='_blank') Strategy
     div zLOT price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
@@ -47,6 +53,9 @@
         span yVault:
         | 
         a(href='https://twitter.com/macarse' target='_blank') Macarse
+        span  - Guest List:
+        | 
+        a(href='https://twitter.com/bantg', target='_blank') banteg
         span  - UI:
         | 
         a(href='https://twitter.com/fameal', target='_blank') fameal
