@@ -1,5 +1,12 @@
 # yvToken
 
+## Project customization
+Edit variables in config.js accordingly
+
+```
+
+```
+
 ## Project setup
 ```
 npm install
