@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import drizzleVuePlugin from '@drizzle/vue-plugin'
 import drizzleOptions from './drizzleOptions'
 import VueKonami from 'vue-konami'
- 
+
 Vue.use(VueKonami)
 
 Vue.use(Vuex)
