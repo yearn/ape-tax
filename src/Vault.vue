@@ -35,7 +35,7 @@
       div(v-if="bribe_unlocked")
         span If you still want to join the party...
         | 
-        button(v-if="has_allowance_bribe" @click.prevent='on_bribe_the_bouncer') 💰 Bribe the bouncer
+        button(v-if="has_allowance_bribe" @click.prevent='on_bribe_the_bouncer') 💰 Bribe the bouncer with ({{ bribe_cost | fromWei(3) }} YFI)
         button(v-if="!has_allowance_bribe" @click.prevent='on_approve_bribe') 🚀 Approve Bribe
       div(v-else)
         span Remember Konami 🎮
@@ -94,7 +94,8 @@ export default {
       is_guest: false,
       entrance_cost: new ethers.BigNumber.from("1"),
       total_yfi: new ethers.BigNumber.from("0"),
-      bribe_unlocked: false
+      bribe_unlocked: false,
+      bribe_cost: new ethers.BigNumber.from("0")
     }
   },
   filters: {
@@ -311,6 +312,11 @@ export default {
       this.contractGuestList.methods.entrance_cost("1606582475").call().then( response => {
         console.log("Entrance cost: " + response.toString())
         this.entrance_cost = new ethers.BigNumber.from(response.toString())
+      })
+
+      this.contractGuestList.methods.bribe_cost().call().then( response => {
+        console.log("Bribe cost: " + response.toString())
+        this.bribe_cost = new ethers.BigNumber.from(response.toString())
       })
 
     })
