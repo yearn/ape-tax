@@ -1,12 +1,9 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="vault")
     h1 {{ config.TITLE }}
-    div 
-    span <strong>Contracts: </strong>
-    a(:href='vault_link', target='_blank') Vault
-    | 
-    span - 
-    a(href='https://etherscan.io/address/0x4f8140Df266158d6D98Ae16B69ABcc8c17b9b79e#code', target='_blank') Strategy
+    div Vault: 
+      a(:href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'" target='_blank') {{ config.VAULT_ADDR }}
+    div Version: {{ vault_version }}
     div {{ config.WANT_SYMBOL }} price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
@@ -14,9 +11,11 @@
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
     div Available limit: {{ vault_available_limit | fromWei(2) }} {{ config.WANT_SYMBOL }}
-    //h2 <strong>Strategies</strong>
-    //div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
-    //div Avg. Price: {{ average_price | fromWei(4) }}
+    div(v-for="(strategy, index) in strategies")
+      h2 <strong>Strategies</strong>
+      div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
+      div Address: 
+        a(:href="'https://etherscan.io/address/' + strategy.address + '#code'", target="_blank") {{ strategy.address }}
     h2 <strong>Wallet</strong>
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
@@ -92,6 +91,8 @@ const ERROR_GUEST_LIMIT_ALL = "That would exceed your guest limit. Try not doing
 
 export default {
   name: 'Vault',
+  components: {
+  },
   data() {
     return {
       config: config,
@@ -99,7 +100,8 @@ export default {
       want_price: 0,
       amount: 0,
       amount_wrap: 0,
-      ntrump_owned: 0,
+      strategies: [],
+      strategies_balance: 0,
       average_price: 0,
       error: null,
       contractGuestList: null,
@@ -109,7 +111,6 @@ export default {
       bribe_unlocked: false,
       bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
-      vault_link: 'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'
     }
   },
   filters: {
@@ -198,6 +199,33 @@ export default {
       let namehash = ethers.utils.namehash(lookup)
       this.username = await resolver.methods.name(namehash).call()
     },
+    async get_strategies(vault) {
+      for (let i = 0, p = Promise.resolve(); i < 20; i++) {
+        p = p.then(_ => new Promise(resolve =>
+          vault.methods.withdrawalQueue(i).call().then( strat_addr => {
+            
+            if (strat_addr !== ADDRESS_ZERO) {
+              let Strategy = new web3.eth.Contract(yStrategy, strat_addr)
+              let data = { 
+                address: strat_addr, 
+                balance: null
+              }
+
+              // Add to strat address to array
+              this.$set(this.strategies, i, data)
+
+              Strategy.methods.name().call().then( name => {
+                console.log(name)
+                this.$set(this.strategies[i], 'name', name)
+              })
+
+            }
+
+            resolve();
+          })    
+        ));
+      }
+    },
     call(contract, method, args, out='number') {
       let key = this.drizzleInstance.contracts[contract].methods[method].cacheCall(...args)
       let value
@@ -227,6 +255,9 @@ export default {
     },
     vault() {
       return this.drizzleInstance.contracts['Vault'].address
+    },
+    vault_version() {
+      return this.call('Vault', 'apiVersion', [], 'string')
     },
     vault_supply() {
       return this.call('Vault', 'totalSupply', [])
@@ -279,10 +310,9 @@ export default {
 
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens()
-    
-    
-    let Vault = new web3.eth.Contract(yVaultV2, this.vault)
 
+    let Vault = new web3.eth.Contract(yVaultV2, this.vault)
+    this.get_strategies(Vault)
     // Get GuestList contract and use it :)
     Vault.methods.guestList().call().then( response => {
 
@@ -318,24 +348,8 @@ export default {
     })
 
     // Iterate through strats
-    /*for (let i = 0, p = Promise.resolve(); i < 20; i++) {
-      p = p.then(_ => new Promise(resolve =>
-        Vault.methods.withdrawalQueue(i).call().then( response => {
-          let Strategy = new web3.eth.Contract(yStrategyNTrump, response)
-          Strategy.methods.averagePrice().call().then( response => {
-            this.average_price = new ethers.BigNumber.from(response)
-          })
-          if (response !== ADDRESS_ZERO) {
-            nTrump.methods.balanceOf(response).call().then( response => {
-              let amount = new ethers.BigNumber.from(response.toString())
-              this.ntrump_owned = amount.add(this.ntrump_owned)
-            })
-          }
-          resolve();
-        })    
-      ));
-    }*/
-    
+
+
   },
 
 }

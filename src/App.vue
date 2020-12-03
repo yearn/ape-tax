@@ -1,6 +1,6 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="app")
-    .logo 💤🌖
+    .logo {{ config.LOGO }}
     .section
       Vault
   div(v-else)
@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import config from './config.js'
 import Vault from './Vault'
 import { mapGetters } from 'vuex'
 
@@ -16,7 +17,11 @@ export default {
   components: {
     Vault,
   },
-
+  data() {
+    return {
+      config: config,
+    }
+  },
   computed: mapGetters('drizzle', ['isDrizzleInitialized'])
 }
 </script>
