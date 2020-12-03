@@ -151,17 +151,7 @@ export default {
         return
       }
 
-      if (this.contractGuestList !== null) {
-        this.contractGuestList.methods.authorized(this.activeAccount, this.amount).call().then( response => {
-          if (response === true) {
-            this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
-          } else {
-            this.error = ERROR_GUEST_LIMIT
-          }
-        })
-      } else {
-        this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
-      }
+      this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(ethers.utils.parseEther(this.amount.toString()).toString(), {from: this.activeAccount})
 
     },
     on_deposit_all() {
@@ -171,17 +161,7 @@ export default {
         return
       }
       
-      if (this.contractGuestList !== null) {
-        this.contractGuestList.methods.authorized(this.activeAccount, this.want_balance).call().then( response => {
-          if (response === true) {
-            this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
-          } else {
-            this.error = ERROR_GUEST_LIMIT_ALL
-          }
-        })
-      } else {
-        this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
-      }
+      this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({from: this.activeAccount})
 
     },
     on_bribe_the_bouncer() {
