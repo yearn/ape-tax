@@ -1,26 +1,26 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized", id="vault")
-    h1 zLOT Vault
+    h1 {{ config.TITLE }}
     div 
     span <strong>Contracts: </strong>
-    a(href='https://etherscan.io/address/0xca6c9fb742071044247298ea0dbd60b77586e1e8#code', target='_blank') Vault
+    a(:href='vault_link', target='_blank') Vault
     | 
     span - 
     a(href='https://etherscan.io/address/0x4f8140Df266158d6D98Ae16B69ABcc8c17b9b79e#code', target='_blank') Strategy
-    div zLOT price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
+    div {{ config.WANT_SYMBOL }} price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
     div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
     div Total Assets: {{ vault_total_assets | fromWei(2) }}
     div Total AUM: {{ vault_total_aum | toCurrency(2) }}
     p
     div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-    div Available limit: {{ vault_available_limit | fromWei(2) }} zLOT
+    div Available limit: {{ vault_available_limit | fromWei(2) }} {{ config.WANT_SYMBOL }}
     //h2 <strong>Strategies</strong>
     //div nTrump Owned: {{ ntrump_owned | fromWei15(2) }}
     //div Avg. Price: {{ average_price | fromWei(4) }}
     h2 <strong>Wallet</strong>
     div Your Account: <strong>{{ username || activeAccount }}</strong>
     div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
-    div Your zLOT Balance: {{ want_balance | fromWei(2) }}
+    div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2) }}
     div Your ETH Balance: {{ eth_balance | fromWei(2) }}
     p
     div(v-if="is_guest || yfi_needed <= 0")
@@ -65,6 +65,8 @@
 </template>
 
 <script>
+import config from './config.js'
+
 import { mapGetters } from 'vuex'
 import ethers from 'ethers'
 import axios from 'axios'
@@ -92,6 +94,7 @@ export default {
   name: 'Vault',
   data() {
     return {
+      config: config,
       username: null,
       want_price: 0,
       amount: 0,
@@ -104,7 +107,9 @@ export default {
       entrance_cost: new ethers.BigNumber.from("1"),
       total_yfi: new ethers.BigNumber.from("0"),
       bribe_unlocked: false,
-      bribe_cost: new ethers.BigNumber.from("0")
+      bribe_cost: new ethers.BigNumber.from("0"),
+      vault_activation: 0,
+      vault_link: 'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'
     }
   },
   filters: {
@@ -267,9 +272,9 @@ export default {
   },
   async created() {
 
-    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=zlot&vs_currencies=usd') //TODO
+    axios.get('https://api.coingecko.com/api/v3/simple/price?ids=' + config.WANT_SYMBOL.toLowerCase() + '&vs_currencies=usd')
       .then(response => {
-        this.want_price = response.data.zlot.usd //TODO
+        this.want_price = response.data[config.WANT_SYMBOL.toLowerCase()].usd
       })
 
     //Active account is defined?
@@ -297,10 +302,12 @@ export default {
         console.log("Total YFI: " + response.toString())
         this.total_yfi = new ethers.BigNumber.from(response.toString())
       })
-
-      this.contractGuestList.methods.entrance_cost("1606582475").call().then( response => {
-        console.log("Entrance cost: " + response.toString())
-        this.entrance_cost = new ethers.BigNumber.from(response.toString())
+      
+      Vault.methods.activation().call().then( vault_activation => {
+        this.contractGuestList.methods.entrance_cost(vault_activation).call().then( response => {
+          console.log("Entrance cost: " + response.toString())
+          this.entrance_cost = new ethers.BigNumber.from(response.toString())
+        })
       })
 
       this.contractGuestList.methods.bribe_cost().call().then( response => {
