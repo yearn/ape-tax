@@ -60,7 +60,7 @@
   div(v-else)
     .red
       span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
-    <div v-konami @konami="bribe_unlocked = !bribe_unlocked"></div>
+    div v-konami @konami="bribe_unlocked = !bribe_unlocked"
     div(v-if="bribe_unlocked")
       span If you still want to join the party...
       |
@@ -133,7 +133,6 @@ export default {
       bribe_unlocked: false,
       bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
-      roi_week: 0,
     };
   },
   filters: {
@@ -162,8 +161,6 @@ export default {
       return `${(data * 100).toFixed(precision)}%`;
     },
     toCurrency(data, precision) {
-      if ( !data ) return "-";
-      
       if (typeof data !== "number") {
         data = parseFloat(data);
       }
@@ -276,9 +273,6 @@ export default {
         );
       }
     },
-    get_block_timestamp(timestamp) {
-      return axios.get(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=JXRIIVMTAN887F9D7NCTVQ7NMGNT1A4KA3`)      
-    },
     call(contract, method, args, out = "number") {
       let key = this.drizzleInstance.contracts[contract].methods[
         method
@@ -377,11 +371,12 @@ export default {
     if (this.activeAccount !== undefined) this.load_reverse_ens();
 
     let Vault = new web3.eth.Contract(yVaultV2, this.vault);
-    console.log(Vault);
     this.get_strategies(Vault);
-
     // Get GuestList contract and use it :)
-    Vault.methods.guestList().call().then((response) => {
+    Vault.methods
+      .guestList()
+      .call()
+      .then((response) => {
         if (response == ADDRESS_ZERO) {
           //if there's not guest list, everyone is a guest ;)
           console.log("No guest list. Everyone is invited!");
@@ -398,12 +393,18 @@ export default {
             });
         }
 
-        this.contractGuestList.methods.total_yfi(this.activeAccount).call().then((response) => {
+        this.contractGuestList.methods
+          .total_yfi(this.activeAccount)
+          .call()
+          .then((response) => {
             console.log("Total YFI: " + response.toString());
             this.total_yfi = new ethers.BigNumber.from(response.toString());
           });
 
-        Vault.methods.activation().call().then((vault_activation) => {
+        Vault.methods
+          .activation()
+          .call()
+          .then((vault_activation) => {
             this.contractGuestList.methods
               .entrance_cost(vault_activation)
               .call()
@@ -423,33 +424,6 @@ export default {
             this.bribe_cost = new ethers.BigNumber.from(response.toString());
           });
       });
-
-    // Get blocknumber and calc APY
-    Vault.methods.pricePerShare().call().then( currentPrice => {
-      const seconds_in_a_year = 31536000;
-      const now = Math.round(Date.now() / 1000);
-
-      // 1 week ago
-      const one_week_ago = (now - 60 * 60 * 24 * 7);
-      const ts_past = one_week_ago < config.BLOCK_ACTIVATED?config.BLOCK_ACTIVATED:one_week_ago;
-
-      const ts_diff = now - ts_past;
-
-      console.log("TS Past: " + one_week_ago);
-      console.log("TS Activation: " + config.BLOCK_ACTIVATED);
-
-      this.get_block_timestamp(ts_past).then(response => {
-        console.log("Past block: " + response.data.result);
-        Vault.methods.pricePerShare().call({}, response.data.result).then( pastPrice => {
-          let roi = (currentPrice / pastPrice - 1) * 100;
-          console.log("Current Price: " + currentPrice);
-          console.log("Past Price: " + pastPrice);
-          this.roi_week = roi/ts_diff*seconds_in_a_year;
-          console.log("ROI week: " + roi);
-          console.log("ROI year: " + this.roi_week);
-        });
-      });
-    });
 
     // Iterate through strats
   },
