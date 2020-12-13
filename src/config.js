@@ -1,7 +1,7 @@
 // Main config file for common parameters
 export default Object.freeze({
     'yusdcidle' : { // route path
-        TITLE: "yVault",
+        TITLE: "USDc Idle",
         LOGO: "🏆🪙",
         VAULT_ADDR: "0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b",
         WANT_ADDR: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -11,7 +11,7 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
     },
     'devhugger' : {
-        TITLE: "DEV Hugger yVault",
+        TITLE: "DEV Hugger",
         LOGO: "👾🤗",
         VAULT_ADDR: "0xFeD651936Af7e98F7F2A93c03B1E28a2DA7dfaD4",
         WANT_ADDR: "0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26",
@@ -21,7 +21,7 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
     },
     'apetrumpet' : {
-        TITLE: "apeTrump(et) yVault",
+        TITLE: "apeTrump(et)",
         LOGO: "🦧🎺",
         VAULT_ADDR: "0xba81fb02d5e7b94b341e82d1959c372590b852be",
         WANT_ADDR: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -31,7 +31,7 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
     },
     'icecreath2' : {
-        TITLE: "iceCREATH2 yVault",
+        TITLE: "iceCREATH2",
         LOGO: "🍦TH2",
         VAULT_ADDR: "0x20Eb2A369b71C29FC4aFCddBbc1CAB66CCfcB062",
         WANT_ADDR: "0xcBc1065255cBc3aB41a6868c22d1f1C573AB89fd",
