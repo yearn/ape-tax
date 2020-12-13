@@ -2,7 +2,7 @@
 export default Object.freeze({
     'yusdcidle' : { // route path
         TITLE: "USDc Idle",
-        LOGO: "🏆🪙",
+        LOGO: "🏆🚀",
         VAULT_ADDR: "0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b",
         WANT_ADDR: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         WANT_SYMBOL: "USDC",
@@ -72,7 +72,7 @@ export default Object.freeze({
     },
     'sushirocket' : {
         TITLE: "yvSushi YFI-ETH",
-        LOGO: "🍣🚀🍬",
+        LOGO: "🍣🍬",
         VAULT_ADDR: "0x27Eb83254D900AB4F9b15d5652d913963FeC35e3",
         WANT_ADDR: "0x088ee5007C98a9677165D78dD2109AE4a3D04d0C",
         WANT_SYMBOL: "SLP",
