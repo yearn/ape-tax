@@ -14,14 +14,15 @@
   p
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
+  h2 <strong>Strategies</strong>
   div(v-for="(strategy, index) in strategies")
-    h2 <strong>Strategies</strong>
     div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
     div Address:&nbsp;
       a(
         :href="'https://etherscan.io/address/' + strategy.address + '#code'",
         target="_blank"
       ) 📃Contract
+      p
   h2 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
