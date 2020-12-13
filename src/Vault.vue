@@ -366,7 +366,7 @@ export default {
     axios
       .get(
         "https://api.coingecko.com/api/v3/simple/price?ids=" +
-          config.WANT_SYMBOL.toLowerCase() +
+          config.COINGECKO_SYMBOL.toLowerCase() +
           "&vs_currencies=usd"
       )
       .then((response) => {
