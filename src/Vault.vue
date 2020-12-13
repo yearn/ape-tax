@@ -75,7 +75,7 @@
       span Made with 💙
       span yVault:
       |
-      a(href="https://twitter.com/{{ config.VAULT_DEV }}", target="_blank") config.VAULT_DEV
+      a(:href="'https://twitter.com/' + config.VAULT_DEV", target="_blank") {{ config.VAULT_DEV }}
       span - Guest List:
       |
       a(href="https://twitter.com/bantg", target="_blank") banteg
