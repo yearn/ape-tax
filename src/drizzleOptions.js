@@ -24,7 +24,7 @@ const options = (config) => ({
       contractName: 'YFI', //YFI to approve bribe
       web3Contract: new web3.eth.Contract(ERC20, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e")
     },
-  ] : {},
+  ] : [],
   events: {
   },
   polls: {
