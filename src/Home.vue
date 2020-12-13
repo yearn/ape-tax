@@ -5,7 +5,7 @@
   div 
     ul(v-for="(vault, key) in allConfig")
       li 
-        a( class="arrowLink" :href="'/' + key") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+        a( class="links" :href="'/' + key") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
 </template>
 
 <script>
@@ -34,16 +34,16 @@ ul {
   padding-left: 0.5em;
   padding-bottom: 0.5em;
 }
-a,
-a:visited,
-a:hover {
+a.links,
+a.links:visited,
+a.links:hover {
   font-family: IBM Plex Mono,monospace;
   font-size: 16px;
   font-weight: 500;
   color: #2c3e50;
   text-decoration: none;
 }
-a:hover span.text {
+a.links:hover span.text {
   border-bottom: 1px dotted red;
 }
 .muted {
