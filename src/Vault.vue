@@ -87,7 +87,6 @@ div(v-else)
 </template>
 
 <script>
-import config from "./config.js";
 
 import { mapGetters } from "vuex";
 import ethers from "ethers";
@@ -115,9 +114,9 @@ const ERROR_GUEST_LIMIT_ALL =
 export default {
   name: "Vault",
   components: {},
+  props: ['config'],
   data() {
     return {
-      config: config,
       username: null,
       want_price: 0,
       amount: 0,
@@ -370,11 +369,11 @@ export default {
     axios
       .get(
         "https://api.coingecko.com/api/v3/simple/price?ids=" +
-          config.COINGECKO_SYMBOL.toLowerCase() +
+          this.config.COINGECKO_SYMBOL.toLowerCase() +
           "&vs_currencies=usd"
       )
       .then((response) => {
-        this.want_price = response.data[config.COINGECKO_SYMBOL.toLowerCase()].usd;
+        this.want_price = response.data[this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
       });
 
     //Active account is defined?
@@ -435,12 +434,12 @@ export default {
 
       // 1 week ago
       const one_week_ago = (now - 60 * 60 * 24 * 7);
-      const ts_past = one_week_ago < config.BLOCK_ACTIVATED?config.BLOCK_ACTIVATED:one_week_ago;
+      const ts_past = one_week_ago < this.config.BLOCK_ACTIVATED?this.config.BLOCK_ACTIVATED:one_week_ago;
 
       const ts_diff = now - ts_past;
 
       console.log("TS Past: " + one_week_ago);
-      console.log("TS Activation: " + config.BLOCK_ACTIVATED);
+      console.log("TS Activation: " + this.config.BLOCK_ACTIVATED);
 
       this.get_block_timestamp(ts_past).then(response => {
         console.log("Past block: " + response.data.result);

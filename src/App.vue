@@ -2,7 +2,7 @@
   div(v-if="isDrizzleInitialized", id="app")
     .logo {{ config.LOGO }}
     .section
-      Vault
+      Component(:config="config")
   div(v-else)
     div Loading yApp...
 </template>
@@ -12,14 +12,25 @@ import config from './config.js'
 import Vault from './Vault'
 import { mapGetters } from 'vuex'
 
+// TODO: change to custom home and not found
+const NotFound = { template: '<p>Page not found</p>' }
+const Home = { template: '<p>Welcome</p>' }
+
+const vaultPath = window.location.pathname.substring(1)
+const vaultConfig = config[vaultPath] || null;
+
+const Component = window.location.pathname === '/' ? Home : (
+  Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound
+)
+
 export default {
   name: 'app',
   components: {
-    Vault,
+    Component,
   },
   data() {
     return {
-      config: config,
+      config: vaultConfig,
     }
   },
   computed: mapGetters('drizzle', ['isDrizzleInitialized'])
