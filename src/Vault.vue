@@ -374,7 +374,7 @@ export default {
           "&vs_currencies=usd"
       )
       .then((response) => {
-        this.want_price = response.data[config.WANT_SYMBOL.toLowerCase()].usd;
+        this.want_price = response.data[config.COINGECKO_SYMBOL.toLowerCase()].usd;
       });
 
     //Active account is defined?
