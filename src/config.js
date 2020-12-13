@@ -41,8 +41,8 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
     },
     'wethcitadel' : {
-        TITLE: "iceCREATH2 yVault",
-        LOGO: "🍦TH2",
+        TITLE: "WETH Citadel",
+        LOGO: "🦧🏰",
         VAULT_ADDR: "0x18c447b7Ad755379B8800F1Ef5165E8542946Afd",
         WANT_ADDR: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         WANT_SYMBOL: "WETH",
@@ -51,7 +51,7 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
     },
     'zzzvault' : {
-        TITLE: "zzz yVault",
+        TITLE: "zLOT yVault",
         LOGO: "💤🌖",
         VAULT_ADDR: "0xCA6C9fB742071044247298Ea0dBd60b77586e1E8",
         WANT_ADDR: "0xA8e7AD77C60eE6f30BaC54E2E7c0617Bd7B5A03E",
@@ -62,7 +62,7 @@ export default Object.freeze({
     },
     'elcalfos' : {
         TITLE: "El Calfos yVault",
-        LOGO: "💤🌖",
+        LOGO: "🐳🧙",
         VAULT_ADDR: "0xbe77b53a165d3109ae9500ebaa9328b577960abf",
         WANT_ADDR: "0x584bc13c7d411c00c01a62e8019472de68768430",
         WANT_SYMBOL: "HEGIC",
