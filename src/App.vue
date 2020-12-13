@@ -1,7 +1,7 @@
 <template lang="pug">
   div(v-if="isDrizzleInitialized || isHome", id="app")
     .section
-      Component(:config="config" :allConfig="allConfig")
+      Section(:config="config" :allConfig="allConfig")
   div(v-else)
     div Loading yApp...
 </template>
@@ -18,14 +18,14 @@ const NotFound = { template: '<p>Page not found</p>' }
 const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
 
-const Component = window.location.pathname === '/' ? Home : (
+const Section = window.location.pathname === '/' ? Home : (
   Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound
 )
 
 export default {
   name: 'app',
   components: {
-    Component,
+    Section,
   },
   data() {
     return {
