@@ -1,8 +1,7 @@
 <template lang="pug">
-  div(v-if="isDrizzleInitialized", id="app")
-    .logo {{ config.LOGO }}
+  div(v-if="isDrizzleInitialized || isHome", id="app")
     .section
-      Component(:config="config")
+      Component(:config="config" :allConfig="allConfig")
   div(v-else)
     div Loading yApp...
 </template>
@@ -10,11 +9,11 @@
 <script>
 import config from './config.js'
 import Vault from './Vault'
+import Home from './Home'
 import { mapGetters } from 'vuex'
 
 // TODO: change to custom home and not found
 const NotFound = { template: '<p>Page not found</p>' }
-const Home = { template: '<p>Welcome</p>' }
 
 const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
@@ -31,6 +30,8 @@ export default {
   data() {
     return {
       config: vaultConfig,
+      allConfig: config,
+      isHome: window.location.pathname === '/',
     }
   },
   computed: mapGetters('drizzle', ['isDrizzleInitialized'])

@@ -1,5 +1,6 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
+  .logo {{ config.LOGO }}
   h1 {{ config.TITLE }}
   div Vault:&nbsp;
     a(
