@@ -1,6 +1,7 @@
 <template lang="pug">
 #home
   h1 ytVaults Registry
+  div.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
   div.spacer
   div 
     ul(v-for="(vault, key) in allConfig")
@@ -33,6 +34,9 @@ ul {
   list-style-type: none;
   padding-left: 0.5em;
   padding-bottom: 0.5em;
+}
+div.warning {
+  width: 50%;
 }
 a.links,
 a.links:visited,
