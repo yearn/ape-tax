@@ -10,10 +10,8 @@
 import config from './config.js'
 import Vault from './Vault'
 import Home from './Home'
+import NotFound from './NotFound'
 import { mapGetters } from 'vuex'
-
-// TODO: change to custom home and not found
-const NotFound = { template: '<p>Page not found</p>' }
 
 const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
