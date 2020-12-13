@@ -8,12 +8,12 @@
     ) 📃Contract
   div Version: {{ vault_version }}
   div {{ config.WANT_SYMBOL }} price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
-  div Deposit Limit: {{ vault_deposit_limit | fromWei(2) }}
-  div Total Assets: {{ vault_total_assets | fromWei(2) }}
-  div Total AUM: {{ vault_total_aum | toCurrency(2) }}
+  div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}
+  div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}
+  div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
   p
-  div Price Per Share: {{ vault_price_per_share | fromWei(8) }}
-  div Available limit: {{ vault_available_limit | fromWei(2) }} {{ config.WANT_SYMBOL }}
+  div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
+  div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
   div(v-for="(strategy, index) in strategies")
     h2 <strong>Strategies</strong>
     div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
@@ -24,8 +24,8 @@
       ) 📃Contract
   h2 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
-  div Your Vault shares: {{ yvtoken_balance | fromWei(2) }}
-  div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2) }}
+  div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
+  div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your ETH Balance: {{ eth_balance | fromWei(2) }}
   p
   div(v-if="is_guest || yfi_needed <= 0")
@@ -137,10 +137,11 @@ export default {
     };
   },
   filters: {
-    fromWei(data, precision) {
+    fromWei(data, precision, decimals) {
+      if (decimals === undefined) decimals = 18;
       if (data === "loading") return data;
       if (data > 2 ** 255) return "♾️";
-      let value = ethers.utils.commify(ethers.utils.formatEther(data));
+      let value = ethers.utils.commify(ethers.utils.formatUnits(data, decimals));
       let parts = value.split(".");
 
       if (precision === 0) return parts[0];
@@ -200,7 +201,7 @@ export default {
       }
 
       this.drizzleInstance.contracts["Vault"].methods["deposit"].cacheSend(
-        ethers.utils.parseEther(this.amount.toString()).toString(),
+        ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals).toString(),
         {
           from: this.activeAccount,
         }
@@ -327,12 +328,15 @@ export default {
       return this.call("Vault", "availableDepositLimit", []);
     },
     vault_total_aum() {
-      let toFloat = new ethers.BigNumber.from(10).pow(16).toString();
+      let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.vault_total_assets.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
     },
     vault_price_per_share() {
       return this.call("Vault", "pricePerShare", []);
+    },
+    vault_decimals() {
+      return this.call("Vault", "decimals", []);
     },
     yvtoken_balance() {
       return this.call("Vault", "balanceOf", [this.activeAccount]);
