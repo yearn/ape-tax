@@ -2,6 +2,8 @@
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
   h1 {{ config.TITLE }}
+  div.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+  p
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
