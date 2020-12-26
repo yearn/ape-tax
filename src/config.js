@@ -63,7 +63,7 @@ export default Object.freeze({
     'elcalfos' : {
         TITLE: "El Calfos yVault",
         LOGO: "🐳🧙",
-        VAULT_ADDR: "0xbe77b53a165d3109ae9500ebaa9328b577960abf",
+        VAULT_ADDR: "0x19db27D2E9E4B780CF9A296D575aBbddEe1578DA",
         WANT_ADDR: "0x584bc13c7d411c00c01a62e8019472de68768430",
         WANT_SYMBOL: "HEGIC",
         COINGECKO_SYMBOL: "HEGIC",
