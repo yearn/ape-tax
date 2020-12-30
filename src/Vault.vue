@@ -11,8 +11,8 @@
     ) 📃Contract
   div Version: {{ vault_version }}
   div {{ config.WANT_SYMBOL }} price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
-  div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}
-  div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}
+  div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
+  div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
   p
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
