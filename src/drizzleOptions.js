@@ -1,5 +1,6 @@
 import ERC20 from './abi/ERC20.json'
 import yVaultV2 from './abi/yVaultV2.json'
+import LidoVault from './abi/LidoVault.json'
 import yStrategy from './abi/yStrategy.json'
 
 
@@ -14,7 +15,7 @@ const options = (config) => ({
   contracts: config !== null ? [
     {
       contractName: 'Vault', //yvzLOT
-      web3Contract: new web3.eth.Contract(yVaultV2, config.VAULT_ADDR)
+      web3Contract: new web3.eth.Contract(config.VAULT_ABI, config.VAULT_ADDR)
     },
     {
       contractName: 'WANT', //zLOT
