@@ -39,7 +39,7 @@
     v-if="vault_available_limit > 0",
     @click.prevent="on_deposit"
   ) 🏦 Transfer & Deposit
-  button(:disabled="!has_want_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+  button(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
   .red(v-if="error")
     span {{ error }}
   p
@@ -284,6 +284,9 @@ export default {
     },
     has_want_balance() {
       return this.want_balance > 0;
+    },
+    has_yvtoken_balance() {
+      return this.yvtoken_balance > 0;
     },
   },
   async created() {
