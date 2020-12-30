@@ -56,4 +56,25 @@ export default {
 .logo {
   font-size: 80px;
 }
+
+.column {
+  float: left;
+  width: 40%;
+}
+
+.column-sm {
+  float: left;
+  width: 25%;
+  margin-right: 1%;
+}
+
+.warning {
+  font-size: 13px;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 </style>

@@ -2,7 +2,8 @@
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
   h1 {{ config.TITLE }}
-  div.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+  div.row
+    div.column.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
   p
   div Vault:&nbsp;
     a(

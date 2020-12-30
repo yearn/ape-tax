@@ -2,7 +2,11 @@
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
   h1 {{ config.TITLE }}
-  div.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+  div.row
+    div.column-sm.warning
+      div ⚠️ <strong>WARNING</strong> This vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+    div.column-sm.warning
+      div 📢 <strong>DISCLAIMER</strong> When you transfer and deposit, convert your ETH into stETH 1:1 and desposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.
   p
   div Vault:&nbsp;
     a(
