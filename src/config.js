@@ -124,5 +124,16 @@ export default Object.freeze({
         VAULT_DEV : "bantg",
         BLOCK_ACTIVATED: 1606599919,
     },
+    'daiironbank' : {
+        TITLE: "DAI Ironbank",
+        LOGO: "🦾🏦",
+        VAULT_ABI: yVaultV2,
+        VAULT_ADDR: "0x07dbC20B84fF63F3cc542F6A22E5a71cbA5670A4",
+        WANT_ADDR: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        WANT_SYMBOL: "DAI",
+        COINGECKO_SYMBOL: "dai",
+        VAULT_DEV : "arbingsam",
+        BLOCK_ACTIVATED: 1606599919,
+    },
     
 })
