@@ -139,6 +139,7 @@ export default Object.freeze({
         TITLE: "DAI Ironbank",
         LOGO: "🦾🏦",
         VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
         VAULT_ADDR: "0x07dbC20B84fF63F3cc542F6A22E5a71cbA5670A4",
         WANT_ADDR: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
         WANT_SYMBOL: "DAI",
@@ -150,6 +151,7 @@ export default Object.freeze({
         TITLE: "WETH Maker",
         LOGO: "🖲🏰",
         VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
         VAULT_ADDR: "0x6392e8fa0588CB2DCb7aF557FdC9D10FDe48A325",
         WANT_ADDR: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         WANT_SYMBOL: "WETH",
@@ -157,5 +159,4 @@ export default Object.freeze({
         VAULT_DEV : "orbxball",
         BLOCK_ACTIVATED: 1606599919,
     },
-    
 })
