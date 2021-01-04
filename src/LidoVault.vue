@@ -1,13 +1,10 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
-  h1 {{ config.TITLE }}
-  div.row
-    div.column-sm.warning
-      div ⚠️ <strong>WARNING</strong> This vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
-    div.column-sm.warning
-      div 📢 <strong>DISCLAIMER</strong> When you transfer and deposit, convert your ETH into stETH 1:1 and desposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.
-  p
+  h1.title.is-3 {{ config.TITLE }}
+  div.columns
+    div.column.is-one-quarter ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+    div.column.is-one-quarter 📢 <strong>DISCLAIMER</strong> When you transfer and deposit, your ETH will be converted into stETH 1:1 and deposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
@@ -18,35 +15,51 @@
   div Deposit Limit: ♾️ {{ config.WANT_SYMBOL }}
   div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
-  p
+  div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: ♾️ {{ config.WANT_SYMBOL }}
-  h2 <strong>Wallet</strong>
+  div.spacer
+  h2.title.is-4 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your ETH Balance: {{ eth_balance | fromWei(2) }}
-  p
+  div.spacer
   span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
-  p
-  label(v-if="vault_available_limit > 0") Amount
-  input(
-    v-if="vault_available_limit > 0",
-    size="is-small",
-    v-model.number="amount",
-    type="number",
-    min=0
-  )
-  span(v-if="vault_available_limit <= 0") Deposits closed.
-  p
-  button(
-    v-if="vault_available_limit > 0",
-    @click.prevent="on_deposit"
-  ) 🏦 Transfer & Deposit
-  button(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+  div.spacer 
+  b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+    b-input(v-model.number="amount", size="is-small", type="number", min=0)
+    p.control
+      b-button.is-static(size="is-small") ETH
+
+      button.unstyled(
+      v-if="vault_available_limit > 0",
+      @click.prevent="on_deposit"
+      ) 🏦 Deposit ETH
+
+
+  b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+    b-input(v-model.number="amount_steth", size="is-small", type="number", min=0)
+    p.control
+      b-button.is-static(size="is-small") stETH
+
+      button.unstyled(
+      v-if="vault_available_limit > 0",
+      :disabled="has_allowance_vault",
+      @click.prevent="on_approve_vault"
+      ) {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve stETH' }}
+      button.unstyled(
+      v-if="vault_available_limit > 0",
+      :disabled="!has_allowance_vault",
+      @click.prevent="on_deposit_steth"
+      ) 🏦 Deposit stETH
+
+  div.spacer
+
+  button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
   .red(v-if="error")
     span {{ error }}
-  p
+  div.spacer
     .muted
       span Made with 💙
       | 
@@ -57,6 +70,8 @@
       span - UI:
       |
       a(href="https://twitter.com/fameal", target="_blank") fameal
+      |, 
+      a(href="https://twitter.com/emilianobonassi", target="_blank") emilianobonassi
       |, 
       a(href="https://twitter.com/vasa_develop", target="_blank") vasa
 div(v-else)
@@ -96,7 +111,7 @@ export default {
       username: null,
       want_price: 0,
       amount: 0,
-      amount_wrap: 0,
+      amount_steth: 0,
       strategies: [],
       strategies_balance: 0,
       average_price: 0,
@@ -180,6 +195,22 @@ export default {
           from: this.activeAccount,
           to: this.vault,
           value: ethers.utils.parseEther(this.amount.toString()).toString()
+        }
+      );
+    },
+    on_deposit_steth() {
+      this.error = null;
+
+      if (this.amount_steth <= 0) {
+        this.error = ERROR_NEGATIVE;
+        this.amount_steth = 0;
+        return;
+      }
+
+      this.drizzleInstance.contracts["Vault"].methods["deposit"].cacheSend(
+        ethers.utils.parseUnits(this.amount_steth.toString(), this.vault_decimals).toString(),
+        {
+          from: this.activeAccount,
         }
       );
     },
@@ -348,6 +379,9 @@ button {
 .muted {
   color: gray;
   font-size: 0.8em;
+}
+.muted a {
+  text-decoration: underline;
 }
 .red {
   color: red;

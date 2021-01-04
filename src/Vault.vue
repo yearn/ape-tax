@@ -1,10 +1,9 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
-  h1 {{ config.TITLE }}
-  div.row
-    div.column.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
-  p
+  h1.title.is-3 {{ config.TITLE }}
+  div.columns
+    div.column.is-half ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
@@ -15,10 +14,11 @@
   div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
-  p
+  div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
-  h2 <strong>Strategies</strong>
+  div.spacer
+  h2.title.is-4 <strong>Strategies</strong>
   div(v-for="(strategy, index) in strategies")
     div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
     div Address:&nbsp;
@@ -26,42 +26,39 @@
         :href="'https://etherscan.io/address/' + strategy.address + '#code'",
         target="_blank"
       ) 📃Contract
-      p
-  h2 <strong>Wallet</strong>
+  div.spacer
+  h2.title.is-4 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your ETH Balance: {{ eth_balance | fromWei(2) }}
-  p
+  div.spacer
   div(v-if="is_guest || yfi_needed <= 0")
     span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
-    p
-    label(v-if="vault_available_limit > 0") Amount
-    input(
-      v-if="vault_available_limit > 0",
-      size="is-small",
-      v-model.number="amount",
-      type="number",
-      min=0
-    )
+    div.spacer
+    b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+      b-input(v-model.number="amount", size="is-small", type="number",min=0)
+      p.control
+        b-button.is-static(size="is-small") {{ config.WANT_SYMBOL }}
+
     span(v-if="vault_available_limit <= 0") Deposits closed.
-    p
-    button(
+    div.spacer
+    button.unstyled(
       v-if="vault_available_limit > 0",
       :disabled="has_allowance_vault",
       @click.prevent="on_approve_vault"
     ) {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
-    button(
+    button.unstyled(
       v-if="vault_available_limit > 0",
       :disabled="!has_allowance_vault",
       @click.prevent="on_deposit"
     ) 🏦 Deposit
-    button(
+    button.unstyled(
       v-if="vault_available_limit > 0",
       :disabled="!has_allowance_vault",
       @click.prevent="on_deposit_all"
     ) 🏦 Deposit All
-    button(:disabled="!has_want_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+    button.unstyled(:disabled="!has_want_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
   div(v-else)
     .red
       span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
@@ -69,24 +66,29 @@
     div(v-if="bribe_unlocked")
       span If you still want to join the party...
       |
-      button(v-if="has_allowance_bribe", @click.prevent="on_bribe_the_bouncer") 💰 Bribe the bouncer with ({{ bribe_cost | fromWei(3) }} YFI)
-      button(v-if="!has_allowance_bribe", @click.prevent="on_approve_bribe") 🚀 Approve Bribe
+      button.unstyled(v-if="has_allowance_bribe", @click.prevent="on_bribe_the_bouncer") 💰 Bribe the bouncer with ({{ bribe_cost | fromWei(3) }} YFI)
+      button.unstyled(v-if="!has_allowance_bribe", @click.prevent="on_approve_bribe") 🚀 Approve Bribe
     div(v-else)
       span Remember Konami 🎮
   .red(v-if="error")
     span {{ error }}
-  p
+  div.spacer
     .muted
       span Made with 💙
+      | 
       span yVault:
-      |
+      | 
       a(:href="'https://twitter.com/' + config.VAULT_DEV", target="_blank") {{ config.VAULT_DEV }}
+      | 
       span - Guest List:
-      |
-      a(href="https://twitter.com/bantg", target="_blank") banteg
+      | 
+      a(href="https://twitter.com/bantg", target="_blank") bantg
+      | 
       span - UI:
-      |
+      | 
       a(href="https://twitter.com/fameal", target="_blank") fameal
+      |, 
+      a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
 div(v-else)
   div Loading yApp...
 </template>
@@ -465,12 +467,15 @@ export default {
 </script>
 
 <style>
-button {
-  margin-right: 1em;
+input {
+  height: 26px;
 }
 .muted {
   color: gray;
   font-size: 0.8em;
+}
+.muted a {
+  text-decoration: underline;
 }
 .red {
   color: red;

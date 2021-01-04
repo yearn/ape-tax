@@ -7,6 +7,11 @@ import drizzleVuePlugin from '@drizzle/vue-plugin'
 import drizzleOptions from './drizzleOptions'
 import VueKonami from 'vue-konami'
 
+import Buefy from 'buefy'
+import 'buefy/dist/buefy.css'
+
+Vue.use(Buefy)
+
 Vue.use(VueKonami)
 
 Vue.use(Vuex)

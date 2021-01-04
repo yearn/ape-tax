@@ -1,13 +1,20 @@
 <template lang="pug">
 #home
-  h1 ytVaults Registry
-  div.row
-    div.column.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+  h1.title.is-3 Test Vaults Registry
+  div.columns
+    div.column.is-two-thirds ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
   div.spacer
-  div 
-    ul(v-for="(vault, key) in allConfig")
-      li 
-        a( class="links" :href="'/' + key") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+  div.columns
+    div.column.is-one-third
+      h2.title.is-4 🚀 Yearn Vaults
+      ul(v-for="vault in yearnVaults")
+        li 
+          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+    div.column.is-one-third
+      h2.title.is-4 🧠 Experiments
+      ul(v-for="vault in experimentVaults")
+        li 
+          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
 </template>
 
 <script>
@@ -24,9 +31,33 @@ export default {
   },
   filters: {},
   methods: {},
-  computed: {},
-  created() {
+  computed: {
+    yearnVaults() {
+      var items = this.allConfig;
+  
+      var result = Object.keys(items)
+        .map(((key) => ({
+          ...items[key],
+          URL: key
+        })))
+        .filter(item => item.VAULT_TYPE === 'yearn')
+
+      return result;
+    },
+    experimentVaults() {
+      var items = this.allConfig;
+  
+      var result = Object.keys(items)
+        .map(((key) => ({
+          ...items[key],
+          URL: key
+        })))
+        .filter(item => item.VAULT_TYPE === 'experiment')
+
+      return result;
+    }
   },
+  created() {},
 }
 </script>
 
@@ -35,6 +66,13 @@ ul {
   list-style-type: none;
   padding-left: 0.5em;
   padding-bottom: 0.5em;
+}
+ul li {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+div.warning {
+  width: 50%;
 }
 a.links,
 a.links:visited,
