@@ -36,14 +36,11 @@
   div(v-if="is_guest || yfi_needed <= 0")
     span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
     div.spacer
-    label(v-if="vault_available_limit > 0") Amount
-    input(
-      v-if="vault_available_limit > 0",
-      size="is-small",
-      v-model.number="amount",
-      type="number",
-      min=0
-    )
+    b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+      b-input(v-model.number="amount", size="is-small", type="number",min=0)
+      p.control
+        b-button.is-static(size="is-small") {{ config.WANT_SYMBOL }}
+
     span(v-if="vault_available_limit <= 0") Deposits closed.
     div.spacer
     button.unstyled(
@@ -85,11 +82,13 @@
       | 
       span - Guest List:
       | 
-      a(href="https://twitter.com/bantg", target="_blank") banteg
+      a(href="https://twitter.com/bantg", target="_blank") bantg
       | 
       span - UI:
       | 
       a(href="https://twitter.com/fameal", target="_blank") fameal
+      |, 
+      a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
 div(v-else)
   div Loading yApp...
 </template>
@@ -468,6 +467,9 @@ export default {
 </script>
 
 <style>
+input {
+  height: 26px;
+}
 .muted {
   color: gray;
   font-size: 0.8em;

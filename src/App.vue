@@ -44,17 +44,30 @@ export default {
 
 #app {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-size: 0.8rem;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
   color: #2c3e50;
-  margin-top: 20px;
+  margin-top: 0px;
+}
+.section {
+  padding: 1rem !important;
+}
+body, button, input, optgroup, select, textarea {
+  font-family: 'IBM Plex Mono', monospace !important;
+}
+
+.control .unstyled {
+  margin-left: 0.5em;
 }
 
 button.unstyled {
-  margin-right: 1em;
+  margin-right: 0.5em;
+  height: 2.5em;
+  line-height: 1.5;
+  font-size: 0.75rem
 }
 
 .logo {
