@@ -1,9 +1,10 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
-  h1 {{ config.TITLE }}
-  div.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
-  p
+  h1.title.is-3 {{ config.TITLE }}
+  div.columns
+    div.column.is-one-quarter ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+    div.column.is-one-quarter 📢 <strong>DISCLAIMER</strong> When you transfer and deposit, your ETH will be converted into stETH 1:1 and deposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
@@ -14,17 +15,18 @@
   div Deposit Limit: ♾️ {{ config.WANT_SYMBOL }}
   div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
-  p
+  div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: ♾️ {{ config.WANT_SYMBOL }}
-  h2 <strong>Wallet</strong>
+  div.spacer
+  h2.title.is-4 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your ETH Balance: {{ eth_balance | fromWei(2) }}
-  p
+  div.spacer
   span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
-  p
+  div.spacer
   label(v-if="vault_available_limit > 0") Amount
   input(
     v-if="vault_available_limit > 0",
@@ -34,15 +36,15 @@
     min=0
   )
   span(v-if="vault_available_limit <= 0") Deposits closed.
-  p
-  button(
+  div.spacer
+  button.unstyled(
     v-if="vault_available_limit > 0",
     @click.prevent="on_deposit"
   ) 🏦 Transfer & Deposit
-  button(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+  button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
   .red(v-if="error")
     span {{ error }}
-  p
+  div.spacer
     .muted
       span Made with 💙
       | 
@@ -344,6 +346,9 @@ button {
 .muted {
   color: gray;
   font-size: 0.8em;
+}
+.muted a {
+  text-decoration: underline;
 }
 .red {
   color: red;

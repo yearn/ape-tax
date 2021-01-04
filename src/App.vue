@@ -44,13 +44,17 @@ export default {
 
 #app {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
   color: #2c3e50;
   margin-top: 20px;
+}
+
+button.unstyled {
+  margin-right: 1em;
 }
 
 .logo {
