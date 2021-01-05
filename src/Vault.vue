@@ -58,7 +58,7 @@
       :disabled="!has_allowance_vault",
       @click.prevent="on_deposit_all"
     ) 🏦 Deposit All
-    button.unstyled(:disabled="!has_want_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+    button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
   div(v-else)
     .red
       span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
