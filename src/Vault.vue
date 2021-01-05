@@ -371,6 +371,9 @@ export default {
     has_want_balance() {
       return this.want_balance > 0;
     },
+    has_yvtoken_balance() {
+      return this.yvtoken_balance > 0;
+    },
   },
   async created() {
     axios
