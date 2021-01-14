@@ -7,13 +7,13 @@
   div.columns
     div.column.is-one-third
       h2.title.is-4 🚀 Yearn Vaults
-      ul(v-for="vault in yearnVaults")
-        li 
+      ul
+        li(v-for="vault in yearnVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
     div.column.is-one-third
       h2.title.is-4 🧠 Experiments
-      ul(v-for="vault in experimentVaults")
-        li 
+      ul
+        li(v-for="vault in experimentVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
 </template>
 
