@@ -159,4 +159,16 @@ export default Object.freeze({
         VAULT_DEV : "orbxball",
         BLOCK_ACTIVATED: 1606599919,
     },
+    'stecrv' : {
+        TITLE: "st. Ether-ETH Pool",
+        LOGO: "💧🎱",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0xdCD90C7f6324cfa40d7169ef80b12031770B4325",
+        WANT_ADDR: "0x06325440D014e39736583c165C2963BA99fAf14E",
+        WANT_SYMBOL: "steCRV",
+        COINGECKO_SYMBOL: "steCRV",
+        VAULT_DEV : "arbingsam",
+        BLOCK_ACTIVATED: 1606599919,
+    },
 })
