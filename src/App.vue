@@ -10,6 +10,7 @@
 import config from './config.js'
 import Vault from './Vault'
 import LidoVault from './LidoVault'
+import stETHLPVault from './stETHLPVault'
 import Home from './Home'
 import NotFound from './NotFound'
 import { mapGetters } from 'vuex'
@@ -17,9 +18,24 @@ import { mapGetters } from 'vuex'
 const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
 
+let VaultType;
+
+switch (window.location.pathname) {
+  case '/yvsteth':
+    VaultType = LidoVault;
+    break;
+  case '/stecrv':
+    VaultType = stETHLPVault;
+    break;
+  default:
+    VaultType = Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound;
+}
+
+/*
 const VaultType = window.location.pathname === '/yvsteth' ? LidoVault : (
   Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound
 )
+*/
 
 const Section = window.location.pathname === '/' ? Home : VaultType
 
