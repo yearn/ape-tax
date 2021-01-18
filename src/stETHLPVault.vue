@@ -428,7 +428,7 @@ export default {
     if (this.activeAccount !== undefined) this.load_reverse_ens();
      
     // Zap In Contract
-    this.contractZapIn = new web3.eth.Contract(ZapSteth, '0x5D103FC2E9bc2ABB34B8dC7f575Fc5D5F8eE4d32');
+    this.contractZapIn = new web3.eth.Contract(ZapSteth, '0x15e5405B90Abba31F29c618f9dC8D65E95257660');
 
     let Vault = new web3.eth.Contract(yVaultV2, this.vault);
     console.log(Vault);
