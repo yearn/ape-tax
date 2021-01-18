@@ -61,17 +61,25 @@
           :disabled="!has_allowance_vault",
           @click.prevent="on_deposit_all"
         ) 🏦 Deposit All
-
-    b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
-      b-input(v-model.number="amount_eth", size="is-small", type="number", min=0)
-      p.control
-        b-button.is-static(size="is-small") ETH
-
-        button.unstyled(
-          v-if="vault_available_limit > 0",
-          @click.prevent="on_deposit_eth"
-          ) 🏦 Zap In With ETH
     
+    div.columns
+      div.column.is-2
+        b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+          b-input(v-model.number="amount_eth", size="is-small", type="number", min=0)
+          p.control
+            b-button.is-static(size="is-small") ETH
+    
+      div.column
+        b-field(label="Slippage", custom-class="is-small", v-if="vault_available_limit > 0")
+          b-input(v-model.number="slippage", size="tiny is-small", type="number", min=0, step=0.1)
+          p.control
+            b-button.is-static(size="is-small") %
+
+            button.unstyled(
+              v-if="vault_available_limit > 0",
+              @click.prevent="on_deposit_eth"
+              ) 🏦 Zap In With ETH
+        
     div.spacer
     
     button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
@@ -146,6 +154,7 @@ export default {
       want_price: 0,
       amount: 0,
       amount_eth: 0,
+      slippage: 0.5,
       strategies: [],
       strategies_balance: 0,
       average_price: 0,
@@ -241,9 +250,8 @@ export default {
         return;
       }
 
-      const slippage = 50; //out of 1000
-      console.log(slippage);
-      this.contractZapIn.methods.zapEthIn(slippage).send( 
+      console.log(this.slippage*100);
+      this.contractZapIn.methods.zapEthIn(this.slippage*100).send( 
         { 
           from: this.activeAccount,
           value: ethers.utils.parseEther(this.amount_eth.toString()).toString() 
@@ -369,7 +377,8 @@ export default {
       return this.call("Vault", "totalAssets", []);
     },
     vault_available_limit() {
-      return this.call("Vault", "availableDepositLimit", []);
+      return 1;
+      //return this.call("Vault", "availableDepositLimit", []);
     },
     vault_total_aum() {
       let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
@@ -537,5 +546,9 @@ a,
 a:visited,
 a:hover {
   color: gray;
+}
+
+.tiny {
+  width: 5em;
 }
 </style>
