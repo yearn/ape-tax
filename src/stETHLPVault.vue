@@ -71,7 +71,7 @@
     
       div.column
         b-field(label="Slippage", custom-class="is-small", v-if="vault_available_limit > 0")
-          b-input(v-model.number="slippage", size="tiny is-small", type="number", min=0, step=0.1)
+          b-input(v-model.number="slippage", size="is-small", type="number", min=0, step=0.1)
           p.control
             b-button.is-static(size="is-small") %
 
