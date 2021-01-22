@@ -17,6 +17,7 @@
   div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
+  progress-bar(:progress="progress_limit" :width="50")
   div.spacer
   h2.title.is-4 <strong>Strategies</strong>
   div(v-for="(strategy, index) in strategies")
@@ -123,6 +124,7 @@ div(v-else)
 import { mapGetters } from "vuex";
 import ethers from "ethers";
 import axios from "axios";
+import ProgressBar from './components/ProgressBar';
 import GuestList from "./abi/GuestList.json";
 import ZapSteth from "./abi/ZapSteth.json";
 import yVaultV2 from "./abi/yVaultV2.json";
@@ -146,7 +148,9 @@ const ERROR_GUEST_LIMIT_ALL =
 
 export default {
   name: "Vault",
-  components: {},
+  components: {
+    ProgressBar,
+  },
   props: ['config'],
   data() {
     return {
@@ -377,8 +381,7 @@ export default {
       return this.call("Vault", "totalAssets", []);
     },
     vault_available_limit() {
-      return 1;
-      //return this.call("Vault", "availableDepositLimit", []);
+      return this.call("Vault", "availableDepositLimit", []);
     },
     vault_total_aum() {
       let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
@@ -399,6 +402,9 @@ export default {
     },
     eth_balance() {
       return this.activeBalance;
+    },
+    progress_limit() {
+      return (this.vault_deposit_limit.isZero()?0:(this.vault_deposit_limit - this.vault_available_limit) / this.vault_deposit_limit);
     },
     yfi_needed() {
       return this.entrance_cost.sub(this.total_yfi);
