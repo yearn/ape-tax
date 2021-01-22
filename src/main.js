@@ -10,7 +10,9 @@ import VueKonami from 'vue-konami'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
-Vue.use(Buefy)
+Vue.use(Buefy, {
+  defaultUseHtml5Validation: false,
+})
 
 Vue.use(VueKonami)
 
