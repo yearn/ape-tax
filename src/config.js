@@ -50,18 +50,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "CRETH2",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-    },
-    'wethcitadel' : {
-        TITLE: "WETH Citadel",
-        LOGO: "🦧🏰",
-        VAULT_ABI: yVaultV2,
-        VAULT_TYPE: 'yearn',
-        VAULT_ADDR: "0x18c447b7Ad755379B8800F1Ef5165E8542946Afd",
-        WANT_ADDR: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        WANT_SYMBOL: "WETH",
-        COINGECKO_SYMBOL: "WETH",
-        VAULT_DEV : "arbingsam",
-        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "withdraw",
     },
     'zzzvault' : {
         TITLE: "zLOT yVault",
@@ -98,6 +87,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "DAI",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "use_production",
     },
     'usdc' : {
         TITLE: "USd Coin yVault",
@@ -110,6 +100,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "USDC",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "use_production",
     },
     'yvsteth' : {
         TITLE: "Lido St. Ether Vault",
