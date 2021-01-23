@@ -10,20 +10,24 @@
       ul
         li(v-for="vault in yearnVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+          status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
       h2.title.is-4 🧠 Experiments
       ul
         li(v-for="vault in experimentVaults")
-          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
 </template>
 
 <script>
+import StatusTag from './components/StatusTag';
 
 import { mapGetters } from "vuex";
 
 export default {
   name: "Home",
-  components: {},
+  components: {
+    StatusTag
+  },
   props: ['allConfig'],
   data() {
     return {
