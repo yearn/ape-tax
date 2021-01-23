@@ -20,7 +20,7 @@ export default {
 
   computed: {
 	progress_pct () {
-		return this.progress.toFixed(2) * 100 + " %";
+		return (this.progress * 100).toFixed(2) + " %";
 	},
 	progress_line() {
 		let whole_width = Math.floor(this.progress * this.width);
