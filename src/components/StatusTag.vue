@@ -48,5 +48,6 @@ export default {
 <style>
 .tag {
 	margin-left: 1em;
+	font-size: 0.6rem !important;
 }
 </style>
