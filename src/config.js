@@ -150,4 +150,16 @@ export default Object.freeze({
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
     },
+    'ironlender' : {
+        TITLE: "WETH Iron Lender",
+        LOGO: "🦾💰",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0xED0244B688cF059f32f45E38A6ac6E479D6755f6",
+        WANT_ADDR: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        WANT_SYMBOL: "WETH",
+        COINGECKO_SYMBOL: "ethereum",
+        VAULT_DEV : "arbingsam",
+        BLOCK_ACTIVATED: 1606599919,
+    },
 })
