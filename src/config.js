@@ -63,6 +63,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "zLOT",
         VAULT_DEV : "macarse",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "withdraw",
     },
     'sushirocket' : {
         TITLE: "yvSushi YFI-ETH",
