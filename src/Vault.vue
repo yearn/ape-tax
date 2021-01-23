@@ -3,7 +3,8 @@
   .logo {{ config.LOGO }}
   h1.title.is-3 {{ config.TITLE }}
   div.columns
-    div.column.is-half ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+    div.column.is-half
+      info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
@@ -100,6 +101,7 @@ import { mapGetters } from "vuex";
 import ethers from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
+import InfoMessage from './components/InfoMessage';
 import GuestList from "./abi/GuestList.json";
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
@@ -124,6 +126,7 @@ export default {
   name: "Vault",
   components: {
     ProgressBar,
+    InfoMessage,
   },
   props: ['config'],
   data() {
@@ -335,7 +338,11 @@ export default {
       return this.call("Vault", "totalAssets", []);
     },
     vault_available_limit() {
-      return this.call("Vault", "availableDepositLimit", []);
+      if (this.config.VAULT_STATUS == 'active' || this.config.VAULT_STATUS == '') {
+        return this.call("Vault", "availableDepositLimit", []);
+      } else {
+        return BN_ZERO;
+      }
     },
     vault_total_aum() {
       let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();

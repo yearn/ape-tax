@@ -3,7 +3,8 @@
   .logo {{ config.LOGO }}
   h1.title.is-3 {{ config.TITLE }}
   div.columns
-    div.column.is-half ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
+    div.column.is-half
+      info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
       :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
@@ -125,6 +126,7 @@ import { mapGetters } from "vuex";
 import ethers from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
+import InfoMessage from './components/InfoMessage';
 import GuestList from "./abi/GuestList.json";
 import ZapSteth from "./abi/ZapSteth.json";
 import yVaultV2 from "./abi/yVaultV2.json";
@@ -150,6 +152,7 @@ export default {
   name: "Vault",
   components: {
     ProgressBar,
+    InfoMessage,
   },
   props: ['config'],
   data() {
