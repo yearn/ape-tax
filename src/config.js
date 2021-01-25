@@ -88,7 +88,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "DAI",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "use_production",
+        VAULT_STATUS: "withdraw",
     },
     'usdc' : {
         TITLE: "USd Coin yVault",
@@ -101,7 +101,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "USDC",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "use_production",
+        VAULT_STATUS: "withdraw",
     },
     'yvsteth' : {
         TITLE: "Lido St. Ether Vault",
@@ -138,6 +138,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "WETH",
         VAULT_DEV : "orbxball",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "withdraw",
     },
     'stecrv' : {
         TITLE: "st. Ether-ETH Pool",
