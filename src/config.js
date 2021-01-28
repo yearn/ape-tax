@@ -126,6 +126,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "dai",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "withdraw",
     },
     'wethmaker' : {
         TITLE: "WETH Maker",
