@@ -14,6 +14,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "usd-coin",
         VAULT_DEV : "emilianobonassi",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'devhugger' : {
         TITLE: "DEV Hugger",
@@ -26,6 +27,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "dev",
         VAULT_DEV : "devprtcl",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'apetrumpet' : {
         TITLE: "apeTrump(et)",
@@ -38,6 +40,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "nTrump",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'icecreath2' : {
         TITLE: "iceCREATH2",
@@ -76,6 +79,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "SLP",
         VAULT_DEV : "andy8052",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'daihard' : {
         TITLE: "DAI Hard yVault",
@@ -114,6 +118,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "staked-ether",
         VAULT_DEV : "bantg",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'daiironbank' : {
         TITLE: "DAI Ironbank",
@@ -152,6 +157,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "ethereum",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'ironlender' : {
         TITLE: "WETH Iron Lender",
@@ -164,6 +170,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "ethereum",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
     },
     'mmwbtc' : {
         TITLE: "Mushroom Worker",
