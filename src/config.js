@@ -178,4 +178,17 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active",
     },
+    'ecrvseth' : {
+        TITLE: "God sETH/ETH",
+        LOGO: "𓀀☀︎",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0x0e880118C29F095143dDA28e64d95333A9e75A47",
+        WANT_ADDR: "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c",
+        WANT_SYMBOL: "eCRV",
+        COINGECKO_SYMBOL: "ethereum",
+        VAULT_DEV : "matkam",
+        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
+    },
 })
