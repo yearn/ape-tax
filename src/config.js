@@ -165,4 +165,17 @@ export default Object.freeze({
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
     },
+    'mmwbtc' : {
+        TITLE: "Mushroom Worker",
+        LOGO: "🍄🧑‍🌾",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'experiment',
+        VAULT_ADDR: "0x0e8A7717A4FD7694682E7005957dD5d7598bF14A",
+        WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        WANT_SYMBOL: "WBTC",
+        COINGECKO_SYMBOL: "wrapped-bitcoin",
+        VAULT_DEV : "mushroomsfinan1",
+        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active",
+    },
 })
