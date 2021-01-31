@@ -186,7 +186,7 @@ export default Object.freeze({
         VAULT_STATUS: "active",
     },
     'ecrvseth' : {
-        TITLE: "God sETH/ETH",
+        TITLE: "Egyptian God sETH/ETH",
         LOGO: "𓀀☀︎",
         VAULT_ABI: yVaultV2,
         VAULT_TYPE: 'yearn',
