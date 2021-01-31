@@ -8,7 +8,10 @@
     div.column.is-one-third
       h2.title.is-4 🚀 Yearn Vaults
       ul
-        li(v-for="vault in yearnVaults")
+        li(v-for="vault in yearnVaultsActive")
+          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+          status-tag(:status="vault.VAULT_STATUS")
+        li(v-for="vault in yearnVaultsOther")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
@@ -45,6 +48,32 @@ export default {
           URL: key
         })))
         .filter(item => item.VAULT_TYPE === 'yearn')
+        .slice().reverse()
+
+      return result;
+    },
+    yearnVaultsActive() {
+      var items = this.allConfig;
+  
+      var result = Object.keys(items)
+        .map(((key) => ({
+          ...items[key],
+          URL: key
+        })))
+        .filter(item => item.VAULT_TYPE === 'yearn' && item.VAULT_STATUS === 'active')
+        .slice().reverse()
+
+      return result;
+    },
+    yearnVaultsOther() {
+      var items = this.allConfig;
+  
+      var result = Object.keys(items)
+        .map(((key) => ({
+          ...items[key],
+          URL: key
+        })))
+        .filter(item => item.VAULT_TYPE === 'yearn' && item.VAULT_STATUS != 'active')
         .slice().reverse()
 
       return result;
