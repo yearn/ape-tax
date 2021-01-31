@@ -8,13 +8,13 @@
     div.column.is-one-third
       h2.title.is-4 🚀 Yearn Vaults
       ul
-        li(v-for="vault in yearnVaults.slice().reverse()")
+        li(v-for="vault in yearnVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
       h2.title.is-4 🧠 Experiments
       ul
-        li(v-for="vault in experimentVaults.slice().reverse()")
+        li(v-for="vault in experimentVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
 </template>
 
@@ -45,6 +45,7 @@ export default {
           URL: key
         })))
         .filter(item => item.VAULT_TYPE === 'yearn')
+        .slice().reverse()
 
       return result;
     },
@@ -57,6 +58,7 @@ export default {
           URL: key
         })))
         .filter(item => item.VAULT_TYPE === 'experiment')
+        .slice().reverse()
 
       return result;
     }
