@@ -198,4 +198,17 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active",
     },
+    'wethgenlender': {
+        TITLE: "WETH Gen Lender",
+        LOGO: "🧬💰",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0xac333895ce1a73875cf7b4ecdc5a743c12f3d82b",
+        WANT_ADDR: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        WANT_SYMBOL: "WETH",
+        COINGECKO_SYMBOL: "ethereum",
+        VAULT_DEV : "arbingsam",
+        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active", 
+    }
 })
