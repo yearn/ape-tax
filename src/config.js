@@ -213,7 +213,7 @@ export default Object.freeze({
     },
     'susdidle': {
         TITLE: "sUSD Idle",
-        LOGO: "🏆🪙",
+        LOGO: "🏆⚔️",
         VAULT_ABI: yVaultV2,
         VAULT_TYPE: 'yearn',
         VAULT_ADDR: "0x3466c90017F82DDA939B01E8DBd9b0f97AEF8DfC",
