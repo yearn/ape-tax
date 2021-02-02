@@ -219,7 +219,7 @@ export default Object.freeze({
         VAULT_ADDR: "0x3466c90017F82DDA939B01E8DBd9b0f97AEF8DfC",
         WANT_ADDR: "0x57ab1ec28d129707052df4df418d58a2d46d5f51",
         WANT_SYMBOL: "sUSD",
-        COINGECKO_SYMBOL: "susd",
+        COINGECKO_SYMBOL: "nusd",
         VAULT_DEV : "emilianobonassi",
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active", 
