@@ -73,7 +73,11 @@ export default {
           ...items[key],
           URL: key
         })))
-        .filter(item => item.VAULT_TYPE === 'yearn' && item.VAULT_STATUS != 'active')
+        .filter(item => 
+          item.VAULT_TYPE === 'yearn' 
+          && item.VAULT_STATUS != 'active'
+          && item.VAULT_STATUS != 'stealth'
+        )
         .slice().reverse()
 
       return result;
@@ -86,7 +90,10 @@ export default {
           ...items[key],
           URL: key
         })))
-        .filter(item => item.VAULT_TYPE === 'experiment')
+        .filter(
+          item => item.VAULT_TYPE === 'experiment' 
+          && item.VAULT_STATUS != 'stealth'
+        )
         .slice().reverse()
 
       return result;
