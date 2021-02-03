@@ -27,7 +27,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "dev",
         VAULT_DEV : "devprtcl",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active",
+        VAULT_STATUS: "withdraw",
     },
     'apetrumpet' : {
         TITLE: "apeTrump(et)",
