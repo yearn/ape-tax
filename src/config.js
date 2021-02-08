@@ -14,7 +14,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "usd-coin",
         VAULT_DEV : "emilianobonassi",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active",
+        VAULT_STATUS: "withdraw",
     },
     'devhugger' : {
         TITLE: "DEV Hugger",
