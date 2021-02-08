@@ -79,7 +79,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "SLP",
         VAULT_DEV : "andy8052",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active",
+        VAULT_STATUS: "withdraw",
     },
     'daihard' : {
         TITLE: "DAI Hard yVault",
