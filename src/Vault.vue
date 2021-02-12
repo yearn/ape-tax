@@ -38,29 +38,38 @@
   div(v-if="is_guest || yfi_needed <= 0")
     span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
     div.spacer
+
+    span(v-if="vault_available_limit <= 0") Deposits closed.
+
     b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
       b-input(v-model.number="amount", size="is-small", type="number",min=0)
       p.control
         b-button.is-static(size="is-small") {{ config.WANT_SYMBOL }}
+    
+        button.unstyled(
+          v-if="vault_available_limit > 0",
+          :disabled="has_allowance_vault",
+          @click.prevent="on_approve_vault"
+        ) {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
+        
+        button.unstyled(
+          v-if="vault_available_limit > 0",
+          :disabled="!has_allowance_vault",
+          @click.prevent="on_deposit"
+        ) 🏦 Deposit
+        
+        button.unstyled(
+          v-if="vault_available_limit > 0",
+          :disabled="!has_allowance_vault",
+          @click.prevent="on_deposit_all"
+        ) 🏦 Deposit All
+    
+    zap(:contract="progress_limit" :symbol="50")
 
-    span(v-if="vault_available_limit <= 0") Deposits closed.
     div.spacer
-    button.unstyled(
-      v-if="vault_available_limit > 0",
-      :disabled="has_allowance_vault",
-      @click.prevent="on_approve_vault"
-    ) {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
-    button.unstyled(
-      v-if="vault_available_limit > 0",
-      :disabled="!has_allowance_vault",
-      @click.prevent="on_deposit"
-    ) 🏦 Deposit
-    button.unstyled(
-      v-if="vault_available_limit > 0",
-      :disabled="!has_allowance_vault",
-      @click.prevent="on_deposit_all"
-    ) 🏦 Deposit All
+    
     button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+    
   div(v-else)
     .red
       span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
@@ -102,7 +111,9 @@ import ethers from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
+import Zap from './components/Zap';
 import GuestList from "./abi/GuestList.json";
+import ZapABI from "./abi/Zap.json";
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
 import ERC20 from "./abi/ERC20.json";
@@ -147,6 +158,7 @@ export default {
       bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
       roi_week: 0,
+      contractZap: null,
     };
   },
   filters: {
@@ -390,6 +402,9 @@ export default {
     },
   },
   async created() {
+    // Zap Contract
+    this.contractZap = new web3.eth.Contract(ZapABI, '0x15e5405B90Abba31F29c618f9dC8D65E95257660');
+
     axios
       .get(
         "https://api.coingecko.com/api/v3/simple/price?ids=" +
