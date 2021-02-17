@@ -23,7 +23,6 @@ const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
 console.log(drizzleOptions(vaultConfig));
 Vue.use(drizzleVuePlugin, { store, drizzleOptions: drizzleOptions(vaultConfig) })
-
 Vue.config.productionTip = false
 
 new Vue({

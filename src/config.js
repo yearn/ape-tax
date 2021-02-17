@@ -184,6 +184,8 @@ export default Object.freeze({
         VAULT_DEV : "matkam",
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active",
+        ZAP_ADDRESS: "0x2777938e0a1c12bce97c9cc9b36e737c08519a2c",
+        ZAP_SYMBOL: "ETH",
     },
     'wethgenlender': {
         TITLE: "WETH Gen Lender",
@@ -209,6 +211,6 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "nusd",
         VAULT_DEV : "emilianobonassi",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active", 
+        VAULT_STATUS: "active",
     },
 })

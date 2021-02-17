@@ -64,7 +64,7 @@
           @click.prevent="on_deposit_all"
         ) 🏦 Deposit All
     
-    zap(:contract="progress_limit" :symbol="50")
+    zap(:contract="config.ZAP_ADDRESS" :symbol="config.ZAP_SYMBOL")
 
     div.spacer
     
@@ -113,7 +113,6 @@ import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
 import Zap from './components/Zap';
 import GuestList from "./abi/GuestList.json";
-import ZapABI from "./abi/Zap.json";
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
 import ERC20 from "./abi/ERC20.json";
@@ -138,6 +137,7 @@ export default {
   components: {
     ProgressBar,
     InfoMessage,
+    Zap,
   },
   props: ['config'],
   data() {
@@ -402,8 +402,6 @@ export default {
     },
   },
   async created() {
-    // Zap Contract
-    this.contractZap = new web3.eth.Contract(ZapABI, '0x15e5405B90Abba31F29c618f9dC8D65E95257660');
 
     axios
       .get(
