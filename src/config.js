@@ -211,4 +211,17 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active", 
     },
+    'creamyswords': {
+        TITLE: "Creamy Swords SNX",
+        LOGO: "🍦⚔️",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0x7356f09c294cb9c6428ac7327b24b0f29419c181",
+        WANT_ADDR: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+        WANT_SYMBOL: "SNX",
+        COINGECKO_SYMBOL: "synthetix-network-token",
+        VAULT_DEV : "jmonteer23",
+        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "active", 
+    },
 })
