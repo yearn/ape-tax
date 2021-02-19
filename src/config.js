@@ -224,4 +224,17 @@ export default Object.freeze({
         BLOCK_ACTIVATED: 1606599919,
         VAULT_STATUS: "active", 
     },
+    'spadavault': {
+        TITLE: "SpadaVault",
+        LOGO: "s🦡",
+        VAULT_ABI: yVaultV2,
+        VAULT_TYPE: 'yearn',
+        VAULT_ADDR: "0x1Ae8Ccd120A05080d9A01C3B4F627F865685D091",
+        WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        WANT_SYMBOL: "WBTC",
+        COINGECKO_SYMBOL: "wrapped-bitcoin",
+        VAULT_DEV : "arbingsam",
+        BLOCK_ACTIVATED: 1606599919,
+        VAULT_STATUS: "stealth", 
+    },
 })
