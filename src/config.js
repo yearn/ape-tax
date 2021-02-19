@@ -183,7 +183,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "ethereum",
         VAULT_DEV : "matkam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active",
+        VAULT_STATUS: "withdraw",
     },
     'wethgenlender': {
         TITLE: "WETH Gen Lender",
