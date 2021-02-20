@@ -3,6 +3,19 @@ import LidoVault from './abi/LidoVault.json'
 
 // Main config file for common parameters
 export default Object.freeze({
+  '1inch' : { // route path
+      TITLE: "1Inch Little Horse",
+      LOGO: "🤏🐴",
+      VAULT_ABI: yVaultV2,
+      VAULT_TYPE: 'yearn',
+      VAULT_ADDR: "0xb8c3b7a2a618c552c23b1e4701109a9e756bab67",
+      WANT_ADDR: "0x111111111117dc0aa78b770fa6a738034120c302",
+      WANT_SYMBOL: "1INCH",
+      COINGECKO_SYMBOL: "1inch",
+      VAULT_DEV : "akshaynexust",
+      BLOCK_ACTIVATED: 1606599919,
+      VAULT_STATUS: "active",
+  },
     'yusdcidle' : { // route path
         TITLE: "USDc Idle",
         LOGO: "🏆🚀",
@@ -40,7 +53,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "nTrump",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active",
+        VAULT_STATUS: "withdraw",
     },
     'icecreath2' : {
         TITLE: "iceCREATH2",
@@ -196,7 +209,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "ethereum",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active", 
+        VAULT_STATUS: "active",
     },
     'susdidle': {
         TITLE: "sUSD Idle",
@@ -209,7 +222,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "nusd",
         VAULT_DEV : "emilianobonassi",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active", 
+        VAULT_STATUS: "active",
     },
     'creamyswords': {
         TITLE: "Creamy Swords SNX",
@@ -222,7 +235,7 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "havven",
         VAULT_DEV : "jmonteer23",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "active", 
+        VAULT_STATUS: "active",
     },
     'spadavault': {
         TITLE: "SpadaVault",
@@ -235,6 +248,6 @@ export default Object.freeze({
         COINGECKO_SYMBOL: "wrapped-bitcoin",
         VAULT_DEV : "arbingsam",
         BLOCK_ACTIVATED: 1606599919,
-        VAULT_STATUS: "stealth", 
+        VAULT_STATUS: "stealth",
     },
 })
