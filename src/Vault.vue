@@ -91,6 +91,8 @@
       a(href="https://twitter.com/fameal", target="_blank") fameal
       |, 
       a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
+      |, 
+      a(href="https://twitter.com/x48_crypto", target="_blank") x48
 div(v-else)
   div Loading yApp...
 </template>
