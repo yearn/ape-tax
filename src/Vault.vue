@@ -33,7 +33,7 @@
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
-  div Your ETH Balance: {{ eth_balance | fromWei(2) }}
+  div Your {{ chainCoin }} Balance: {{ coin_balance | fromWei(2) }}
   div.spacer
   div(v-if="is_guest || yfi_needed <= 0")
     span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
@@ -130,7 +130,7 @@ export default {
     ProgressBar,
     InfoMessage,
   },
-  props: ['config', 'chainId'],
+  props: ['config', 'chainId', 'chainCoin'],
   data() {
     return {
       username: null,
@@ -363,7 +363,7 @@ export default {
     want_balance() {
       return this.call("WANT", "balanceOf", [this.activeAccount]);
     },
-    eth_balance() {
+    coin_balance() {
       return this.activeBalance;
     },
     progress_limit() {

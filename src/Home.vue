@@ -36,7 +36,7 @@ export default {
   components: {
     StatusTag,
   },
-  props: ["allConfig", "chainId"],
+  props: ["allConfig", "chainId", "chainCoin"],
   data() {
     return {
       items: Object.keys(this.allConfig)

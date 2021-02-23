@@ -1,8 +1,10 @@
 {
   "1": {
-    "name": "ETH Mainnet"
+    "name": "ETH Mainnet",
+    "coin": "ETH"
   },
   "250": {
-    "name": "FTM Mainnet"
+    "name": "FTM Mainnet",
+    "coin": "FTM"
   }
 }
