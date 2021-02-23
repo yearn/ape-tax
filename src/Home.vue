@@ -15,10 +15,15 @@
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2(v-show="experimentVaults.length").title.is-4 🧠 Experiments
+      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Experiments
       ul
-        li(v-for="vault in experimentVaults")
+        li(v-for="vault in experimentVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
+          status-tag(:status="vault.VAULT_STATUS")
+        li(v-for="vault in experimentVaultsOther")
+          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+          status-tag(:status="vault.VAULT_STATUS")
+
 </template>
 
 <script>
@@ -86,14 +91,30 @@ export default {
 
       return result;
     },
-    experimentVaults() {
+    experimentVaultsActive() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "experiment" && item.VAULT_STATUS != "stealth"
+            item.VAULT_TYPE === "experiment" && item.VAULT_STATUS === "active"
+        )
+        .slice()
+        .reverse();
+
+      return result;
+    },
+    experimentVaultsOther() {
+      var items = this.items;
+
+      var result = items
+        .filter((item) => item.CHAIN_ID === this.chainId)
+        .filter(
+          (item) =>
+            item.VAULT_TYPE === "experiment" &&
+            item.VAULT_STATUS != "active" &&
+            item.VAULT_STATUS != "stealth"
         )
         .slice()
         .reverse();
