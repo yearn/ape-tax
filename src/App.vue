@@ -1,19 +1,22 @@
 <template lang="pug">
-  div(v-if="isDrizzleInitialized || isHome", id="app")
+  div(v-if="isDrizzleInitialized && chainId", id="app")
+    .chain {{ chainName }}
     .section
-      Section(:config="config" :allConfig="allConfig")
+      Section(:config="config" :allConfig="allConfig" :chainId="chainId")
   div(v-else)
     div Loading yApp...
 </template>
 
 <script>
 import config from './config.js'
+import chains from './chains.json'
 import Vault from './Vault'
 import LidoVault from './LidoVault'
 import stETHLPVault from './stETHLPVault'
 import Home from './Home'
 import NotFound from './NotFound'
 import { mapGetters } from 'vuex'
+import Web3 from 'web3';
 
 const vaultPath = window.location.pathname.substring(1)
 const vaultConfig = config[vaultPath] || null;
@@ -39,6 +42,12 @@ const VaultType = window.location.pathname === '/yvsteth' ? LidoVault : (
 
 const Section = window.location.pathname === '/' ? Home : VaultType
 
+let web3 = new Web3(Web3.givenProvider);
+window.ethereum.on("chainChanged", (chainIdHex) =>
+  window.location.reload()
+);
+
+
 export default {
   name: 'app',
   components: {
@@ -51,7 +60,20 @@ export default {
       isHome: window.location.pathname === '/',
     }
   },
-  computed: mapGetters('drizzle', ['isDrizzleInitialized'])
+  asyncComputed: {
+    ...mapGetters('drizzle', ['isDrizzleInitialized', 'drizzleInstance']),
+    chainId() {
+      if (this.isDrizzleInitialized) {
+        return this.drizzleInstance.web3.eth.getChainId();
+      }
+      return 0
+    },
+    chainName() {
+      if (this.chainId) {
+        return chains[this.chainId].name;
+      }
+    }
+  }
 }
 </script>
 
@@ -70,6 +92,12 @@ export default {
 }
 .section {
   padding: 1rem !important;
+}
+.chain {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  font-size: 20px;
 }
 body, button, input, optgroup, select, textarea {
   font-family: 'IBM Plex Mono', monospace !important;
