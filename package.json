@@ -17,6 +17,7 @@
     "pug": "^3.0.0",
     "pug-plain-loader": "^1.0.0",
     "vue": "^2.6.11",
+    "vue-async-computed": "^3.9.0",
     "vue-konami": "^1.0.10",
     "vuex": "^3.5.1"
   },

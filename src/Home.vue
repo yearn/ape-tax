@@ -6,7 +6,7 @@
   div.spacer
   div.columns
     div.column.is-one-third
-      h2.title.is-4 🚀 Yearn Vaults
+      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Yearn Vaults
       ul
         li(v-for="vault in yearnVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
@@ -15,92 +15,93 @@
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2.title.is-4 🧠 Experiments
+      h2(v-show="experimentVaults.length").title.is-4 🧠 Experiments {{ chainId }} 22
       ul
         li(v-for="vault in experimentVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
 </template>
 
 <script>
-import StatusTag from './components/StatusTag';
+import StatusTag from "./components/StatusTag";
 
 import { mapGetters } from "vuex";
 
 export default {
   name: "Home",
   components: {
-    StatusTag
+    StatusTag,
   },
-  props: ['allConfig'],
+  props: ["allConfig", "chainId"],
   data() {
     return {
+      items: Object.keys(this.allConfig)
+        .map((key) => ({
+          ...this.allConfig[key],
+          URL: key,
+        }))
     };
   },
   filters: {},
   methods: {},
   computed: {
+    ...mapGetters('drizzle', ['drizzleInstance']),
     yearnVaults() {
-      var items = this.allConfig;
-  
-      var result = Object.keys(items)
-        .map(((key) => ({
-          ...items[key],
-          URL: key
-        })))
-        .filter(item => item.VAULT_TYPE === 'yearn')
-        .slice().reverse()
+      var items = this.items;
+
+      var result = items
+        .filter((item) => item.CHAIN_ID === this.chainId)
+        .filter((item) => item.VAULT_TYPE === "yearn")
+        .slice()
+        .reverse();
 
       return result;
     },
     yearnVaultsActive() {
-      var items = this.allConfig;
-  
-      var result = Object.keys(items)
-        .map(((key) => ({
-          ...items[key],
-          URL: key
-        })))
-        .filter(item => item.VAULT_TYPE === 'yearn' && item.VAULT_STATUS === 'active')
-        .slice().reverse()
+      var items = this.items;
+
+      var result = items
+        .filter((item) => item.CHAIN_ID === this.chainId)
+        .filter(
+          (item) =>
+            item.VAULT_TYPE === "yearn" && item.VAULT_STATUS === "active"
+        )
+        .slice()
+        .reverse();
 
       return result;
     },
     yearnVaultsOther() {
-      var items = this.allConfig;
-  
-      var result = Object.keys(items)
-        .map(((key) => ({
-          ...items[key],
-          URL: key
-        })))
-        .filter(item => 
-          item.VAULT_TYPE === 'yearn' 
-          && item.VAULT_STATUS != 'active'
-          && item.VAULT_STATUS != 'stealth'
+      var items = this.items;
+
+      var result = items
+        .filter((item) => item.CHAIN_ID === this.chainId)
+        .filter(
+          (item) =>
+            item.VAULT_TYPE === "yearn" &&
+            item.VAULT_STATUS != "active" &&
+            item.VAULT_STATUS != "stealth"
         )
-        .slice().reverse()
+        .slice()
+        .reverse();
 
       return result;
     },
     experimentVaults() {
-      var items = this.allConfig;
-  
-      var result = Object.keys(items)
-        .map(((key) => ({
-          ...items[key],
-          URL: key
-        })))
+      var items = this.items;
+
+      var result = items
+        .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
-          item => item.VAULT_TYPE === 'experiment' 
-          && item.VAULT_STATUS != 'stealth'
+          (item) =>
+            item.VAULT_TYPE === "experiment" && item.VAULT_STATUS != "stealth"
         )
-        .slice().reverse()
+        .slice()
+        .reverse();
 
       return result;
-    }
+    },
   },
-  created() {},
-}
+};
 </script>
 
 <style>
@@ -119,7 +120,7 @@ div.warning {
 a.links,
 a.links:visited,
 a.links:hover {
-  font-family: IBM Plex Mono,monospace;
+  font-family: IBM Plex Mono, monospace;
   font-size: 16px;
   font-weight: 500;
   color: #2c3e50;

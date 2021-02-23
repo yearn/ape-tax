@@ -6,6 +6,7 @@ import config from './config.js'
 import drizzleVuePlugin from '@drizzle/vue-plugin'
 import drizzleOptions from './drizzleOptions'
 import VueKonami from 'vue-konami'
+import AsyncComputed from 'vue-async-computed'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
@@ -17,6 +18,8 @@ Vue.use(Buefy, {
 Vue.use(VueKonami)
 
 Vue.use(Vuex)
+Vue.use(AsyncComputed)
+
 const store = new Vuex.Store({ state: {} })
 
 const vaultPath = window.location.pathname.substring(1)
