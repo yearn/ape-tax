@@ -15,7 +15,7 @@
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2(v-show="experimentVaults.length").title.is-4 🧠 Experiments {{ chainId }} 22
+      h2(v-show="experimentVaults.length").title.is-4 🧠 Experiments
       ul
         li(v-for="vault in experimentVaults")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
