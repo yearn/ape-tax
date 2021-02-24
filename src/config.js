@@ -285,4 +285,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
+  hotcoins: {
+    TITLE: "HotCoins Vault",
+    LOGO: "🔥🪙",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "yearn",
+    VAULT_ADDR: "0xBF7AA989192b020a8d3e1C65a558e123834325cA",
+    WANT_ADDR: "0x0316eb71485b0ab14103307bf65a021042c6d380",
+    WANT_SYMBOL: "HBTC",
+    COINGECKO_SYMBOL: "huobi-btc",
+    VAULT_DEV: "arbingsam",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "stealth",
+    CHAIN_ID: 1,
+  },
 });
