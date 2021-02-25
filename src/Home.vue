@@ -2,11 +2,10 @@
 #home
   h1.title.is-3 Test Vaults Registry
   div.columns
-    div.column.is-two-thirds ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. Proceed with caution.
-  div.spacer
+    div.column.is-two-thirds.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when production ones are deployed. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution.
   div.columns
     div.column.is-one-third
-      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Yearn Vaults
+      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Experimental Vaults
       ul
         li(v-for="vault in yearnVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
@@ -15,7 +14,7 @@
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Experiments
+      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Weird Experiments
       ul
         li(v-for="vault in experimentVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
@@ -136,7 +135,9 @@ ul li {
   margin-bottom: 1em;
 }
 div.warning {
-  width: 50%;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  background-color: #fff257;
 }
 a.links,
 a.links:visited,
