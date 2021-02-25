@@ -3,7 +3,7 @@
   .logo {{ config.LOGO }}
   h1.title.is-3 {{ config.TITLE }}
   div.columns
-    div.column.is-half
+    div.column.is-half.warning
       info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
