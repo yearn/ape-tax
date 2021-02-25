@@ -3,6 +3,21 @@ import LidoVault from "./abi/LidoVault.json";
 
 // Main config file for common parameters
 export default Object.freeze({
+  "uni": {
+    // route path
+    TITLE: "Uniswap Pool Together",
+    LOGO: "🎰🦄",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "yearn",
+    VAULT_ADDR: "0xFe8A3837cFf919C800bdC5d1ac6136F84497d679",
+    WANT_ADDR: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    WANT_SYMBOL: "UNI",
+    COINGECKO_SYMBOL: "uniswap",
+    VAULT_DEV: "mattdwest",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
   "1inch": {
     // route path
     TITLE: "1Inch Little Horse",
