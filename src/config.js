@@ -3,21 +3,6 @@ import LidoVault from "./abi/LidoVault.json";
 
 // Main config file for common parameters
 export default Object.freeze({
-  "1inch": {
-    // route path
-    TITLE: "1Inch Little Horse",
-    LOGO: "🤏🐴",
-    VAULT_ABI: yVaultV2,
-    VAULT_TYPE: "yearn",
-    VAULT_ADDR: "0xb8c3b7a2a618c552c23b1e4701109a9e756bab67",
-    WANT_ADDR: "0x111111111117dc0aa78b770fa6a738034120c302",
-    WANT_SYMBOL: "1INCH",
-    COINGECKO_SYMBOL: "1inch",
-    VAULT_DEV: "akshaynexust",
-    BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
-    CHAIN_ID: 1,
-  },
   yusdcidle: {
     // route path
     TITLE: "USDc Idle",
@@ -297,6 +282,20 @@ export default Object.freeze({
     VAULT_DEV: "arbingsam",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "stealth",
+    CHAIN_ID: 1,
+  },
+  "1inch": {
+    TITLE: "1Inch Little Horse",
+    LOGO: "🤏🐴",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "yearn",
+    VAULT_ADDR: "0xb8c3b7a2a618c552c23b1e4701109a9e756bab67",
+    WANT_ADDR: "0x111111111117dc0aa78b770fa6a738034120c302",
+    WANT_SYMBOL: "1INCH",
+    COINGECKO_SYMBOL: "1inch",
+    VAULT_DEV: "akshaynexust",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
 });
