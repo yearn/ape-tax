@@ -9,7 +9,7 @@ export default Object.freeze({
     LOGO: "🎰🦄",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "yearn",
-    VAULT_ADDR: "0xfe8a3837cff919c800bdc5d1ac6136f84497d679",
+    VAULT_ADDR: "0xFe8A3837cFf919C800bdC5d1ac6136F84497d679",
     WANT_ADDR: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
     WANT_SYMBOL: "UNI",
     COINGECKO_SYMBOL: "uniswap",
