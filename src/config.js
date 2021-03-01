@@ -271,7 +271,7 @@ export default Object.freeze({
     CHAIN_ID: 250,
   },
   fantomsdollar: {
-    TITLE: "Fantom's dollar",
+    TITLE: "Fantom's Dollar",
     LOGO: "👻💵",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "yearn",
