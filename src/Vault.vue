@@ -7,7 +7,7 @@
       info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
-      :href="'https://etherscan.io/address/' + config.VAULT_ADDR + '#code'",
+      :href="chainExplorer + '/address/' + config.VAULT_ADDR + '#code'",
       target="_blank"
     ) 📃Contract
   div Version: {{ vault_version }}
@@ -25,7 +25,7 @@
     div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
     div Address:&nbsp;
       a(
-        :href="'https://etherscan.io/address/' + strategy.address + '#code'",
+        :href="chainExplorer + '/address/' + strategy.address + '#code'",
         target="_blank"
       ) 📃Contract
   div.spacer
@@ -130,7 +130,7 @@ export default {
     ProgressBar,
     InfoMessage,
   },
-  props: ['config', 'chainId', 'chainCoin'],
+  props: ['config', 'chainId', 'chainCoin', 'chainExplorer'],
   data() {
     return {
       username: null,

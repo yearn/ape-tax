@@ -2,7 +2,7 @@
   div(v-if="isDrizzleInitialized && chainId", id="app")
     .chain {{ chainName }}
     .section
-      Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin")
+      Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
   div(v-else)
     div Loading yApp...
 </template>
@@ -76,6 +76,11 @@ export default {
     chainCoin() {
       if (this.chainId) {
         return chains[this.chainId].coin;
+      }
+    },
+    chainExplorer() {
+      if (this.chainId) {
+        return chains[this.chainId].block_explorer;
       }
     }
   }

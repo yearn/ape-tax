@@ -1,10 +1,12 @@
 {
   "1": {
     "name": "ETH Mainnet",
-    "coin": "ETH"
+    "coin": "ETH",
+    "block_explorer": "https://etherscan.io"
   },
   "250": {
     "name": "FTM Mainnet",
-    "coin": "FTM"
+    "coin": "FTM",
+    "block_explorer": "https://ftmscan.com"
   }
 }
