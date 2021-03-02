@@ -312,4 +312,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  fullmetalfarmer: {
+    TITLE: "Full Metal Farmer",
+    LOGO: "🧙‍♂️🧪",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "yearn",
+    VAULT_ADDR: "0x56A5Fd5104a4956898753dfb060ff32882Ae0eb4",
+    WANT_ADDR: "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF",
+    WANT_SYMBOL: "ALCX",
+    COINGECKO_SYMBOL: "alchemix",
+    VAULT_DEV: "akshaynexust",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
