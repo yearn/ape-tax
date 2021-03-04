@@ -1,10 +1,15 @@
 <template lang="pug">
-  div(v-if="isDrizzleInitialized && chainId", id="app")
-    .chain {{ chainName }}
-    .section
-      Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
-  div(v-else)
-    div Loading Ex<sup>2</sup> 🧪...
+  #app
+    div(v-konami @konami="showApeTax = !showApeTax")
+    div(v-if="showApeTax")
+      div.apeTax
+    div(v-else)
+      div(v-if="isDrizzleInitialized && chainId", id="app")
+        .chain {{ chainName }}
+        .section
+          Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
+      div(v-else)
+        div Loading Ex<sup>2</sup> 🧪...
 </template>
 
 <script>
@@ -58,6 +63,7 @@ export default {
       config: vaultConfig,
       allConfig: config,
       isHome: window.location.pathname === '/',
+      showApeTax: false,
     }
   },
   asyncComputed: {
@@ -147,5 +153,14 @@ button.unstyled {
   content: "";
   display: table;
   clear: both;
+}
+
+.apeTax {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url(assets/splash_apetax.png);
+  background-size: cover;
+  background-color: purple;
 }
 </style>
