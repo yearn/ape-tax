@@ -26,16 +26,16 @@ npm run build
 npm run lint
 ```
 
-## Add a vault
+## Add an experimental experiment
 
-Add a new element to the config.js array:
+Add a new element to the config.js array, at the end:
 
 ```javascript
 'path': { // URL path
-  TITLE: "Vault", // Title of the vault, let you imagination fly
-  LOGO: "🏆🪙", // Emojis to show on top, make it fun please
+  TITLE: "Hardrock Farmer", // Title of the vault, let you imagination fly
+  LOGO: "🎸👨‍🌾", // Emojis to show on top, make it fun please
   VAULT_ABI: yVaultV2, // Usually that one, unless doing a custom one
-  VAULT_TYPE: 'yearn', // 'yearn', 'experimental' to select in which column it should show
+  VAULT_TYPE: 'weird', // 'weird', 'experimental' to select in which column it should show
   VAULT_ADDR: "0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b", // Vault address
   WANT_ADDR: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // Token address
   WANT_SYMBOL: "USDC", // want symbol to show in UI
@@ -43,5 +43,6 @@ Add a new element to the config.js array:
   VAULT_DEV : "emilianobonassi", // Developer of the vault
   BLOCK_ACTIVATED: 1606599919, // When the vault was activated (not implemented yet)
   VAULT_STATUS: "active", // 'active', 'withdraw'. Not active vaults have a label to show status
+  CHAIN_ID: 1, // 1: Ethereum mainnet, 250: Fantom network
 }
 ```
