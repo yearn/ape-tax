@@ -5,7 +5,7 @@
     div.column.is-two-thirds.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution.
   div.columns
     div.column.is-one-third
-      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Experimental Vaults
+      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Experimental
       ul
         li(v-for="vault in yearnVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
@@ -14,7 +14,7 @@
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Weird Experiments
+      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Weird
       ul
         li(v-for="vault in experimentVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
