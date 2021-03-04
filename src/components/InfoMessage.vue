@@ -10,8 +10,8 @@
 			a(href="https://yearn.finance/vaults", target="_blank") <strong>yearn.finance</strong>
 		span(v-else)
 			| ⚠️ <strong>WARNING</strong> this vault is experimental.
-			| It's extremely risky and will probably be discarded when production ones are deployed.
-			| Proceed with caution.
+			| It's extremely risky and will probably be discarded when the test is over.
+			| Proceed with extreme caution.
 </template>
 
 <script>
