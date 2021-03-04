@@ -2,7 +2,7 @@
 #home
   h1.title.is-3 Experimental Experiments Registry
   div.columns
-    div.column.is-two-thirds.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution.
+    div.column.is-two-thirds.warning ⚠️ <strong>WARNING</strong> this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution.
   div.columns
     div.column.is-one-third
       h2(v-show="experimentalVaultsActive.length || experimentalVaultsOther.length").title.is-4 🚀 Experimental

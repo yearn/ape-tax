@@ -3,7 +3,7 @@
   .logo {{ config.LOGO }}
   h1.title.is-3 {{ config.TITLE }}
   div.columns
-    div.column.is-one-quarter ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when the test is over. Proceed with caution.
+    div.column.is-one-quarter ⚠️ <strong>WARNING</strong> this experiment is experimental. They are extremely risky and will probably be discarded when the test is over. Proceed with caution.
     div.column.is-one-quarter 📢 <strong>DISCLAIMER</strong> When you transfer and deposit, your ETH will be converted into stETH 1:1 and deposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.
   div Vault:&nbsp;
     a(
