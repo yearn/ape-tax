@@ -1,32 +1,38 @@
-# Yearn Rocks 🤘🎸
+# Ape Tax 🦍🧮
+
 If you want to run the UI yourself, check the following steps:
 
 ## Project setup
-```
+
+```bash
 npm install
 ```
 
 ### Compiles and hot-reloads for development
-```
+
+```bash
 npm run serve
 ```
 
 ### Compiles and minifies for production
-```
+
+```bash
 npm run build
 ```
 
 ### Lints and fixes files
-```
+
+```bash
 npm run lint
 ```
 
 ## Add a vault
+
 Add a new element to the config.js array:
 
-```
+```javascript
 'path': { // URL path
-  TITLE: "yVault", // Title of the vault, let you imagination fly
+  TITLE: "Vault", // Title of the vault, let you imagination fly
   LOGO: "🏆🪙", // Emojis to show on top, make it fun please
   VAULT_ABI: yVaultV2, // Usually that one, unless doing a custom one
   VAULT_TYPE: 'yearn', // 'yearn', 'experimental' to select in which column it should show
@@ -38,5 +44,4 @@ Add a new element to the config.js array:
   BLOCK_ACTIVATED: 1606599919, // When the vault was activated (not implemented yet)
   VAULT_STATUS: "active", // 'active', 'withdraw'. Not active vaults have a label to show status
 }
-
 ```
