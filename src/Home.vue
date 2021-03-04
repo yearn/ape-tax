@@ -5,21 +5,21 @@
     div.column.is-two-thirds.warning ⚠️ <strong>WARNING</strong> this vaults are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution.
   div.columns
     div.column.is-one-third
-      h2(v-show="yearnVaultsActive.length || yearnVaultsOther.length").title.is-4 🚀 Experimental
+      h2(v-show="experimentalVaultsActive.length || experimentalVaultsOther.length").title.is-4 🚀 Experimental
       ul
-        li(v-for="vault in yearnVaultsActive")
+        li(v-for="vault in experimentalVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
-        li(v-for="vault in yearnVaultsOther")
+        li(v-for="vault in experimentalVaultsOther")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third
-      h2(v-show="experimentVaultsActive.length").title.is-4 🧠 Weird
+      h2(v-show="weirdVaultsActive.length").title.is-4 🧠 Weird
       ul
-        li(v-for="vault in experimentVaultsActive")
+        li(v-for="vault in weirdVaultsActive")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
           status-tag(:status="vault.VAULT_STATUS")
-        li(v-for="vault in experimentVaultsOther")
+        li(v-for="vault in weirdVaultsOther")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
 
@@ -49,39 +49,39 @@ export default {
   methods: {},
   computed: {
     ...mapGetters('drizzle', ['drizzleInstance']),
-    yearnVaults() {
+    experimentalVaults() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
-        .filter((item) => item.VAULT_TYPE === "yearn")
+        .filter((item) => item.VAULT_TYPE === "experimental")
         .slice()
         .reverse();
 
       return result;
     },
-    yearnVaultsActive() {
+    experimentalVaultsActive() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "yearn" && item.VAULT_STATUS === "active"
+            item.VAULT_TYPE === "experimental" && item.VAULT_STATUS === "active"
         )
         .slice()
         .reverse();
 
       return result;
     },
-    yearnVaultsOther() {
+    experimentalVaultsOther() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "yearn" &&
+            item.VAULT_TYPE === "experimental" &&
             item.VAULT_STATUS != "active" &&
             item.VAULT_STATUS != "stealth"
         )
@@ -90,28 +90,28 @@ export default {
 
       return result;
     },
-    experimentVaultsActive() {
+    weirdVaultsActive() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "experiment" && item.VAULT_STATUS === "active"
+            item.VAULT_TYPE === "weird" && item.VAULT_STATUS === "active"
         )
         .slice()
         .reverse();
 
       return result;
     },
-    experimentVaultsOther() {
+    weirdVaultsOther() {
       var items = this.items;
 
       var result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "experiment" &&
+            item.VAULT_TYPE === "weird" &&
             item.VAULT_STATUS != "active" &&
             item.VAULT_STATUS != "stealth"
         )
