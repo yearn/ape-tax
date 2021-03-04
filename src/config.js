@@ -61,7 +61,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   sushirocket: {
-    TITLE: "yvSushi YFI-ETH",
+    TITLE: "Sushi YFI-ETH",
     LOGO: "🍣🍬",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
