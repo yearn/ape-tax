@@ -4,7 +4,7 @@
     .section
       Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
   div(v-else)
-    div Loading yApp...
+    div Loading Ex<sup>2</sup> 🧪...
 </template>
 
 <script>
