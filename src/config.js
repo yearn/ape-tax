@@ -75,7 +75,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   daihard: {
-    TITLE: "DAI Hard yVault",
+    TITLE: "DAI Hard",
     LOGO: "🏅💪",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
@@ -89,7 +89,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   usdc: {
-    TITLE: "USd Coin yVault",
+    TITLE: "USd Coin",
     LOGO: "🇺🇸🪙",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
@@ -103,7 +103,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   yvsteth: {
-    TITLE: "Lido St. Ether Vault",
+    TITLE: "Lido St. Ether",
     LOGO: "👼🏦",
     VAULT_ABI: LidoVault,
     VAULT_TYPE: "weird",
@@ -285,7 +285,7 @@ export default Object.freeze({
     CHAIN_ID: 250,
   },
   hotcoins: {
-    TITLE: "HotCoins Vault",
+    TITLE: "HotCoins",
     LOGO: "🔥🪙",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
