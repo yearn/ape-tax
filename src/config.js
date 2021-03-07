@@ -312,4 +312,18 @@ export default Object.freeze({
     VAULT_STATUS: "stealth",
     CHAIN_ID: 1,
   },
+  bluedata: {
+    TITLE: "Blue Data",
+    LOGO: "🔵💿",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xE14d13d8B3b85aF791b2AADD661cDBd5E6097Db1",
+    WANT_ADDR: "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+    WANT_SYMBOL: "YFI",
+    COINGECKO_SYMBOL: "yearn-finance",
+    VAULT_DEV: "arbingsam",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "stealth",
+    CHAIN_ID: 1,
+  },
 });
