@@ -32,6 +32,7 @@
   h2.title.is-4 <strong>Wallet</strong>
   div Your Account: <strong>{{ username || activeAccount }}</strong>
   div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
+  div Your shares value: {{ yvtoken_value | toCurrency(2, vault_decimals) }}
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your {{ chainCoin }} Balance: {{ coin_balance | fromWei(2) }}
   div.spacer
@@ -359,6 +360,11 @@ export default {
     },
     yvtoken_balance() {
       return this.call("Vault", "balanceOf", [this.activeAccount]);
+    },
+    yvtoken_value() {
+      let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+      let numAum = this.yvtoken_balance.div(toFloat).toNumber();
+      return (numAum / 100) * this.want_price;
     },
     want_balance() {
       return this.call("WANT", "balanceOf", [this.activeAccount]);
