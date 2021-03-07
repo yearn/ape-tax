@@ -298,4 +298,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  badgergoat: {
+    TITLE: "Badger GOAT",
+    LOGO: "🦡🐐",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x3149950258FbBcE1638d6C23ac93A692604Ef864",
+    WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    WANT_SYMBOL: "WBTC",
+    COINGECKO_SYMBOL: "wrapped-bitcoin",
+    VAULT_DEV: "orbxball",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "stealth",
+    CHAIN_ID: 1,
+  },
 });
