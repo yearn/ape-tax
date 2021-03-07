@@ -323,7 +323,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "yearn-finance",
     VAULT_DEV: "arbingsam",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "experimental",
+    VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
 });
