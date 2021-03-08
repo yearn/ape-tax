@@ -354,4 +354,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  dataaave: {
+    TITLE: "Data AAVE",
+    LOGO: "💿🕊",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xac1c90b9c76d56ba2e24f3995f7671c745f8f308",
+    WANT_ADDR: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+    WANT_SYMBOL: "AAVE",
+    COINGECKO_SYMBOL: "aave",
+    VAULT_DEV: "0xangelfish",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
