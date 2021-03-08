@@ -299,7 +299,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   badgergoat: {
-    TITLE: "Badger GOAT",
+    TITLE: "Badger's GOAT",
     LOGO: "🦡🐐",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
