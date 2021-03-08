@@ -337,7 +337,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "ocean-protocol",
     VAULT_DEV: "akshaynexust",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "stealth",
+    VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
   sushidata: {
@@ -351,7 +351,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "sushi",
     VAULT_DEV: "poolpitako",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "stealth",
+    VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
 });
