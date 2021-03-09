@@ -368,4 +368,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  idletether: {
+    TITLE: "Idle Tether",
+    LOGO: "🛌T",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xAf322a2eDf31490250fdEb0D712621484b09aBB6",
+    WANT_ADDR: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    WANT_SYMBOL: "USDT",
+    COINGECKO_SYMBOL: "tether",
+    VAULT_DEV: "emilianobonassi",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
