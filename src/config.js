@@ -382,4 +382,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  trueidle: {
+    TITLE: "True Idle",
+    LOGO: "T🛌",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x49b3e44e54b6220af892dba48ae45f1ea6bc4ae9",
+    WANT_ADDR: "0x0000000000085d4780B73119b644AE5ecd22b376",
+    WANT_SYMBOL: "TUSD",
+    COINGECKO_SYMBOL: "true-usd",
+    VAULT_DEV: "emilianobonassi",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
