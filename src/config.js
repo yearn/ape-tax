@@ -396,4 +396,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  poolwithus: {
+    TITLE: "Pool with Us",
+    LOGO: "🏊‍♂️👩‍👩‍👧‍👧",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x2F194Da57aa855CAa02Ea3Ab991fa5d38178B9e6",
+    WANT_ADDR: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    WANT_SYMBOL: "UNI",
+    COINGECKO_SYMBOL: "uniswap",
+    VAULT_DEV: "mattdwest",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
