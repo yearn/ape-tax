@@ -410,4 +410,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  ironllama: {
+    TITLE: "Iron Llama",
+    LOGO: "🏦🦙",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x27b7b1ad7288079a66d12350c828d3c00a6f07d7",
+    WANT_ADDR: "0x5282a4ef67d9c33135340fb3289cc1711c13638c",
+    WANT_SYMBOL: "ib3CRV",
+    COINGECKO_SYMBOL: "usd-coin",
+    VAULT_DEV: "dudesahn",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
