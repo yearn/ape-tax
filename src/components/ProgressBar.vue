@@ -40,7 +40,6 @@ export default {
 </script>
 <style>
 .progress-bar { 
-	/*white-space: pre-wrap;*/
 	display: inline-block;
 	white-space: nowrap;
 }
