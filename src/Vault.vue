@@ -17,7 +17,8 @@
   div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
-  progress-bar(:progress="progress_limit" :width="50")
+  progress-bar.is-hidden-mobile(:progress="progress_limit" :width="50")
+  progress-bar.is-hidden-tablet(:progress="progress_limit" :width="30")
   div.spacer
   h2.title.is-4 <strong>Strategies</strong>
   div(v-for="(strategy, index) in strategies")
