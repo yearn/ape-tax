@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar">
+  <div class="progress-bar is-size-8-mobile">
 	
 	<span class="progress-body">
 	[
@@ -39,7 +39,9 @@ export default {
 
 </script>
 <style>
+
 .progress-bar { 
+	display: inline-block;
 	white-space: pre-wrap;
 }
 
@@ -47,4 +49,5 @@ export default {
 	background-color: #f0f0f0;
 	color: black;
 }
+
 </style>

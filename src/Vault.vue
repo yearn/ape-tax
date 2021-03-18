@@ -1,10 +1,9 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
-  h1.title.is-3 {{ config.TITLE }}
-  div.columns
-    div.column.is-half.warning
-      info-message(:status="config.VAULT_STATUS")
+  h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
+  div.container.is-max-desktop.warning.is-size-7-mobile
+    info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
       :href="chainExplorer + '/address/' + config.VAULT_ADDR + '#code'",
@@ -18,7 +17,8 @@
   div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
-  progress-bar(:progress="progress_limit" :width="50")
+  progress-bar.is-hidden-mobile(:progress="progress_limit" :width="50")
+  progress-bar.is-hidden-tablet(:progress="progress_limit" :width="30")
   div.spacer
   h2.title.is-4 <strong>Strategies</strong>
   div(v-for="(strategy, index) in strategies")
