@@ -1,10 +1,9 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized")
   .logo {{ config.LOGO }}
-  h1.title.is-3 {{ config.TITLE }}
-  div.columns
-    div.column.is-half.warning
-      info-message(:status="config.VAULT_STATUS")
+  h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
+  div.container.is-max-desktop.warning.is-size-7-mobile
+    info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(
       :href="chainExplorer + '/address/' + config.VAULT_ADDR + '#code'",

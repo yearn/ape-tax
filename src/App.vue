@@ -5,7 +5,7 @@
       div.apeTax
     div(v-else)
       div(v-if="isDrizzleInitialized && chainId", id="app")
-        .chain {{ chainName }}
+        .chain.is-size-5.is-size-6-mobile {{ chainName }}
         .section
           Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
       div(v-else)
@@ -113,8 +113,9 @@ export default {
   position: absolute;
   top: 5px;
   right: 20px;
-  font-size: 20px;
+  font-size: 1.2rem;
 }
+
 body, button, input, optgroup, select, textarea {
   font-family: 'IBM Plex Mono', monospace !important;
 }
@@ -131,7 +132,7 @@ button.unstyled {
 }
 
 .logo {
-  font-size: 80px;
+  font-size: 5rem;
 }
 
 .column {
@@ -146,7 +147,7 @@ button.unstyled {
 }
 
 .warning {
-  font-size: 13px;
+  font-size: 0.8rem;
 }
 
 .row:after {
