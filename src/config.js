@@ -410,4 +410,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  vesperusdc: {
+    TITLE: "Vesper-bell USDC",
+    LOGO: "🛐🪙",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x477faf103dadc5fe5baa40951cf7512dcbc18126",
+    WANT_ADDR: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    WANT_SYMBOL: "USDC",
+    COINGECKO_SYMBOL: "usd-coin",
+    VAULT_DEV: "real_mills",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
