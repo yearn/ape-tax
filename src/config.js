@@ -410,18 +410,4 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
-  bnbdai: {
-    TITLE: "BNB dai",
-    LOGO: "??",
-    VAULT_ABI: yVaultV2,
-    VAULT_TYPE: "experimental",
-    VAULT_ADDR: "0xc84E92e5aAD1B957A36505098aaA6881C722E522",
-    WANT_ADDR: "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3",
-    WANT_SYMBOL: "bDAI",
-    COINGECKO_SYMBOL: "DAI",
-    VAULT_DEV: "poolpitako",
-    BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
-    CHAIN_ID: 56,
-  },
 });
