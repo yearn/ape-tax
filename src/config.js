@@ -410,4 +410,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  fantombaby: {
+    TITLE: "Fantom's Ape Ape Baby",
+    LOGO: "🧊👶",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xEea0714eC1af3b0D41C624Ba5ce09aC92F4062b1",
+    WANT_ADDR: "0xf16e81dce15b08f326220742020379b855b87df9",
+    WANT_SYMBOL: "ICE",
+    COINGECKO_SYMBOL: "",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 250,
+  },
 });
