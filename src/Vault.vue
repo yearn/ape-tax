@@ -45,7 +45,9 @@
         b-button.is-static(size="is-small") {{ config.WANT_SYMBOL }}
 
     span(v-if="vault_available_limit <= 0") Deposits closed.
+    
     div.spacer
+
     button.unstyled(
       v-if="vault_available_limit > 0",
       :disabled="has_allowance_vault",
@@ -61,7 +63,16 @@
       :disabled="!has_allowance_vault",
       @click.prevent="on_deposit_all"
     ) 🏦 Deposit All
-    button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+    
+    div.spacer
+
+    b-field(label="Withdrawal Slippage", custom-class="is-small", v-if="vault_available_limit > 0")
+      b-input(v-model.number="slippage", size="is-small", type="number", min=0, step=0.1)
+      p.control
+        b-button.is-static(size="is-small") %
+
+        button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+    
   div(v-else)
     .red
       span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
@@ -150,6 +161,7 @@ export default {
       bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
       roi_week: 0,
+      slippage: this.config.MIN_SLIPPAGE,
     };
   },
   filters: {
@@ -249,9 +261,13 @@ export default {
         this.amount = 0;
         return;
       }
-      this.drizzleInstance.contracts["Vault"].methods["withdraw"].cacheSend({
-        from: this.activeAccount,
-      });
+      
+      this.drizzleInstance.contracts["Vault"].methods["withdraw"].cacheSend(
+        this.activeAccount,
+        this.yvtoken_balance,
+        this.slippage*100,
+        { from: this.activeAccount }
+        );
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + ".addr.reverse";

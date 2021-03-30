@@ -17,6 +17,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   icecreath2: {
     TITLE: "iceCREATH2",
@@ -31,6 +32,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   sushirocket: {
     TITLE: "Sushi YFI-ETH",
@@ -45,6 +47,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   daihard: {
     TITLE: "DAI Hard",
@@ -59,6 +62,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   usdc: {
     TITLE: "USd Coin",
@@ -73,6 +77,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   yvsteth: {
     TITLE: "Lido St. Ether",
@@ -87,6 +92,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   daiironbank: {
     TITLE: "DAI Ironbank",
@@ -101,6 +107,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   wethmaker: {
     TITLE: "WETH Maker",
@@ -115,6 +122,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   stecrv: {
     TITLE: "st. Ether-ETH Pool",
@@ -129,6 +137,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   ironlender: {
     TITLE: "WETH Iron Lender",
@@ -143,6 +152,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   mmwbtc: {
     TITLE: "Mushroom Worker",
@@ -157,6 +167,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   ecrvseth: {
     TITLE: "Egyptian God sETH/ETH",
@@ -171,6 +182,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   wethgenlender: {
     TITLE: "WETH Gen Lender",
@@ -185,6 +197,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   susdidle: {
     TITLE: "sUSD Idle",
@@ -199,6 +212,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   creamyswords: {
     TITLE: "Creamy Swords SNX",
@@ -213,6 +227,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   spadavault: {
     TITLE: "SpadaVault",
@@ -227,6 +242,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "stealth",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   fantomsfury: {
     TITLE: "Fantom's Fury",
@@ -241,6 +257,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
+    MIN_SLIPPAGE: 1,
   },
   fantomsdollar: {
     TITLE: "Fantom's Dollar",
@@ -255,6 +272,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
+    MIN_SLIPPAGE: 1,
   },
   hotcoins: {
     TITLE: "HotCoins",
@@ -269,6 +287,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "stealth",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   fullmetalfarmer: {
     TITLE: "Full Metal Farmer",
@@ -283,6 +302,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   badgergoat: {
     TITLE: "Badger's GOAT",
@@ -297,6 +317,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "stealth",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   oceanofdata: {
     TITLE: "Ocean of Data",
@@ -311,6 +332,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   dataaave: {
     TITLE: "Data AAVE",
@@ -325,6 +347,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   idletether: {
     TITLE: "Idle Tether",
@@ -339,6 +362,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   trueidle: {
     TITLE: "True Idle",
@@ -353,6 +377,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   poolwithus: {
     TITLE: "Pool with Us",
@@ -367,6 +392,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   vesperusdc: {
     TITLE: "Vesper-bell USDC",
@@ -381,6 +407,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   ghostysusd: {
     TITLE: "Ghosty Dollar",
@@ -395,6 +422,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
   sushibank: {
     TITLE: "Bank Sushi",
@@ -409,5 +437,6 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+    MIN_SLIPPAGE: 1,
   },
 });
