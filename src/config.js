@@ -424,4 +424,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
+  bscbaby: {
+    TITLE: "BSC's Ape Ape Baby",
+    LOGO: "🧊👶",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x78bef219b3348CD65387F6f7B27c9ee3Bf525704",
+    WANT_ADDR: "0xf16e81dce15b08f326220742020379b855b87df9",
+    WANT_SYMBOL: "ICE",
+    COINGECKO_SYMBOL: "",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
+  },
 });
