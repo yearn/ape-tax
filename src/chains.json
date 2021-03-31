@@ -8,5 +8,10 @@
     "name": "FTM Mainnet",
     "coin": "FTM",
     "block_explorer": "https://ftmscan.com"
+  },
+  "56": {
+    "name": "BSC Mainnet",
+    "coin": "BNB",
+    "block_explorer": "https://bscscan.com"
   }
 }
