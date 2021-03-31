@@ -167,7 +167,7 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
-    MIN_SLIPPAGE: 1,
+    MIN_SLIPPAGE: 21,
   },
   ecrvseth: {
     TITLE: "Egyptian God sETH/ETH",
