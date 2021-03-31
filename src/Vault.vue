@@ -161,7 +161,7 @@ export default {
       bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
       roi_week: 0,
-      slippage: this.config.MIN_SLIPPAGE,
+      slippage: this.config.MIN_SLIPPAGE/100,
     };
   },
   filters: {
