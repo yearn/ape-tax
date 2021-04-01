@@ -263,8 +263,8 @@ export default {
       }
       
       this.drizzleInstance.contracts["Vault"].methods["withdraw"].cacheSend(
+        max_uint.toString(),
         this.activeAccount,
-        this.yvtoken_balance,
         this.slippage*100,
         { from: this.activeAccount }
         );
