@@ -438,4 +438,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
+  ellipsoidal: {
+    TITLE: "Ellipsoidal Farmer",
+    LOGO: "🍩3️⃣",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xC8057Fd6F7917b5398f52d861d50685E6AbbED14",
+    WANT_ADDR: "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452",
+    WANT_SYMBOL: "3EPS",
+    COINGECKO_SYMBOL: "DAI",
+    VAULT_DEV: "akshaynexust",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
+  },
 });
