@@ -451,5 +451,18 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
+  baghunter: {
+    TITLE: "Bag Hunter",
+    LOGO: "👜⚔️",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E",
+    WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    WANT_SYMBOL: "WBTC",
+    COINGECKO_SYMBOL: "wrapped-bitcoin",
+    VAULT_DEV: "akshaynexust",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
   },
 });
