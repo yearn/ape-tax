@@ -472,7 +472,7 @@ export default Object.freeze({
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
     VAULT_ADDR: "0xD2C65E20C3fDE3F18097e7414e65596e0C83B1a9",
-    WANT_ADDR: "0xe92B3D2E0Bdd5255610Eafe248334be922329fAb",
+    WANT_ADDR: "0xf16e81dce15b08f326220742020379b855b87df9",
     WANT_SYMBOL: "ICE",
     COINGECKO_SYMBOL: "ice-token",
     VAULT_DEV: "poolpitako",
