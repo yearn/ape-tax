@@ -155,7 +155,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "wrapped-bitcoin",
     VAULT_DEV: "mushroomsfinan1",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   ecrvseth: {
