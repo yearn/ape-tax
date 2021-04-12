@@ -466,4 +466,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  ethbaby: {
+    TITLE: "ETH's Ape Ape Baby",
+    LOGO: "🧊👶",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xD2C65E20C3fDE3F18097e7414e65596e0C83B1a9",
+    WANT_ADDR: "0xe92B3D2E0Bdd5255610Eafe248334be922329fAb",
+    WANT_SYMBOL: "ICE",
+    COINGECKO_SYMBOL: "ice-token",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
