@@ -211,7 +211,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "havven",
     VAULT_DEV: "jmonteer23",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   spadavault: {
