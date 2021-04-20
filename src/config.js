@@ -493,5 +493,19 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+  },
+  tetheredape: {
+    TITLE: "Tethered Ape",
+    LOGO: "🕸🦧",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x7Da96a3891Add058AdA2E826306D812C638D87a7",
+    WANT_ADDR: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    WANT_SYMBOL: "USDT",
+    COINGECKO_SYMBOL: "tether",
+    VAULT_DEV: "dudesahn",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
   }
 });
