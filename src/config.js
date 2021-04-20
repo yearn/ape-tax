@@ -480,4 +480,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  spartanbank: {
+    TITLE: "Spartan Bank",
+    LOGO: "⚔️🏦",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xF29AE508698bDeF169B89834F76704C3B205aedf",
+    WANT_ADDR: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+    WANT_SYMBOL: "SNX",
+    COINGECKO_SYMBOL: "havven",
+    VAULT_DEV: "jmonteer23",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  }
 });
