@@ -507,5 +507,19 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
+  },
+  frappedape: {
+    TITLE: "BSC's Frapped Ape",
+    LOGO: "☕️🦧",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x626530FCD25a8c9A949B024AAbbAe4BAE7D5F320",
+    WANT_ADDR: "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+    WANT_SYMBOL: "fUSDT",
+    COINGECKO_SYMBOL: "tether",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
   }
 });
