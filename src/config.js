@@ -521,5 +521,20 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
+  },
+  bscfusdtproxyeth: {
+    TITLE: "BSC's fUSDT proxy to ETH",
+    LOGO: "😷🐙",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x2A3020a71Ab92D5CdBAfEB72f0b90D1DfdF1B6E2",
+    WANT_ADDR: "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+    WANT_SYMBOL: "fUSDT",
+    COINGECKO_SYMBOL: "tether",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
   }
+
 });
