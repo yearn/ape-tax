@@ -379,7 +379,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "usd-coin",
     VAULT_DEV: "real_mills",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   ghostysusd: {
