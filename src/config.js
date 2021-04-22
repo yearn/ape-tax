@@ -533,7 +533,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "tether",
     VAULT_DEV: "poolpitako",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "stealth",
     CHAIN_ID: 56,
   }
 
