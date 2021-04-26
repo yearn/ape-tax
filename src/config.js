@@ -536,10 +536,9 @@ export default Object.freeze({
     VAULT_STATUS: "stealth",
     CHAIN_ID: 56,
   },
-
   bsceth: {
     TITLE: "BSC ETH",
-    LOGO: "😷🕳️",
+    LOGO: "🐨🕳️",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
     VAULT_ADDR: "0x9cBdd0f1d9FB5D1ea6f3d022D0896E57aF5f087f",
@@ -550,7 +549,19 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
+  },
+  weth2bsc: {
+    TITLE: "WETH 2 BSC",
+    LOGO: "🐨🕳️",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xa2619fDFB99ABeb533a1147461f3f1109c5ADe75",
+    WANT_ADDR: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    WANT_SYMBOL: "WETH",
+    COINGECKO_SYMBOL: "WETH",
+    VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
   }
-
-
 });
