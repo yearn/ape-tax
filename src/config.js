@@ -546,7 +546,7 @@ export default Object.freeze({
     WANT_ADDR: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
     WANT_SYMBOL: "ETH",
     COINGECKO_SYMBOL: "ethereum",
-    VAULT_DEV: "FP",
+    VAULT_DEV: "fp_crypto",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
