@@ -563,7 +563,19 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
+  },
+  grandmastersdai: {
+    TITLE: "Old Grandmaster's DAI",
+    LOGO: "♟👴",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xB98Df7163E61bf053564bde010985f67279BBCEC",
+    WANT_ADDR: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    WANT_SYMBOL: "DAI",
+    COINGECKO_SYMBOL: "DAI",
+    VAULT_DEV: "_tonkers",
+    BLOCK_ACTIVATED: 1619291138,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
   }
-
-
 });
