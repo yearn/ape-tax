@@ -508,7 +508,7 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
-  frappedape: {
+  bscfrappedape: {
     TITLE: "BSC's Frapped Ape",
     LOGO: "☕️🦧",
     VAULT_ABI: yVaultV2,
@@ -548,6 +548,20 @@ export default Object.freeze({
     VAULT_DEV: "poolpitako",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "stealth",
+    CHAIN_ID: 250,
+  },
+  ftmfrappedape: {
+    TITLE: "FTM's Frapped Ape",
+    LOGO: "☕️🦧",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x1E9eC284BA99E14436f809291eBF7dC8CCDB12e1",
+    WANT_ADDR: "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+    WANT_SYMBOL: "fUSDT",
+    COINGECKO_SYMBOL: "tether",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
     CHAIN_ID: 250,
   }
 
