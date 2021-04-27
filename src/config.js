@@ -538,7 +538,7 @@ export default Object.freeze({
   },
   bsceth: {
     TITLE: "BSC ETH",
-    LOGO: "🐨🕳️",
+    LOGO: "🕳️🐨",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
     VAULT_ADDR: "0x9cBdd0f1d9FB5D1ea6f3d022D0896E57aF5f087f",
