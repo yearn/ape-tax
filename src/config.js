@@ -522,6 +522,7 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
+
   bscfusdtproxyeth: {
     TITLE: "BSC's fUSDT proxy to ETH",
     LOGO: "😷🐙",
@@ -536,6 +537,22 @@ export default Object.freeze({
     VAULT_STATUS: "stealth",
     CHAIN_ID: 56,
   },
+
+  bsceth: {
+    TITLE: "BSC ETH",
+    LOGO: "🕳️🐨",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x9cBdd0f1d9FB5D1ea6f3d022D0896E57aF5f087f",
+    WANT_ADDR: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+    WANT_SYMBOL: "ETH",
+    COINGECKO_SYMBOL: "ethereum",
+    VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
+  },
+
   ftmfusdtproxyeth: {
     TITLE: "FTM's fUSDT proxy to ETH",
     LOGO: "😷🐙",
