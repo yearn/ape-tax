@@ -577,5 +577,20 @@ export default Object.freeze({
     BLOCK_ACTIVATED: 1619291138,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
-  }
+  },
+  bnbfarmer: {
+    TITLE: "BNB Farmer",
+    LOGO: "🔶👨‍🌾",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x7E12d21eeEF120dc5E23c8e70162815A9071Dde9",
+    WANT_ADDR: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    WANT_SYMBOL: "wBNB",
+    COINGECKO_SYMBOL: "binancecoin",
+    VAULT_DEV: "poolpitako",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
+  },
+
 });
