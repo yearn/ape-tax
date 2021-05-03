@@ -609,5 +609,21 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
+  spooky: {
+    TITLE: "Spooky Skeletons",
+    LOGO: "🙀👻",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x79330397e161C67703e9bce2cA2Db73937D5fc7e",
+    WANT_ADDR: "0x841fad6eae12c286d1fd18d1d525dffa75c7effe",
+    WANT_SYMBOL: "BOO",
+    COINGECKO_SYMBOL: "",
+    VAULT_DEV: "lanceUpp",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 250,
+  },
+
+
 
 });
