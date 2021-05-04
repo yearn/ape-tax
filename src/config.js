@@ -452,20 +452,6 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
-  baghunter: {
-    TITLE: "Bag Hunter",
-    LOGO: "👜⚔️",
-    VAULT_ABI: yVaultV2,
-    VAULT_TYPE: "experimental",
-    VAULT_ADDR: "0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E",
-    WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    WANT_SYMBOL: "WBTC",
-    COINGECKO_SYMBOL: "wrapped-bitcoin",
-    VAULT_DEV: "akshaynexust",
-    BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
-    CHAIN_ID: 1,
-  },
   ethbaby: {
     TITLE: "ETH's Ape Ape Baby",
     LOGO: "🧊👶",
@@ -494,20 +480,7 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
-  tetheredape: {
-    TITLE: "Tethered Ape",
-    LOGO: "🕸🦧",
-    VAULT_ABI: yVaultV2,
-    VAULT_TYPE: "experimental",
-    VAULT_ADDR: "0x7Da96a3891Add058AdA2E826306D812C638D87a7",
-    WANT_ADDR: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-    WANT_SYMBOL: "USDT",
-    COINGECKO_SYMBOL: "tether",
-    VAULT_DEV: "dudesahn",
-    BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
-    CHAIN_ID: 1,
-  },
+
   bscfrappedape: {
     TITLE: "BSC's Frapped Ape",
     LOGO: "☕️🦧",
@@ -623,7 +596,5 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
-
-
 
 });
