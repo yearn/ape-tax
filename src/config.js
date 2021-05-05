@@ -590,7 +590,7 @@ export default Object.freeze({
     VAULT_ADDR: "0x79330397e161C67703e9bce2cA2Db73937D5fc7e",
     WANT_ADDR: "0x841fad6eae12c286d1fd18d1d525dffa75c7effe",
     WANT_SYMBOL: "BOO",
-    COINGECKO_SYMBOL: "",
+    COINGECKO_SYMBOL: "spookyswap",
     VAULT_DEV: "lance_upp",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
