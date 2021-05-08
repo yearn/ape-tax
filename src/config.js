@@ -596,5 +596,19 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
+  rai: {
+    TITLE: "Reflex me",
+    LOGO: "📷💚",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x4856A7EFBbFcaE92AB13c5e2e322Fc77647bB856",
+    WANT_ADDR: "0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
+    WANT_SYMBOL: "RAI",
+    COINGECKO_SYMBOL: "rai",
+    VAULT_DEV: "emilianobonassi",
+    BLOCK_ACTIVATED: 1620418420,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 
 });
