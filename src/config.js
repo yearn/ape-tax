@@ -610,5 +610,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
-
+  nrv: {
+    TITLE: "Nervy Mastermind",
+    LOGO: "☸️🤔",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x7C1Db8938D8170A244635e9ae3AEb41663B6D858",
+    WANT_ADDR: "0x42F6f551ae042cBe50C739158b4f0CAC0Edb9096",
+    WANT_SYMBOL: "NRV",
+    COINGECKO_SYMBOL: "nerve-finance",
+    VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 56,
+  },
 });
