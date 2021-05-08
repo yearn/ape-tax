@@ -611,8 +611,8 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   nrv: {
-    TITLE: "Nervous Nancy",
-    LOGO: "😬👩",
+    TITLE: "Nervy Mastermind",
+    LOGO: "☸️🤔",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
     VAULT_ADDR: "0x7C1Db8938D8170A244635e9ae3AEb41663B6D858",
