@@ -365,7 +365,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "uniswap",
     VAULT_DEV: "mattdwest",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   vesperusdc: {
