@@ -624,7 +624,7 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
-  complifi_usdc: {
+  complifiusdc: {
     TITLE: "Comfi Carousel",
     LOGO: "🛋🎠",
     VAULT_ABI: yVaultV2,
