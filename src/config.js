@@ -624,4 +624,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
+  complifiusdc: {
+    TITLE: "Comfi Carousel",
+    LOGO: "🛋🎠",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x71955515ADF20cBDC699B8bC556Fc7Fd726B31B0",
+    WANT_ADDR: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    WANT_SYMBOL: "USDC",
+    COINGECKO_SYMBOL: "usd-coin",
+    VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
