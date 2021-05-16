@@ -638,4 +638,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  rengrandmaster: {
+    TITLE: "ren Grandmaster",
+    LOGO: "⛓♟",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x3408324Dbb537886CADc180f6FfCf674eE215F67",
+    WANT_ADDR: "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+    WANT_SYMBOL: "renBTC",
+    COINGECKO_SYMBOL: "renbtc",
+    VAULT_DEV: "_tonkers",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
