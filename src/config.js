@@ -323,7 +323,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "aave",
     VAULT_DEV: "0xangelfish",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   idletether: {
@@ -407,7 +407,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "sushi",
     VAULT_DEV: "akshaynexust",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   fantombaby: {
