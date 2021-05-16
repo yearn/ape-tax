@@ -624,6 +624,21 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 56,
   },
+  ftm_woofy: {
+    TITLE: "FTM's Wandering Woofy",
+    LOGO: "🧭🐶",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x6fCE944d1f2f877B3972e0E8ba81d27614D62BeD",
+    WANT_ADDR: "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
+    WANT_SYMBOL: "WOOFY",
+    COINGECKO_SYMBOL: "woofy",
+    VAULT_DEV: "lance_upp",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 250,
+  },
+
   complifiusdc: {
     TITLE: "Comfi Carousel",
     LOGO: "🛋🎠",
