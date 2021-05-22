@@ -609,7 +609,6 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
-
   complifiusdc: {
     TITLE: "Comfi Carousel",
     LOGO: "🛋🎠",
@@ -620,6 +619,20 @@ export default Object.freeze({
     WANT_SYMBOL: "USDC",
     COINGECKO_SYMBOL: "usd-coin",
     VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
+  frogprince: {
+    TITLE: "The Frog Prince",
+    LOGO: "🐸💋",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xf962b098ecc4352aa2ad1d4164bd2b8367fd94c3",
+    WANT_ADDR: "0x514910771af9ca656af840dff83e8264ecf986ca",
+    WANT_SYMBOL: "LINK",
+    COINGECKO_SYMBOL: "chainlink",
+    VAULT_DEV: "jmonteer23",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
