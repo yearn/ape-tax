@@ -637,4 +637,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  coinsonfire: {
+    TITLE: "Coins On Fire",
+    LOGO: "🪙🔥",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xe7bf2905371cfeaeefe2d4c2c386b6b2a7e4270a",
+    WANT_ADDR: "0x0316eb71485b0ab14103307bf65a021042c6d380",
+    WANT_SYMBOL: "HBTC",
+    COINGECKO_SYMBOL: "huobi-btc",
+    VAULT_DEV: "arbingsam",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "stealth",
+    CHAIN_ID: 1,
+  },
 });
