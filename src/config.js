@@ -637,4 +637,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  frogprince2: {
+    TITLE: "The Frog Prince 2",
+    LOGO: "🐸💋",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x671a912c10bba0cfa74cfc2d6fba9ba1ed9530b2",
+    WANT_ADDR: "0x514910771af9ca656af840dff83e8264ecf986ca",
+    WANT_SYMBOL: "LINK",
+    COINGECKO_SYMBOL: "chainlink",
+    VAULT_DEV: "jmonteer23",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
