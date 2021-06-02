@@ -13,5 +13,10 @@
     "name": "BSC Mainnet",
     "coin": "BNB",
     "block_explorer": "https://bscscan.com"
+  },
+  "137": {
+    "name": "Matic Mainnet",
+    "coin": "MATIC",
+    "block_explorer": "https://explorer-mainnet.maticvigil.com"
   }
 }
