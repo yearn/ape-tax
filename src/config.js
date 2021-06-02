@@ -620,7 +620,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "usd-coin",
     VAULT_DEV: "fp_crypto",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   frogprince: {
