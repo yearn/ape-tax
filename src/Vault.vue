@@ -36,9 +36,6 @@
   div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
   div Your {{ chainCoin }} Balance: {{ coin_balance | fromWei(2) }}
   div.spacer
-  div(v-if="is_guest || yfi_needed <= 0")
-    span <strong>You are a guest. Welcome to the <span class="blue">Citadel</span> 🏰</strong>
-    div.spacer
     b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
       b-input(v-model.number="amount", size="is-small", type="number",min=0)
       p.control
@@ -62,17 +59,6 @@
       @click.prevent="on_deposit_all"
     ) 🏦 Deposit All
     button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
-  div(v-else)
-    .red
-      span ⛔ You need {{ yfi_needed | fromWei(4) }} YFI more to enter the Citadel ⛔
-    <div v-konami @konami="bribe_unlocked = !bribe_unlocked"></div>
-    div(v-if="bribe_unlocked")
-      span If you still want to join the party...
-      |
-      button.unstyled(v-if="has_allowance_bribe", @click.prevent="on_bribe_the_bouncer") 💰 Bribe the bouncer with ({{ bribe_cost | fromWei(3) }} YFI)
-      button.unstyled(v-if="!has_allowance_bribe", @click.prevent="on_approve_bribe") 🚀 Approve Bribe
-    div(v-else)
-      span Remember Konami 🎮
   .red(v-if="error")
     span {{ error }}
   div.spacer
@@ -82,10 +68,6 @@
       span yVault:
       | 
       a(:href="'https://twitter.com/' + config.VAULT_DEV", target="_blank") {{ config.VAULT_DEV }}
-      | 
-      span - Guest List:
-      | 
-      a(href="https://twitter.com/bantg", target="_blank") bantg
       | 
       span - UI:
       | 
@@ -105,7 +87,6 @@ import ethers from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
-import GuestList from "./abi/GuestList.json";
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
 import ERC20 from "./abi/ERC20.json";
@@ -121,9 +102,6 @@ const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
-const ERROR_GUEST_LIMIT = "That would exceed your guest limit. Try less.";
-const ERROR_GUEST_LIMIT_ALL =
-  "That would exceed your guest limit. Try not doing all in.";
 
 export default {
   name: "Vault",
@@ -142,12 +120,6 @@ export default {
       strategies_balance: 0,
       average_price: 0,
       error: null,
-      contractGuestList: null,
-      is_guest: false,
-      entrance_cost: new ethers.BigNumber.from("1"),
-      total_yfi: new ethers.BigNumber.from("0"),
-      bribe_unlocked: false,
-      bribe_cost: new ethers.BigNumber.from("0"),
       vault_activation: 0,
       roi_week: 0,
     };
@@ -200,13 +172,6 @@ export default {
         { from: this.activeAccount }
       );
     },
-    on_approve_bribe() {
-      this.drizzleInstance.contracts["YFI"].methods["approve"].cacheSend(
-        this.vault,
-        max_uint,
-        { from: this.activeAccount }
-      );
-    },
     on_deposit() {
       this.error = null;
 
@@ -233,15 +198,6 @@ export default {
       this.drizzleInstance.contracts["Vault"].methods["deposit"].cacheSend({
         from: this.activeAccount,
       });
-    },
-    on_bribe_the_bouncer() {
-      console.log(this.contractGuestList.methods);
-      this.contractGuestList.methods
-        .bribe_the_bouncer()
-        .send({ from: this.activeAccount })
-        .then((response) => {
-          console.log(response);
-        });
     },
     on_withdraw_all() {
       if (this.yvtoken_balance <= 0) {
@@ -375,15 +331,6 @@ export default {
     progress_limit() {
       return (this.vault_deposit_limit.isZero()?0:(this.vault_deposit_limit - this.vault_available_limit) / this.vault_deposit_limit);
     },
-    yfi_needed() {
-      return this.entrance_cost.sub(this.total_yfi);
-    },
-    has_allowance_bribe() {
-      return !this.call("YFI", "allowance", [
-        this.activeAccount,
-        this.vault,
-      ]).isZero();
-    },
     has_allowance_vault() {
       return !this.call("WANT", "allowance", [
         this.activeAccount,
@@ -417,50 +364,6 @@ export default {
     let Vault = new web3.eth.Contract(yVaultV2, this.vault);
     console.log(Vault);
     this.get_strategies(Vault);
-
-    // Get GuestList contract and use it :)
-    Vault.methods.guestList().call().then((response) => {
-        if (response == ADDRESS_ZERO) {
-          //if there's not guest list, everyone is a guest ;)
-          console.log("No guest list. Everyone is invited!");
-          this.is_guest = true;
-          this.total_yfi = this.entrance_cost;
-        } else {
-          this.contractGuestList = new web3.eth.Contract(GuestList, response);
-
-          this.contractGuestList.methods
-            .guests(this.activeAccount)
-            .call()
-            .then((response) => {
-              this.is_guest = response;
-            });
-        }
-
-        this.contractGuestList.methods.total_yfi(this.activeAccount).call().then((response) => {
-            console.log("Total YFI: " + response.toString());
-            this.total_yfi = new ethers.BigNumber.from(response.toString());
-          });
-
-        Vault.methods.activation().call().then((vault_activation) => {
-            this.contractGuestList.methods
-              .entrance_cost(vault_activation)
-              .call()
-              .then((response) => {
-                console.log("Entrance cost: " + response.toString());
-                this.entrance_cost = new ethers.BigNumber.from(
-                  response.toString()
-                );
-              });
-          });
-
-        this.contractGuestList.methods
-          .bribe_cost()
-          .call()
-          .then((response) => {
-            console.log("Bribe cost: " + response.toString());
-            this.bribe_cost = new ethers.BigNumber.from(response.toString());
-          });
-      });
 
     // Get blocknumber and calc APY
     Vault.methods.pricePerShare().call().then( currentPrice => {
