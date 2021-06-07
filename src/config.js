@@ -578,7 +578,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "rai",
     VAULT_DEV: "emilianobonassi",
     BLOCK_ACTIVATED: 1620418420,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   nrv: {
