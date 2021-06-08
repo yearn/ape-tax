@@ -656,7 +656,7 @@ export default Object.freeze({
     LOGO: "🧭🐶",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
-    VAULT_ADDR: "0xb442450Af36d17D83Fe7BCc93bC17b18f94E245d",
+    VAULT_ADDR: "0xEAFB3Ee25B5a9a1b35F193A4662E3bDba7A95BEb",
     WANT_ADDR: "0xEAFB3Ee25B5a9a1b35F193A4662E3bDba7A95BEb",
     WANT_SYMBOL: "WOOFY",
     COINGECKO_SYMBOL: "woofy",
