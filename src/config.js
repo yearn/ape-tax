@@ -679,4 +679,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 137,
   },
+  ultrasoundmoney: {
+    TITLE: "Wrapped Ultra Sound Money",
+    LOGO: "🦇🔊",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xa258C4606Ca8206D8aA700cE2143D7db854D168c",
+    WANT_ADDR: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    WANT_SYMBOL: "WETH",
+    COINGECKO_SYMBOL: "weth",
+    VAULT_DEV: "fameal",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
