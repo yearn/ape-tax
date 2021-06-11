@@ -721,4 +721,18 @@ export default Object.freeze({
     VAULT_STATUS: "stealth",
     CHAIN_ID: 1,
   },
+  dollarstorebento: {
+    TITLE: "Dollar Store Bento",
+    LOGO: "💵🍱",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x32A2d6F07079b6CdFe942B198773cDA1398544b1",
+    WANT_ADDR: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    WANT_SYMBOL: "USDC",
+    COINGECKO_SYMBOL: "usd-coin",
+    VAULT_DEV: "fp_crypto",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 137,
+  },
 });
