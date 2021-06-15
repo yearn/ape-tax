@@ -34,4 +34,7 @@ div.notFound {
   text-align: center;
   font-size: 3em;
 }
+.notFound .smallish {
+    font-size: 0.5em;
+}
 </style>

@@ -42,7 +42,7 @@ export default {
         .map((key) => ({
           ...this.allConfig[key],
           URL: key,
-        }))
+        })),
     };
   },
   filters: {},
@@ -72,7 +72,7 @@ export default {
         .slice()
         .reverse();
 
-      return result;
+return result;
     },
     experimentalVaultsOther() {
       var items = this.items;

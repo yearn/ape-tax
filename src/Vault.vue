@@ -1,5 +1,5 @@
 <template lang="pug">
-#vault(v-if="isDrizzleInitialized")
+#vault(v-if="isDrizzleInitialized && !wrong_chain")
   .logo {{ config.LOGO }}
   h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
   div.container.is-max-desktop.warning.is-size-7-mobile
@@ -76,6 +76,12 @@
       a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
       |, 
       a(href="https://twitter.com/x48_crypto", target="_blank") x48
+div(v-else-if=("isDrizzleInitialized && wrong_chain"))
+  div(class="notFound")
+    p ❌⛓
+    p Wrong Chain
+    p.smallish Change it on Metamask
+    a.smallish(href="/") Back Home
 div(v-else)
   div Loading yApp...
 </template>
@@ -122,6 +128,7 @@ export default {
       error: null,
       vault_activation: 0,
       roi_week: 0,
+      wrong_chain: false,
     };
   },
   filters: {
@@ -346,7 +353,8 @@ export default {
   },
   async created() {
     if (this.chainId && this.config.CHAIN_ID !== this.chainId) {
-      window.location.href = '/'
+      //window.location.href = '/';
+      this.wrong_chain = true;
     }
     axios
       .get(
