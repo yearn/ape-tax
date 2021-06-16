@@ -5,9 +5,12 @@
       div.apeTax
     div(v-else)
       div(v-if="isDrizzleInitialized && chainId", id="app")
-        .chain.is-size-5.is-size-6-mobile {{ chainName }}
+        .chain
+          select.is-size-5.is-size-6(v-model="selectedChainId" @change="changeNetwork($event)")
+            option(v-for="(chain, id) in chains" :value="id" :key="id") {{ chain.name }}
+          .chain_status.is-size-6.is-size-7-mobile(v-if="chainId != selectedChainId") CHANGE METAMASK NETWORK
         .section
-          Section(:config="config" :allConfig="allConfig" :chainId="chainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
+          Section(:config="config" :allConfig="allConfig" :chainId="selectedChainId" :chainCoin="chainCoin" :chainExplorer="chainExplorer")
       div(v-else)
         div Loading Ex<sup>2</sup> 🧪...
 </template>
@@ -48,8 +51,9 @@ const VaultType = window.location.pathname === '/yvsteth' ? LidoVault : (
 const Section = window.location.pathname === '/' ? Home : VaultType
 
 let web3 = new Web3(Web3.givenProvider);
-window.ethereum.on("chainChanged", (chainIdHex) =>
-  window.location.reload()
+window.ethereum.on("chainChanged", (chainIdHex) => {
+    window.location.reload();
+  }
 );
 
 
@@ -64,6 +68,8 @@ export default {
       allConfig: config,
       isHome: window.location.pathname === '/',
       showApeTax: false,
+      chains: chains,
+      selectedChainId: null,
     }
   },
   asyncComputed: {
@@ -72,23 +78,31 @@ export default {
       if (this.isDrizzleInitialized) {
         return this.drizzleInstance.web3.eth.getChainId();
       }
-      return 0
+      return 0;
     },
     chainName() {
       if (this.chainId) {
-        return chains[this.chainId].name;
+        return chains[this.selectedChainId].name;
       }
     },
     chainCoin() {
       if (this.chainId) {
-        return chains[this.chainId].coin;
+        return chains[this.selectedChainId].coin;
       }
     },
     chainExplorer() {
       if (this.chainId) {
-        return chains[this.chainId].block_explorer;
+        return chains[this.selectedChainId].block_explorer;
       }
     }
+  },
+  methods: {
+    async changeNetwork(event) {
+      this.selectedChainId = parseInt(event.target.value);
+    },
+  },
+  async created() {
+    this.selectedChainId = await web3.eth.getChainId();
   }
 }
 </script>
@@ -114,6 +128,12 @@ export default {
   top: 5px;
   right: 20px;
   font-size: 1.2rem;
+  text-align: right;
+}
+
+.chain_status {
+  color: red;
+  font-size: 0.1rem;
 }
 
 body, button, input, optgroup, select, textarea {
