@@ -749,7 +749,7 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
-  : {
+  tiedtyler: {
     TITLE: "Tied Tyler",
     LOGO: "🕴🪢",
     VAULT_ABI: yVaultV2,
