@@ -14,6 +14,8 @@
   div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
+  div(v-if="gross_apr > 0").spacer
+  div(v-if="gross_apr > 0") Gross APR: {{ gross_apr | toPct(2) }}
   div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
@@ -127,7 +129,7 @@ export default {
       average_price: 0,
       error: null,
       vault_activation: 0,
-      roi_week: 0,
+      gross_apr: 0,
       wrong_chain: false,
     };
   },
@@ -366,41 +368,17 @@ export default {
         this.want_price = response.data[this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
       });
 
+    axios.get("https://api.yearn.finance/v1/chains/1/vaults/all")
+    .then((response) => {
+      this.gross_apr = response.data.filter((item) => item.address === this.vault).[0].apy.gross_apr;
+    });
+
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens();
 
     let Vault = new web3.eth.Contract(yVaultV2, this.vault);
-    console.log(Vault);
     this.get_strategies(Vault);
 
-    // Get blocknumber and calc APY
-    Vault.methods.pricePerShare().call().then( currentPrice => {
-      const seconds_in_a_year = 31536000;
-      const now = Math.round(Date.now() / 1000);
-
-      // 1 week ago
-      const one_week_ago = (now - 60 * 60 * 24 * 7);
-      const ts_past = one_week_ago < this.config.BLOCK_ACTIVATED?this.config.BLOCK_ACTIVATED:one_week_ago;
-
-      const ts_diff = now - ts_past;
-
-      console.log("TS Past: " + one_week_ago);
-      console.log("TS Activation: " + this.config.BLOCK_ACTIVATED);
-
-      this.get_block_timestamp(ts_past).then(response => {
-        console.log("Past block: " + response.data.result);
-        Vault.methods.pricePerShare().call({}, response.data.result).then( pastPrice => {
-          let roi = (currentPrice / pastPrice - 1) * 100;
-          console.log("Current Price: " + currentPrice);
-          console.log("Past Price: " + pastPrice);
-          this.roi_week = roi/ts_diff*seconds_in_a_year;
-          console.log("ROI week: " + roi);
-          console.log("ROI year: " + this.roi_week);
-        });
-      });
-    });
-
-    // Iterate through strats
   },
 };
 </script>
