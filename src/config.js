@@ -777,4 +777,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  intergalacticsushi: {
+    TITLE: "Intergalactic Sushi",
+    LOGO: "✨🍣",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x497590d2d57f05cf8B42A36062fA53eBAe283498",
+    WANT_ADDR: "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+    WANT_SYMBOL: "SUSHI",
+    COINGECKO_SYMBOL: "sushi",
+    VAULT_DEV: "dudesahn",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
