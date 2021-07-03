@@ -791,4 +791,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
+  ftmbtccrv: {
+    TITLE: "Fantom Bitcoin",
+    LOGO: "👻🪙",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF",
+    WANT_ADDR: "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
+    WANT_SYMBOL: "btcCRV",
+    COINGECKO_SYMBOL: "wrapped-bitcoin",
+    VAULT_DEV: "0xorb",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 250,
+  },
 });
