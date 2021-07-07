@@ -805,4 +805,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 250,
   },
+  wether: {
+    TITLE: "Wether",
+    LOGO: "🧬🐑",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0x9ecE944BBcd320F224293117E2780259411D34A3",
+    WANT_ADDR: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+    WANT_SYMBOL: "weth",
+    COINGECKO_SYMBOL: "ethereum",
+    VAULT_DEV: "therealmonoloco",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 137,
+  },
 });
