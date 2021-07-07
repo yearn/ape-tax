@@ -536,7 +536,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "DAI",
     VAULT_DEV: "_tonkers",
     BLOCK_ACTIVATED: 1619291138,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "withdraw",
     CHAIN_ID: 1,
   },
   bnbfarmer: {
