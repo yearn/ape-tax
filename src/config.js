@@ -819,4 +819,19 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 137,
   },
+  curvedaave: {
+    TITLE: "Curved aave",
+    LOGO: "🧬🐑",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xb3940551f4bfe0d93411d85e9cf20abf45943200",
+    WANT_ADDR: "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
+    WANT_SYMBOL: "am3CRV",
+    COINGECKO_SYMBOL: "DAI",
+    VAULT_DEV: "0xorb",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 137,
+  },
+
 });
