@@ -82,7 +82,14 @@ div(v-else-if=("isDrizzleInitialized && wrong_chain"))
   div(class="notFound")
     p ❌⛓
     p Wrong Chain
-    p.smallish Change it on Metamask
+    p.smallish(
+      v-if="this.config.CHAIN_ID === 1"
+    ) Change it on Metamask
+    div
+      button.unstyled(
+        @click.prevent="on_switch_chain"
+        v-if="this.config.CHAIN_ID !== 1",
+      ) 🔀 Switch it on Metamask
     a.smallish(href="/") Back Home
 div(v-else)
   div Loading yApp...
@@ -95,10 +102,9 @@ import {ethers} from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
+import chains from './chains.json'
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
-import ERC20 from "./abi/ERC20.json";
-
 import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
@@ -281,6 +287,21 @@ export default {
           return value;
       }
     },
+    on_switch_chain() {
+      if (!window.ethereum) {
+        console.error(`window.ethereum not initialized`)
+        return
+      }
+      if (!chains[this.config.CHAIN_ID] || !chains[this.config.CHAIN_ID].chain_swap) {
+        console.error(`invalid chain_swap configuration`)
+        return
+      }
+      window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [chains[this.config.CHAIN_ID].chain_swap, this.activeAccount],
+      })
+      .catch((error) => console.error(error));
+    }
   },
   computed: {
     ...mapGetters("accounts", ["activeAccount", "activeBalance"]),
@@ -405,6 +426,9 @@ input {
 .spacer {
   padding-top: 1em;
   padding-bottom: 1em;
+}
+.pointer {
+  cursor: pointer;
 }
 a,
 a:visited,
