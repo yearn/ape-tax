@@ -833,5 +833,18 @@ export default Object.freeze({
     VAULT_STATUS: "active",
     CHAIN_ID: 137,
   },
-
+  daihard3: {
+    TITLE: "DAI Hard with a Vengeance",
+    LOGO: "💪3️⃣",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
+    WANT_ADDR: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    WANT_SYMBOL: "DAI",
+    COINGECKO_SYMBOL: "DAI",
+    VAULT_DEV: "arbingsam",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "active",
+    CHAIN_ID: 1,
+  },
 });
