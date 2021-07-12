@@ -91,7 +91,7 @@ div(v-else)
 <script>
 
 import { mapGetters } from "vuex";
-import ethers from "ethers";
+import {ethers} from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
@@ -103,8 +103,8 @@ import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = new ethers.BigNumber.from(0);
+const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
+const BN_ZERO = ethers.BigNumber.from(0);
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
@@ -274,7 +274,7 @@ export default {
       switch (out) {
         case "number":
           if (value === null) value = 0;
-          return new ethers.BigNumber.from(value);
+          return ethers.BigNumber.from(value);
         case "address":
           return value;
         default:
@@ -313,7 +313,7 @@ export default {
       }
     },
     vault_total_aum() {
-      let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+      let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.vault_total_assets.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
     },
@@ -327,7 +327,7 @@ export default {
       return this.call("Vault", "balanceOf", [this.activeAccount]);
     },
     yvtoken_value() {
-      let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+      let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.yvtoken_balance.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
     },

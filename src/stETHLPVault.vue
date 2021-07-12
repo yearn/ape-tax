@@ -123,7 +123,7 @@ div(v-else)
 <script>
 
 import { mapGetters } from "vuex";
-import ethers from "ethers";
+import {ethers} from "ethers";
 import axios from "axios";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
@@ -137,8 +137,8 @@ import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = new ethers.BigNumber.from(0);
+const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
+const BN_ZERO = ethers.BigNumber.from(0);
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
@@ -169,10 +169,10 @@ export default {
       contractGuestList: null,
       contractZapIn: null,
       is_guest: false,
-      entrance_cost: new ethers.BigNumber.from("1"),
-      total_yfi: new ethers.BigNumber.from("0"),
+      entrance_cost: ethers.BigNumber.from("1"),
+      total_yfi: ethers.BigNumber.from("0"),
       bribe_unlocked: false,
-      bribe_cost: new ethers.BigNumber.from("0"),
+      bribe_cost: ethers.BigNumber.from("0"),
       vault_activation: 0,
       roi_week: 0,
     };
@@ -352,7 +352,7 @@ export default {
       switch (out) {
         case "number":
           if (value === null) value = 0;
-          return new ethers.BigNumber.from(value);
+          return ethers.BigNumber.from(value);
         case "address":
           return value;
         default:
@@ -387,7 +387,7 @@ export default {
       return this.call("Vault", "availableDepositLimit", []);
     },
     vault_total_aum() {
-      let toFloat = new ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+      let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.vault_total_assets.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
     },
@@ -472,7 +472,7 @@ export default {
 
         this.contractGuestList.methods.total_yfi(this.activeAccount).call().then((response) => {
             console.log("Total YFI: " + response.toString());
-            this.total_yfi = new ethers.BigNumber.from(response.toString());
+            this.total_yfi = ethers.BigNumber.from(response.toString());
           });
 
         Vault.methods.activation().call().then((vault_activation) => {
@@ -481,7 +481,7 @@ export default {
               .call()
               .then((response) => {
                 console.log("Entrance cost: " + response.toString());
-                this.entrance_cost = new ethers.BigNumber.from(
+                this.entrance_cost = ethers.BigNumber.from(
                   response.toString()
                 );
               });
@@ -492,7 +492,7 @@ export default {
           .call()
           .then((response) => {
             console.log("Bribe cost: " + response.toString());
-            this.bribe_cost = new ethers.BigNumber.from(response.toString());
+            this.bribe_cost = ethers.BigNumber.from(response.toString());
           });
       });
 
