@@ -2,7 +2,7 @@
 #vault(v-if="isDrizzleInitialized && !wrong_chain")
   .logo {{ config.LOGO }}
   h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
-  div.container.is-max-desktop.warning.is-size-7-mobile
+  div.container.is-max-desktop.warning.is-size-7-mobile(:class="config.VAULT_STATUS")
     info-message(:status="config.VAULT_STATUS")
   div Vault:&nbsp;
     a(

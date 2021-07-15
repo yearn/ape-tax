@@ -31,7 +31,7 @@ export default {
 				this.tag_text = 'Withdraw';
 				this.tag_type = 'is-danger';
 				break;
-			case 'use_production':
+			case 'endorsed':
 				this.tag_text = 'Use Production';
 				this.tag_type = 'is-info';
 				this.link = 'https://yearn.finance/vaults';

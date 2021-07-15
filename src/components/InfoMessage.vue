@@ -3,6 +3,8 @@
 		span(v-if="status == 'withdraw'")
 			| 🛑 <strong>WITHDRAW YOUR FUNDS</strong> this experiment is disabled and it will not generate more yield.
 			| Please remove your funds.
+		span(v-if="status == 'endorsed'")
+			| 🚀 <strong>YEARN WEBSITE</strong> this vault is in Yearn Finance website. You don't need to move your funds.
 		span(v-else)
 			| ⚠️ <strong>WARNING</strong> this experiment is experimental.
 			| It's extremely risky and will probably be discarded when the test is over.
@@ -26,7 +28,7 @@ export default {
 			case 'withdraw':
 				this.message_type = 'is-danger';
 				break;
-			case 'use_production':
+			case 'endorsed':
 				this.message_type = 'is-info';
 				break;
 			default:

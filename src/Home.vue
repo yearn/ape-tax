@@ -141,6 +141,13 @@ div.warning {
   padding: 1rem;
   background-color: #fff257;
 }
+div.endorsed {
+  color: white !important;
+  background-color: #0657F9 !important;
+}
+div.endorsed strong{
+  color: white !important;
+}
 a.links,
 a.links:visited,
 a.links:hover {
