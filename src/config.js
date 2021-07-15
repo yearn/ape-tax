@@ -844,7 +844,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "DAI",
     VAULT_DEV: "arbingsam",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "active",
+    VAULT_STATUS: "endorsed",
     CHAIN_ID: 1,
   },
 });
