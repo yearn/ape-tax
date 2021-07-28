@@ -847,7 +847,7 @@ export default Object.freeze({
     VAULT_STATUS: "endorsed",
     CHAIN_ID: 1,
   },
-  bitcoinwaves: {
+  bitcoinwave: {
     TITLE: "Bitcoin wAAVE",
     LOGO: "₿👋",
     VAULT_ABI: yVaultV2,
