@@ -848,7 +848,7 @@ export default Object.freeze({
     CHAIN_ID: 1,
   },
   bitcoinwaves: {
-    TITLE: "Bitcoin wAAVEs",
+    TITLE: "Bitcoin wAAVE",
     LOGO: "₿👋",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
@@ -856,7 +856,7 @@ export default Object.freeze({
     WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     WANT_SYMBOL: "WBTC",
     COINGECKO_SYMBOL: "wrapped-bitcoin",
-    VAULT_DEV: "arbingsam",
+    VAULT_DEV: "GalloDaSballo",
     BLOCK_ACTIVATED: 1606599919,
     VAULT_STATUS: "active",
     CHAIN_ID: 1,
