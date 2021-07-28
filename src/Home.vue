@@ -72,7 +72,7 @@ export default {
         .slice()
         .reverse();
 
-return result;
+      return result;
     },
     experimentalVaultsOther() {
       var items = this.items;

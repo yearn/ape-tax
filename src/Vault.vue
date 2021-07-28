@@ -332,6 +332,9 @@ export default {
       }
     },
     vault_total_aum() {
+       if (this.vault_decimals.isZero()) {
+        return (0);
+      }
       let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.vault_total_assets.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
@@ -346,6 +349,9 @@ export default {
       return this.call("Vault", "balanceOf", [this.activeAccount]);
     },
     yvtoken_value() {
+      if (this.vault_decimals.isZero()) {
+        return (0);
+      }
       let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.yvtoken_balance.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
@@ -389,7 +395,7 @@ export default {
 
     axios.get("https://api.yearn.finance/v1/chains/1/vaults/all")
     .then((response) => {
-      this.gross_apr = response.data.filter((item) => item.address === this.vault).[0].apy.gross_apr;
+      this.gross_apr = response.data.find((item) => item.address === this.vault)?.apy?.gross_apr || 0;
     });
 
     //Active account is defined?

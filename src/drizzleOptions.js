@@ -1,11 +1,6 @@
 import ERC20 from './abi/ERC20.json'
-import yVaultV2 from './abi/yVaultV2.json'
-import LidoVault from './abi/LidoVault.json'
-import yStrategy from './abi/yStrategy.json'
-
-
 import Web3 from 'web3'
-let web3 = new Web3(Web3.givenProvider);
+const web3 = new Web3(Web3.givenProvider);
 
 const options = (config) => ({
   web3: {
