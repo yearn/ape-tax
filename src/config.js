@@ -858,7 +858,7 @@ export default Object.freeze({
     COINGECKO_SYMBOL: "wrapped-bitcoin",
     VAULT_DEV: "arbingsam",
     BLOCK_ACTIVATED: 1606599919,
-    VAULT_STATUS: "endorsed",
+    VAULT_STATUS: "active",
     CHAIN_ID: 1,
   },
 });
