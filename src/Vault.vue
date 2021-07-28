@@ -109,10 +109,9 @@ import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = ethers.BigNumber.from(0);
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
+const max_uint = ethers.constants.MaxUint256;
+const BN_ZERO = ethers.constants.Zero;
+const ADDRESS_ZERO = ethers.constants.AddressZero;
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
@@ -149,7 +148,7 @@ export default {
 
       if (precision === 0) return parts[0];
 
-      return parts[0] + "." + parts[1].slice(0, precision);
+      return parts[0] + "." + (parts[1]?.slice(0, precision) || '0');
     },
     fromWei15(data, precision) {
       if (data === "loading") return data;
@@ -159,7 +158,7 @@ export default {
 
       if (precision === 0) return parts[0];
 
-      return parts[0] + "." + parts[1].slice(0, precision);
+      return parts[0] + "." + (parts[1]?.slice(0, precision) || '0');
     },
     toPct(data, precision) {
       if (isNaN(data)) return "-";
@@ -253,7 +252,6 @@ export default {
                       .name()
                       .call()
                       .then((name) => {
-                        console.log(name);
                         this.$set(this.strategies[i], "name", name);
                       });
                   }

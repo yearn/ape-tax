@@ -131,22 +131,16 @@ import GuestList from "./abi/GuestList.json";
 import ZapSteth from "./abi/ZapSteth.json";
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
-import ERC20 from "./abi/ERC20.json";
 
 import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = ethers.BigNumber.from(0);
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
+const max_uint = ethers.constants.MaxUint256;
+const ADDRESS_ZERO = ethers.constants.AddressZero;
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
-const ERROR_GUEST_LIMIT = "That would exceed your guest limit. Try less.";
-const ERROR_GUEST_LIMIT_ALL =
-  "That would exceed your guest limit. Try not doing all in.";
 
 export default {
   name: "Vault",
