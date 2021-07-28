@@ -847,4 +847,18 @@ export default Object.freeze({
     VAULT_STATUS: "endorsed",
     CHAIN_ID: 1,
   },
+  bitcoinwaves: {
+    TITLE: "Bitcoin wAAVEs",
+    LOGO: "₿👋",
+    VAULT_ABI: yVaultV2,
+    VAULT_TYPE: "experimental",
+    VAULT_ADDR: "0xf11b141be4d1985e41c3aea99417e27603f67c4c",
+    WANT_ADDR: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    WANT_SYMBOL: "WBTC",
+    COINGECKO_SYMBOL: "wrapped-bitcoin",
+    VAULT_DEV: "arbingsam",
+    BLOCK_ACTIVATED: 1606599919,
+    VAULT_STATUS: "endorsed",
+    CHAIN_ID: 1,
+  },
 });
