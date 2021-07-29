@@ -99,13 +99,13 @@ div(v-else)
 
 import { mapGetters } from "vuex";
 import {ethers} from "ethers";
-import axios from "axios";
+import Web3 from "web3";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
 import chains from './chains.json'
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
-import Web3 from "web3";
+import {fetchCryptoPrice, fetchYearnVaults} from './utils/tools';
 
 let web3 = new Web3(Web3.givenProvider);
 
@@ -360,20 +360,12 @@ export default {
     if (this.chainId && this.config.CHAIN_ID !== this.chainId) {
       this.wrong_chain = true;
     }
-    axios
-      .get(
-        "https://api.coingecko.com/api/v3/simple/price?ids=" +
-          this.config.COINGECKO_SYMBOL.toLowerCase() +
-          "&vs_currencies=usd"
-      )
-      .then((response) => {
-        this.want_price = response.data[this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
-      });
-
-    axios.get("https://api.yearn.finance/v1/chains/1/vaults/all")
-    .then((response) => {
-      this.gross_apr = response.data.find((item) => item.address === this.vault)?.apy?.gross_apr || 0;
-    });
+    const response = await Promise.all([
+      fetchCryptoPrice(this.config.COINGECKO_SYMBOL.toLowerCase()),
+      fetchYearnVaults(),
+    ])
+    this.want_price = response[0][this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
+    this.gross_apr = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr || 0;
 
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens();

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import config from './config.js'
+import config from './vaults.json'
 import chains from './chains.json'
 import Vault from './Vault'
 import LidoVault from './LidoVault'

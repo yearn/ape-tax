@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import Vuex from 'vuex'
 
-import config from './config.js'
+import config from './vaults.json'
 import drizzleVuePlugin from '@drizzle/vue-plugin'
 import drizzleOptions from './drizzleOptions'
 import VueKonami from 'vue-konami'
