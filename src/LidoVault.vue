@@ -321,13 +321,14 @@ export default {
       const now = Math.round(Date.now() / 1000);
 
       // 1 week ago
+      const blockActivated = 1606599919;
       const one_week_ago = (now - 60 * 60 * 24 * 7);
-      const ts_past = one_week_ago < this.config.BLOCK_ACTIVATED?this.config.BLOCK_ACTIVATED:one_week_ago;
+      const ts_past = one_week_ago < blockActivated?blockActivated:one_week_ago;
 
       const ts_diff = now - ts_past;
 
       console.log("TS Past: " + one_week_ago);
-      console.log("TS Activation: " + this.config.BLOCK_ACTIVATED);
+      console.log("TS Activation: " + blockActivated);
 
       this.get_block_timestamp(ts_past).then(response => {
         console.log("Past block: " + response.data.result);

@@ -78,17 +78,15 @@
       a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
       |, 
       a(href="https://twitter.com/x48_crypto", target="_blank") x48
+      |, 
+      a(href="https://twitter.com/tbouder", target="_blank") Major
 div(v-else-if=("isDrizzleInitialized && wrong_chain"))
   div(class="notFound")
     p ❌⛓
     p Wrong Chain
-    p.smallish(
-      v-if="this.config.CHAIN_ID === 1"
-    ) Change it on Metamask
     div
       button.unstyled(
-        @click.prevent="on_switch_chain"
-        v-if="this.config.CHAIN_ID !== 1",
+        @click.prevent="on_switch_chain",
       ) 🔀 Switch it on Metamask
     a.smallish(href="/") Back Home
 div(v-else)
@@ -277,15 +275,23 @@ export default {
         console.error(`window.ethereum not initialized`)
         return
       }
-      if (!chains[this.config.CHAIN_ID] || !chains[this.config.CHAIN_ID].chain_swap) {
+      if (!chains[this.config.CHAIN_ID]) {
         console.error(`invalid chain_swap configuration`)
         return
       }
-      window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [chains[this.config.CHAIN_ID].chain_swap, this.activeAccount],
-      })
-      .catch((error) => console.error(error));
+      if (this.config.CHAIN_ID === 1) {
+        window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{chainId: '0x1'}],
+        })
+        .catch((error) => console.error(error));
+      } else {
+        window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [chains[this.config.CHAIN_ID].chain_swap, this.activeAccount],
+        })
+        .catch((error) => console.error(error));
+      }
     }
   },
   computed: {

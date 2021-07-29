@@ -41,7 +41,6 @@ Add a new element to the vaults.json array, at the end:
   "WANT_SYMBOL": "USDC", // want symbol to show in UI
   "COINGECKO_SYMBOL": "usd-coin", // Coingecko symbol, check it on their page
   "VAULT_DEV": "emilianobonassi", // Developer of the vault
-  "BLOCK_ACTIVATED": 1606599919, // When the vault was activated (not implemented yet)
   "VAULT_STATUS": "active", // 'active' is the default, 'withdraw' is for vault closed to new deposits, 'stealth' for hidden vaults and 'endorsed' for vaults used on Yearn Finance. Not active vaults have a label to show status.
   "CHAIN_ID": 1, // 1: Ethereum mainnet, 250: Fantom network, 56: BSC, 137: Polygon network
 }
