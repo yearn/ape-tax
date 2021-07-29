@@ -150,16 +150,6 @@ export default {
 
       return parts[0] + "." + (parts[1]?.slice(0, precision) || '0');
     },
-    fromWei15(data, precision) {
-      if (data === "loading") return data;
-      if (data > 2 ** 255) return "♾️";
-      let value = ethers.utils.commify(ethers.utils.formatUnits(data, 15));
-      let parts = value.split(".");
-
-      if (precision === 0) return parts[0];
-
-      return parts[0] + "." + (parts[1]?.slice(0, precision) || '0');
-    },
     toPct(data, precision) {
       if (isNaN(data)) return "-";
       return `${(data * 100).toFixed(precision)}%`;
@@ -262,9 +252,6 @@ export default {
         );
       }
     },
-    get_block_timestamp(timestamp) {
-      return axios.get(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=JXRIIVMTAN887F9D7NCTVQ7NMGNT1A4KA3`)      
-    },
     call(contract, method, args, out = "number") {
       let key = this.drizzleInstance.contracts[contract].methods[
         method
@@ -304,19 +291,13 @@ export default {
   computed: {
     ...mapGetters("accounts", ["activeAccount", "activeBalance"]),
     ...mapGetters("drizzle", ["drizzleInstance", "isDrizzleInitialized"]),
-    ...mapGetters("contracts", ["getContractData", "contractInstances"]),
+    ...mapGetters("contracts", ["contractInstances"]),
 
-    user() {
-      return this.activeAccount;
-    },
     vault() {
       return this.drizzleInstance.contracts["Vault"].address;
     },
     vault_version() {
       return this.call("Vault", "apiVersion", [], "string");
-    },
-    vault_supply() {
-      return this.call("Vault", "totalSupply", []);
     },
     vault_deposit_limit() {
       return this.call("Vault", "depositLimit", []);
@@ -371,16 +352,12 @@ export default {
         this.vault,
       ]).isZero();
     },
-    has_want_balance() {
-      return this.want_balance > 0;
-    },
     has_yvtoken_balance() {
       return this.yvtoken_balance > 0;
     },
   },
   async created() {
     if (this.chainId && this.config.CHAIN_ID !== this.chainId) {
-      //window.location.href = '/';
       this.wrong_chain = true;
     }
     axios

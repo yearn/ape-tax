@@ -129,16 +129,6 @@ export default {
 
       return parts[0] + "." + parts[1].slice(0, precision);
     },
-    fromWei15(data, precision) {
-      if (data === "loading") return data;
-      if (data > 2 ** 255) return "♾️";
-      let value = ethers.utils.commify(ethers.utils.formatUnits(data, 15));
-      let parts = value.split(".");
-
-      if (precision === 0) return parts[0];
-
-      return parts[0] + "." + parts[1].slice(0, precision);
-    },
     toPct(data, precision) {
       if (isNaN(data)) return "-";
       return `${(data * 100).toFixed(precision)}%`;
@@ -270,9 +260,6 @@ export default {
     vault_version() {
       return this.call("Vault", "version", [], "string");
     },
-    vault_supply() {
-      return this.call("Vault", "totalSupply", []);
-    },
     vault_total_assets() {
       return this.call("Vault", "totalSupply", []);
     },
@@ -307,9 +294,6 @@ export default {
         this.activeAccount,
         this.vault,
       ]).isZero();
-    },
-    has_want_balance() {
-      return this.want_balance > 0;
     },
     has_yvtoken_balance() {
       return this.yvtoken_balance > 0;
