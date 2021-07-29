@@ -78,6 +78,8 @@
       a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
       |, 
       a(href="https://twitter.com/x48_crypto", target="_blank") x48
+      |, 
+      a(href="https://twitter.com/tbouder", target="_blank") Major
 div(v-else-if=("isDrizzleInitialized && wrong_chain"))
   div(class="notFound")
     p ❌⛓
