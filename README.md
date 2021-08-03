@@ -35,3 +35,5 @@ This will prompt you with several information:
 - Which chain ? (*oneOf: Mainnet (1), BSC (56), Polygon (137), Fantom Opera (250)*)
 - What's the address of your vault ? (*ex: 0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b*)
 - Who is the dev of this vault ? (*ex: emilianobonassi*)
+
+<img width="482" alt="Capture d’écran 2021-08-04 à 00 26 37" src="https://user-images.githubusercontent.com/9974362/128094349-de173732-ec31-4314-9d34-b73221a9099f.png">
