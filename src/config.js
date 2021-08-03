@@ -905,7 +905,7 @@ export default Object.freeze({
   },
   truecereal: {
     TITLE: "True Cereal",
-    LOGO: "🔵",
+    LOGO: "🔵🥣",
     VAULT_ABI: yVaultV2,
     VAULT_TYPE: "experimental",
     VAULT_ADDR: "0xFD0877d9095789cAF24c98F7CCe092fa8E120775",
