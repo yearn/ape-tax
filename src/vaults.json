@@ -846,5 +846,5 @@
     "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1,
-  },
+  }
 }
