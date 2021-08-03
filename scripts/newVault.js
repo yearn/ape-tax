@@ -64,10 +64,8 @@ const	toAddress = (address) => {
 	}
 };
 
-let	mode = '';
 let	questions = [];
 if (process.argv.includes('--fast') || process.argv.includes('-f')) {
-	mode = 'fast';
 	questions = [
 		{
 			type: 'input',
@@ -97,7 +95,6 @@ if (process.argv.includes('--fast') || process.argv.includes('-f')) {
 		}
 	];
 } else {
-	mode = 'std';
 	questions = [
 		{
 			type: 'input',
