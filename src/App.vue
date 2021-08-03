@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import config from './config.js'
+import config from './vaults.json'
 import chains from './chains.json'
 import Vault from './Vault'
 import LidoVault from './LidoVault'
@@ -42,16 +42,10 @@ switch (window.location.pathname) {
     VaultType = Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound;
 }
 
-/*
-const VaultType = window.location.pathname === '/yvsteth' ? LidoVault : (
-  Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound
-)
-*/
-
 const Section = window.location.pathname === '/' ? Home : VaultType
 
 let web3 = new Web3(Web3.givenProvider);
-window.ethereum.on("chainChanged", (chainIdHex) => {
+window.ethereum.on("chainChanged", () => {
     window.location.reload();
   }
 );

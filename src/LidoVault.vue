@@ -83,24 +83,15 @@ div(v-else)
 import { mapGetters } from "vuex";
 import {ethers} from "ethers";
 import axios from "axios";
-import GuestList from "./abi/GuestList.json";
 import LidoVault from "./abi/LidoVault.json";
-import ERC20 from "./abi/ERC20.json";
-
 import Web3 from "web3";
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = ethers.BigNumber.from(0);
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
+const max_uint = ethers.constants.MaxUint256;
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
-const ERROR_GUEST_LIMIT = "That would exceed your guest limit. Try less.";
-const ERROR_GUEST_LIMIT_ALL =
-  "That would exceed your guest limit. Try not doing all in.";
 
 export default {
   name: "Vault",
@@ -132,16 +123,6 @@ export default {
       if (data === "loading") return data;
       if (data > 2 ** 255) return "♾️";
       let value = ethers.utils.commify(ethers.utils.formatUnits(data, decimals));
-      let parts = value.split(".");
-
-      if (precision === 0) return parts[0];
-
-      return parts[0] + "." + parts[1].slice(0, precision);
-    },
-    fromWei15(data, precision) {
-      if (data === "loading") return data;
-      if (data > 2 ** 255) return "♾️";
-      let value = ethers.utils.commify(ethers.utils.formatUnits(data, 15));
       let parts = value.split(".");
 
       if (precision === 0) return parts[0];
@@ -279,9 +260,6 @@ export default {
     vault_version() {
       return this.call("Vault", "version", [], "string");
     },
-    vault_supply() {
-      return this.call("Vault", "totalSupply", []);
-    },
     vault_total_assets() {
       return this.call("Vault", "totalSupply", []);
     },
@@ -317,9 +295,6 @@ export default {
         this.vault,
       ]).isZero();
     },
-    has_want_balance() {
-      return this.want_balance > 0;
-    },
     has_yvtoken_balance() {
       return this.yvtoken_balance > 0;
     },
@@ -346,13 +321,14 @@ export default {
       const now = Math.round(Date.now() / 1000);
 
       // 1 week ago
+      const blockActivated = 1606599919;
       const one_week_ago = (now - 60 * 60 * 24 * 7);
-      const ts_past = one_week_ago < this.config.BLOCK_ACTIVATED?this.config.BLOCK_ACTIVATED:one_week_ago;
+      const ts_past = one_week_ago < blockActivated?blockActivated:one_week_ago;
 
       const ts_diff = now - ts_past;
 
       console.log("TS Past: " + one_week_ago);
-      console.log("TS Activation: " + this.config.BLOCK_ACTIVATED);
+      console.log("TS Activation: " + blockActivated);
 
       this.get_block_timestamp(ts_past).then(response => {
         console.log("Past block: " + response.data.result);

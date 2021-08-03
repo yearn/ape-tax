@@ -28,14 +28,12 @@
 <script>
 import StatusTag from "./components/StatusTag";
 
-import { mapGetters } from "vuex";
-
 export default {
   name: "Home",
   components: {
     StatusTag,
   },
-  props: ["allConfig", "chainId", "chainCoin"],
+  props: ["allConfig", "chainId"],
   data() {
     return {
       items: Object.keys(this.allConfig)
@@ -48,18 +46,6 @@ export default {
   filters: {},
   methods: {},
   computed: {
-    ...mapGetters('drizzle', ['drizzleInstance']),
-    experimentalVaults() {
-      var items = this.items;
-
-      var result = items
-        .filter((item) => item.CHAIN_ID === this.chainId)
-        .filter((item) => item.VAULT_TYPE === "experimental")
-        .slice()
-        .reverse();
-
-      return result;
-    },
     experimentalVaultsActive() {
       var items = this.items;
 
@@ -72,7 +58,7 @@ export default {
         .slice()
         .reverse();
 
-return result;
+      return result;
     },
     experimentalVaultsOther() {
       var items = this.items;

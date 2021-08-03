@@ -97,20 +97,19 @@ div(v-else)
 
 import { mapGetters } from "vuex";
 import {ethers} from "ethers";
-import axios from "axios";
+import Web3 from "web3";
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
 import chains from './chains.json'
 import yVaultV2 from "./abi/yVaultV2.json";
 import yStrategy from "./abi/yStrategy.json";
-import Web3 from "web3";
+import {fetchCryptoPrice, fetchYearnVaults} from './utils/tools';
 
 let web3 = new Web3(Web3.givenProvider);
 
-const max_uint = ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = ethers.BigNumber.from(0);
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
+const max_uint = ethers.constants.MaxUint256;
+const BN_ZERO = ethers.constants.Zero;
+const ADDRESS_ZERO = ethers.constants.AddressZero;
 const ERROR_NEGATIVE = "You have to deposit a positive number of tokens 🐀";
 const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
 const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
@@ -147,17 +146,7 @@ export default {
 
       if (precision === 0) return parts[0];
 
-      return parts[0] + "." + parts[1].slice(0, precision);
-    },
-    fromWei15(data, precision) {
-      if (data === "loading") return data;
-      if (data > 2 ** 255) return "♾️";
-      let value = ethers.utils.commify(ethers.utils.formatUnits(data, 15));
-      let parts = value.split(".");
-
-      if (precision === 0) return parts[0];
-
-      return parts[0] + "." + parts[1].slice(0, precision);
+      return parts[0] + "." + (parts[1]?.slice(0, precision) || '0');
     },
     toPct(data, precision) {
       if (isNaN(data)) return "-";
@@ -251,7 +240,6 @@ export default {
                       .name()
                       .call()
                       .then((name) => {
-                        console.log(name);
                         this.$set(this.strategies[i], "name", name);
                       });
                   }
@@ -261,9 +249,6 @@ export default {
             )
         );
       }
-    },
-    get_block_timestamp(timestamp) {
-      return axios.get(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=JXRIIVMTAN887F9D7NCTVQ7NMGNT1A4KA3`)      
     },
     call(contract, method, args, out = "number") {
       let key = this.drizzleInstance.contracts[contract].methods[
@@ -312,19 +297,13 @@ export default {
   computed: {
     ...mapGetters("accounts", ["activeAccount", "activeBalance"]),
     ...mapGetters("drizzle", ["drizzleInstance", "isDrizzleInitialized"]),
-    ...mapGetters("contracts", ["getContractData", "contractInstances"]),
+    ...mapGetters("contracts", ["contractInstances"]),
 
-    user() {
-      return this.activeAccount;
-    },
     vault() {
       return this.drizzleInstance.contracts["Vault"].address;
     },
     vault_version() {
       return this.call("Vault", "apiVersion", [], "string");
-    },
-    vault_supply() {
-      return this.call("Vault", "totalSupply", []);
     },
     vault_deposit_limit() {
       return this.call("Vault", "depositLimit", []);
@@ -340,6 +319,9 @@ export default {
       }
     },
     vault_total_aum() {
+       if (this.vault_decimals.isZero()) {
+        return (0);
+      }
       let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.vault_total_assets.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
@@ -354,6 +336,9 @@ export default {
       return this.call("Vault", "balanceOf", [this.activeAccount]);
     },
     yvtoken_value() {
+      if (this.vault_decimals.isZero()) {
+        return (0);
+      }
       let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
       let numAum = this.yvtoken_balance.div(toFloat).toNumber();
       return (numAum / 100) * this.want_price;
@@ -373,32 +358,20 @@ export default {
         this.vault,
       ]).isZero();
     },
-    has_want_balance() {
-      return this.want_balance > 0;
-    },
     has_yvtoken_balance() {
       return this.yvtoken_balance > 0;
     },
   },
   async created() {
     if (this.chainId && this.config.CHAIN_ID !== this.chainId) {
-      //window.location.href = '/';
       this.wrong_chain = true;
     }
-    axios
-      .get(
-        "https://api.coingecko.com/api/v3/simple/price?ids=" +
-          this.config.COINGECKO_SYMBOL.toLowerCase() +
-          "&vs_currencies=usd"
-      )
-      .then((response) => {
-        this.want_price = response.data[this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
-      });
-
-    axios.get("https://api.yearn.finance/v1/chains/1/vaults/all")
-    .then((response) => {
-      this.gross_apr = response.data.filter((item) => item.address === this.vault).[0].apy.gross_apr;
-    });
+    const response = await Promise.all([
+      fetchCryptoPrice(this.config.COINGECKO_SYMBOL.toLowerCase()),
+      fetchYearnVaults(),
+    ])
+    this.want_price = response[0][this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
+    this.gross_apr = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr || 0;
 
     //Active account is defined?
     if (this.activeAccount !== undefined) this.load_reverse_ens();

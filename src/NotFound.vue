@@ -7,34 +7,18 @@
 </template>
 
 <script>
-
-import { mapGetters } from "vuex";
-
-export default {
-  name: "NotFound",
-  components: {},
-  props: [],
-  data() {
-    return {
-    };
-  },
-  filters: {},
-  methods: {},
-  computed: {},
-  created() {
-  },
-}
+  export default {name: "NotFound"}
 </script>
 
 <style>
-div.notFound {
-	width: 400px;
-	height: 200px;
-	margin: auto;
-  text-align: center;
-  font-size: 3em;
-}
-.notFound .smallish {
-    font-size: 0.5em;
-}
+  div.notFound {
+    width: 400px;
+    height: 200px;
+    margin: auto;
+    text-align: center;
+    font-size: 3em;
+  }
+  .notFound .smallish {
+      font-size: 0.5em;
+  }
 </style>
