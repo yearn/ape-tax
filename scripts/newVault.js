@@ -9,6 +9,7 @@ const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
 const	fs = require('fs');
+const	args = require('yargs').argv;
 
 async function getTokenInfo(tokenAddress) {
 	try {
@@ -64,98 +65,144 @@ const	toAddress = (address) => {
 	}
 };
 
+let	defaultVaultABI = 'yVaultV2';
+let	defaultVaultType = 'experimental';
+let	defaultVaultStatus = 'active';
+let	defaultVaultChain = 1;
 let	questions = [];
-if (process.argv.includes('--fast') || process.argv.includes('-f')) {
-	questions = [
-		{
-			type: 'input',
-			name: 'vaultName',
-			message: 'What\'s the name of your vault ?',
-		},
-		{
-			type: 'input',
-			name: 'vaultLogo',
-			message: 'What\'s the logo for your vault ?',
-		},
-		{
-			type: 'list',
-			name: 'vaultChain',
-			message: 'Which chain ?',
-			choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)'],
-		},
-		{
-			type: 'input',
-			name: 'vaultAddress',
-			message: 'What\'s the address of your vault ?',
-		},
-		{
-			type: 'input',
-			name: 'vaultDev',
-			message: 'Who is the dev of this vault ?',
-		}
-	];
+/******************************************************************************
+**	If the name is not in the arguments, let's prompt it.
+**	The name will be associated with the `TITLE` key.
+******************************************************************************/
+if (!args.name) {
+	questions.push({
+		type: 'input',
+		name: 'vaultName',
+		message: 'What\'s the name of your vault ?',
+	});
+}
+
+/******************************************************************************
+**	If the logo is not in the arguments, let's prompt it.
+**	The logo will be associated with the `LOGO` key. Emojis are expected.
+******************************************************************************/
+if (!args.logo) {
+	questions.push({
+		type: 'input',
+		name: 'vaultLogo',
+		message: 'What\'s the logo for your vault ?',
+	});
+}
+
+/******************************************************************************
+**	If the chain is not in the arguments, let's prompt it.
+**	The chain will be associated with the `CHAINID` key. Numbers are expected.
+**	Possible value : 1, 56, 137, 250
+******************************************************************************/
+if (!args.chain || !([1, 56, 137, 250]).includes(args.chain)) {
+	questions.push(		{
+		type: 'list',
+		name: 'vaultChain',
+		message: 'Which chain ?',
+		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)'],
+	},);
 } else {
-	questions = [
-		{
-			type: 'input',
-			name: 'vaultName',
-			message: 'What\'s the name of your vault ?',
-		},
-		{
-			type: 'input',
-			name: 'vaultLogo',
-			message: 'What\'s the logo for your vault ?',
-		},
-		{
-			type: 'list',
-			name: 'vaultChain',
-			message: 'Which chain ?',
-			choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)'],
-		},
-		{
-			type: 'input',
-			name: 'vaultAddress',
-			message: 'What\'s the address of your vault ?',
-		},
-		{
-			type: 'input',
-			name: 'vaultDev',
-			message: 'Who is the dev of this vault ?',
-		},
-		{
-			type: 'list',
-			name: 'vaultABI',
-			message: 'What kind of vault is it ?',
-			choices: ['yVaultV2', 'LidoVault'],
-			default: 'yVaultV2',
-			filter(val) {
-				return val.toLowerCase();
-			},
-		},
-		{
-			type: 'list',
-			name: 'vaultType',
-			message: 'What kind of vault is it ?',
-			choices: ['experimental', 'weird'],
-		},
-		{
-			type: 'list',
-			name: 'vaultStatus',
-			message: 'What is the status of vault is it ?',
-			choices: ['active', 'withdraw', 'stealth', 'endorsed'],
-		}
-	];
+	if (args.chain === 1)
+		defaultVaultChain = 'Mainnet (1)';
+	if (args.chain === 56)
+		defaultVaultChain = 'BSC (56)';
+	if (args.chain === 137)
+		defaultVaultChain = 'Polygon (137)';
+	if (args.chain === 250)
+		defaultVaultChain = 'Fantom Opera (250)';
+}
+
+/******************************************************************************
+**	If the address is not in the arguments, let's prompt it.
+**	The address will be associated with the `VAULT_ADDR` key. Address not 0 is
+**	expected.
+******************************************************************************/
+if (!args.address) {
+	questions.push({
+		type: 'input',
+		name: 'vaultAddress',
+		message: 'What\'s the address of your vault ?',
+	});
+}
+
+/******************************************************************************
+**	If the dev is not in the arguments, let's prompt it.
+**	The dev will be associated with the `VAULT_DEV` key.
+******************************************************************************/
+if (!args.dev) {
+	questions.push({
+		type: 'input',
+		name: 'vaultDev',
+		message: 'Who is the dev of this vault ?',
+	});
+}
+
+/******************************************************************************
+**	If the abi is not in the arguments, let's prompt it.
+**	The abi will be associated with the `VAULT_ABI` key.
+**	Only if fast is not enabled.
+**	Possible value : yVaultV2, LidoVault
+******************************************************************************/
+if ((!args.abi || !(['yVaultV2', 'LidoVault']).includes(args.abi)) && !args.fast) {
+	questions.push({
+		type: 'list',
+		name: 'vaultABI',
+		message: 'What is the ABI to use for this vault ?',
+		choices: ['yVaultV2', 'LidoVault'],
+		default: 'yVaultV2'
+	});
+} else {
+	defaultVaultABI = args.abi;
+}
+
+/******************************************************************************
+**	If the type is not in the arguments, let's prompt it.
+**	The type will be associated with the `VAULT_TYPE` key.
+**	Only if fast is not enabled.
+**	Possible value : experimental, weird
+******************************************************************************/
+if ((!args.type || !(['experimental', 'weird']).includes(args.type)) && !args.fast) {
+	questions.push({
+		type: 'list',
+		name: 'vaultType',
+		message: 'What kind of vault is it ?',
+		choices: ['experimental', 'weird'],
+	});
+} else {
+	defaultVaultType = args.type;
+}
+
+/******************************************************************************
+**	If the status is not in the arguments, let's prompt it.
+**	The status will be associated with the `VAULT_STATUS` key.
+**	Only if fast is not enabled.
+**	Possible value : experimental, weird
+******************************************************************************/
+if ((!args.status || !(['active', 'withdraw', 'stealth', 'endorsed']).includes(args.type)) && !args.fast) {
+	questions.push({
+		type: 'list',
+		name: 'vaultStatus',
+		message: 'What is the status of vault is it ?',
+		choices: ['active', 'withdraw', 'stealth', 'endorsed'],
+	});
+} else {
+	defaultVaultStatus = args.status;
 }
 
 inquirer.prompt(questions).then(async ({
-	vaultName,
-	vaultLogo,
-	vaultChain,
-	vaultAddress,
-	vaultDev,
-	vaultABI = 'yVaultV2',
-	vaultType = 'experimental',
-	vaultStatus = 'active',
+	vaultName = args.name,
+	vaultLogo = args.logo,
+	vaultAddress = args.address,
+	vaultDev = args.dev,
+	vaultChain = defaultVaultChain,
+	vaultABI = defaultVaultABI,
+	vaultType = defaultVaultType,
+	vaultStatus = defaultVaultStatus,
 }) => {
 	const	address = toAddress(vaultAddress);
 	if (address === ADDRESS_ZERO) {
