@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Tuesday August 3rd 2021
-**	@Filename:				newVault.js
-******************************************************************************/
-
 const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
