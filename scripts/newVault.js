@@ -9,7 +9,7 @@ const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
 const	fs = require('fs');
-const	args = require('yargs').argv;
+const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv
 
 async function getTokenInfo(tokenAddress) {
 	try {
@@ -183,7 +183,7 @@ if ((!args.type || !(['experimental', 'weird']).includes(args.type)) && !args.fa
 **	Only if fast is not enabled.
 **	Possible value : experimental, weird
 ******************************************************************************/
-if ((!args.status || !(['active', 'withdraw', 'stealth', 'endorsed']).includes(args.type)) && !args.fast) {
+if ((!args.status || !(['active', 'withdraw', 'stealth', 'endorsed']).includes(args.status)) && !args.fast) {
 	questions.push({
 		type: 'list',
 		name: 'vaultStatus',
