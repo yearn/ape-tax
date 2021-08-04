@@ -163,8 +163,19 @@ inquirer.prompt(questions).then(async ({
 	}
 	const	provider = getProvider(ENUM_CHAIN[vaultChain]);
 	const	contract = new ethers.Contract(address, ['function token() view returns (address)'], provider);
-	const	[tokenAddress] = await Promise.all([contract.token()]);
+	const	tokenAddress = await contract.token();
+	const	erc20Contract = new ethers.Contract(tokenAddress, ['function symbol() view returns (string)'], provider);
+	const	tokenSymbol = await erc20Contract.symbol();
 	const	tokenInfo = await getTokenInfo(tokenAddress);
+	if (!tokenInfo?.id) {
+		console.log('❌ Impossible to find corresponding token on coinGecko.')
+		const	{wantID} = await inquirer.prompt([{
+			type: 'input',
+			name: 'wantSymbol',
+			message: 'What coingeckoID should we use ?',
+		}]);
+		tokenInfo.id = wantID;
+	}
 	const	vaultSlug = getSlugFromString(vaultName);
 	const	vaults = require('../src/vaults.json');
 	
@@ -181,7 +192,7 @@ inquirer.prompt(questions).then(async ({
 		VAULT_TYPE: vaultType,
 		VAULT_ADDR: address,
 		WANT_ADDR: toAddress(tokenAddress),
-		WANT_SYMBOL: tokenInfo.symbol.toUpperCase(),
+		WANT_SYMBOL: tokenSymbol,
 		COINGECKO_SYMBOL: tokenInfo.id,
 		VAULT_DEV: vaultDev,
 		VAULT_STATUS: vaultStatus,
