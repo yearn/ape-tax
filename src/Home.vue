@@ -21,9 +21,6 @@
 
 <script>
 import StatusTag from "./components/StatusTag";
-import GraphemeSplitter from 'grapheme-splitter';
-
-const splitter = new GraphemeSplitter();
 
 export default {
   name: "Home",
@@ -41,11 +38,7 @@ export default {
     };
   },
   filters: {},
-  methods: {
-    splitLogo(logo) {
-      return splitter.splitGraphemes(logo);
-    },
-  },
+  methods: {},
   computed: {
     experimentalVaultsActive() {
       var items = this.items;
@@ -164,21 +157,5 @@ a.links:hover span.text {
 .spacer {
   padding-top: 1rem;
   padding-bottom: 1rem;
-}
-.vault {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-.text {
-  padding-left: 8px;
-}
-.vaultLogo {
-  width: 20px;
-  text-align: center;
-}
-.flex {
-  display: flex;
-  align-items: center;
 }
 </style>
