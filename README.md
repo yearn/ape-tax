@@ -50,8 +50,9 @@ Here are the arguments :
 - `abi` for the ABI to use for your vault. Valid options are yVaultV2 or LidoVault. (*ex: `node scripts/newVault.js --abi=yVaultV2`*)
 - `type` for the type of vault. Valid options are experimental or weird. (*ex: `node scripts/newVault.js --type=experimental`*)
 - `status` for the status of this vault. Valid options are active, withdraw, stealth or endorsed. (*ex: `node scripts/newVault.js --status=active`*)
+- `coingecko` to specify the coingeckoID to use for this want token. (*ex: `node scripts/newVault.js --coingecko=true-usd`*)
 
 All in one :
 ```
-node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --address=0xFD0877d9095789cAF24c98F7CCe092fa8E120775 --dev=emilianobonassi --abi=yVaultV2 --type=experimental --status=active
+node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --address=0xFD0877d9095789cAF24c98F7CCe092fa8E120775 --dev=emilianobonassi --abi=yVaultV2 --type=experimental --status=active --coingecko=true-usd
 ```

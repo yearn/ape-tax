@@ -4,6 +4,14 @@ const	axios = require('axios');
 const	fs = require('fs');
 const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv
 
+async function checkTokenCGID(tokenID) {
+	try {
+		const	data = await axios.get(`https://api.coingecko.com/api/v3/coins/${tokenID}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`).then(e => e.data);
+		return	data;		
+	} catch (error) {
+		return	{};
+	}
+}
 async function getTokenInfo(tokenAddress) {
 	try {
 		const	data = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${tokenAddress}`).then(e => e.data);
@@ -206,7 +214,13 @@ inquirer.prompt(questions).then(async ({
 	const	tokenAddress = await contract.token();
 	const	erc20Contract = new ethers.Contract(tokenAddress, ['function symbol() view returns (string)'], provider);
 	const	tokenSymbol = await erc20Contract.symbol();
-	const	tokenInfo = await getTokenInfo(tokenAddress);
+	let		tokenInfo = {};
+	if (args.coingecko) {
+		tokenInfo = await checkTokenCGID(args.coingecko);
+	}
+	if (!tokenInfo?.id) {
+		tokenInfo = await getTokenInfo(tokenAddress);
+	}
 	if (!tokenInfo?.id) {
 		console.log('❌ Impossible to find corresponding token on coinGecko.')
 		const	{wantID} = await inquirer.prompt([{
