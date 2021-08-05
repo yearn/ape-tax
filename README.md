@@ -28,20 +28,31 @@ npm run lint
 
 ## Add an experimental experiment
 
-Add a new element to the vaults.json array, at the end:
+#### With prompt
+To add a new vault to the list, you need to run the following command : `node scripts/newVault.js --fast`.  
+This will prompt you with several information:  
+- What's the name of your vault ? (*ex: Hardrock Farmer*)
+- What's the logo for your vault ? (*ex: 🎸👨‍🌾*)
+- Which chain ? (*oneOf: Mainnet (1), BSC (56), Polygon (137), Fantom Opera (250)*)
+- What's the address of your vault ? (*ex: 0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b*)
+- Who is the dev of this vault ? (*ex: emilianobonassi*)
 
-```javascript
-'path': { // URL path
-  "TITLE": "Hardrock Farmer", // Title of the vault, let you imagination fly
-  "LOGO": "🎸👨‍🌾", // Emojis to show on top, make it fun please
-  "VAULT_ABI": "yVaultV2", // Usually that one, unless doing a custom one
-  "VAULT_TYPE": 'weird', // 'weird', 'experimental' to select in which column it should show
-  "VAULT_ADDR": "0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b", // Vault address
-  "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // Token address
-  "WANT_SYMBOL": "USDC", // want symbol to show in UI
-  "COINGECKO_SYMBOL": "usd-coin", // Coingecko symbol, check it on their page
-  "VAULT_DEV": "emilianobonassi", // Developer of the vault
-  "VAULT_STATUS": "active", // 'active' is the default, 'withdraw' is for vault closed to new deposits, 'stealth' for hidden vaults and 'endorsed' for vaults used on Yearn Finance. Not active vaults have a label to show status.
-  "CHAIN_ID": 1, // 1: Ethereum mainnet, 250: Fantom network, 56: BSC, 137: Polygon network
-}
+<img width="482" alt="Capture d’écran 2021-08-04 à 00 26 37" src="https://user-images.githubusercontent.com/9974362/128094349-de173732-ec31-4314-9d34-b73221a9099f.png">
+
+#### With arguments
+You can add some arguments to the script in order to specify some elements. The missing arguments will be prompted as above.  
+Here are the arguments :  
+- `name` for the name of your vault (*ex: `node scripts/newVault.js --name="Hardrock Farmer"`*)
+- `logo` for the logo of your vault (*ex: `node scripts/newVault.js --logo=🎸👨‍🌾`*)
+- `chain` for the chain of your vault. Valid options are 1, 56, 137 or 250. (*ex: `node scripts/newVault.js --chain=1`*)
+- `address` for the address of your vault (*ex: `node scripts/newVault.js --address=0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b`*)
+- `dev` for the name of the dev of your vault (*ex: `node scripts/newVault.js --dev=emilianobonassi`*)
+- `abi` for the ABI to use for your vault. Valid options are yVaultV2 or LidoVault. (*ex: `node scripts/newVault.js --abi=yVaultV2`*)
+- `type` for the type of vault. Valid options are experimental or weird. (*ex: `node scripts/newVault.js --type=experimental`*)
+- `status` for the status of this vault. Valid options are active, withdraw, stealth or endorsed. (*ex: `node scripts/newVault.js --status=active`*)
+- `coingecko` to specify the coingeckoID to use for this want token. (*ex: `node scripts/newVault.js --coingecko=true-usd`*)
+
+All in one :
+```
+node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --address=0xFD0877d9095789cAF24c98F7CCe092fa8E120775 --dev=emilianobonassi --abi=yVaultV2 --type=experimental --status=active --coingecko=true-usd
 ```
