@@ -52,7 +52,8 @@ export default {
   filters: {},
   methods: {
     splitLogo(logo) {
-      return splitter.splitGraphemes(logo);
+      const splitted = splitter.splitGraphemes(logo);
+      return ([splitted[0], `${splitted.slice(1).join('')}`])
     },
   },
   computed: {
@@ -183,16 +184,14 @@ a.links:hover span.text {
   width: 100%;
 }
 .text {
-  margin-left: 8px;
+  margin-left: 16px;
   border-bottom: 1px dotted transparent;
 }
 .vaultLogo {
   width: 20px;
+  text-align: right;
 }
 .vault > .vaultLogo:first-child {
   text-align: left;
-}
-.vault > .vaultLogo:last-child {
-  text-align: right;
 }
 </style>
