@@ -14,6 +14,7 @@
     "buefy": "^0.9.4",
     "core-js": "^3.6.5",
     "ethers": "^5.4.1",
+    "grapheme-splitter": "^1.0.4",
     "pug": "^3.0.0",
     "pug-plain-loader": "^1.0.0",
     "vue": "^2.6.11",

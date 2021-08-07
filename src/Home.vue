@@ -7,20 +7,32 @@
     div.column.is-one-third.is-half-mobile
       h2(v-show="experimentalVaultsActive.length || experimentalVaultsOther.length").title.is-size-4.is-size-6-mobile 🚀 Experimental
       ul
-        li.is-size-6.is-size-7-mobile(v-for="vault in [...experimentalVaultsActive, ...experimentalVaultsOther]")
-          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
+        li(class="vaultLine" v-for="vault in [...experimentalVaultsActive, ...experimentalVaultsOther]")
+          a.is-size-6.is-size-7-mobile(class="links" :href="'/' + vault.URL")
+            <div class="vault">
+              span( class="vaultLogo" v-for="letter in splitLogo(vault.LOGO)")
+                <span>{{ letter }}</span>
+              <span class="text">{{ vault.TITLE }}</span>
+            </div>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third.is-half-mobile
       h2(v-show="weirdVaultsActive.length").title.is-size-4.is-size-6-mobile 🧠 Weird
       ul
-        li.is-size-6.is-size-7-mobile(v-for="vault in [...weirdVaultsActive, ...weirdVaultsOther]")
-          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
+        li(class="vaultLine" v-for="vault in [...weirdVaultsActive, ...weirdVaultsOther]")
+          a.is-size-6.is-size-7-mobile(class="links" :href="'/' + vault.URL")
+            <div class="vault">
+              span( class="vaultLogo" v-for="letter in splitLogo(vault.LOGO)")
+                <span>{{ letter }}</span>
+              <span class="text">{{ vault.TITLE }}</span> 
+            </div>
           status-tag(:status="vault.VAULT_STATUS")
 
 </template>
 
 <script>
 import StatusTag from "./components/StatusTag";
+import GraphemeSplitter from 'grapheme-splitter';
+const splitter = new GraphemeSplitter();
 
 export default {
   name: "Home",
@@ -38,7 +50,12 @@ export default {
     };
   },
   filters: {},
-  methods: {},
+  methods: {
+    splitLogo(logo) {
+      const splitted = splitter.splitGraphemes(logo);
+      return ([splitted[0], `${splitted.slice(1).join('')}`])
+    },
+  },
   computed: {
     experimentalVaultsActive() {
       var items = this.items;
@@ -134,7 +151,6 @@ a.links,
 a.links:visited,
 a.links:hover {
   font-family: IBM Plex Mono, monospace;
-/*  font-size: 1rem;*/
   font-weight: 500;
   color: #2c3e50;
   text-decoration: none;
@@ -157,5 +173,25 @@ a.links:hover span.text {
 .spacer {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+.vaultLine {
+  display: flex;
+  align-items: center;
+}
+.vault {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.text {
+  margin-left: 16px;
+  border-bottom: 1px dotted transparent;
+}
+.vaultLogo {
+  width: 20px;
+  text-align: right;
+}
+.vault > .vaultLogo:first-child {
+  text-align: left;
 }
 </style>
