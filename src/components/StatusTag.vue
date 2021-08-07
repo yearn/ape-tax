@@ -36,6 +36,10 @@ export default {
 				this.tag_type = 'is-info';
 				this.link = 'https://yearn.finance/vaults';
 				break;
+			case 'new':
+				this.tag_text = 'New';
+				this.tag_type = 'is-new';
+				break;
 			default:
 				this.tag_type = '';
 				this.tag_text = '';
@@ -49,5 +53,9 @@ export default {
 .tag {
 	margin-left: 1em;
 	font-size: 0.6rem !important;
+}
+.is-new {
+	background-color: #10B981 !important;
+	color: #FFFFFF !important;
 }
 </style>

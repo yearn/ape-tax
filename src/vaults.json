@@ -805,7 +805,7 @@
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
     "VAULT_DEV": "dudesahn",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "compoundingcosmos": {
@@ -818,7 +818,7 @@
     "WANT_SYMBOL": "COMP",
     "COINGECKO_SYMBOL": "compound-governance-token",
     "VAULT_DEV": "dudesahn",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "spookystars": {
@@ -831,7 +831,7 @@
     "WANT_SYMBOL": "AAVE",
     "COINGECKO_SYMBOL": "aave",
     "VAULT_DEV": "dudesahn",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "truecereal": {
@@ -844,7 +844,7 @@
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
     "VAULT_DEV": "fp_crypto",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
 }

@@ -7,20 +7,14 @@
     div.column.is-one-third.is-half-mobile
       h2(v-show="experimentalVaultsActive.length || experimentalVaultsOther.length").title.is-size-4.is-size-6-mobile 🚀 Experimental
       ul
-        li.is-size-6.is-size-7-mobile(v-for="vault in experimentalVaultsActive")
-          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
-          status-tag(:status="vault.VAULT_STATUS")
-        li.is-size-6.is-size-7-mobile(v-for="vault in experimentalVaultsOther")
+        li.is-size-6.is-size-7-mobile(v-for="vault in [...experimentalVaultsActive, ...experimentalVaultsOther]")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
     div.column.is-one-third.is-half-mobile
       h2(v-show="weirdVaultsActive.length").title.is-size-4.is-size-6-mobile 🧠 Weird
       ul
-        li.is-size-6.is-size-7-mobile(v-for="vault in weirdVaultsActive")
+        li.is-size-6.is-size-7-mobile(v-for="vault in [...weirdVaultsActive, ...weirdVaultsOther]")
           a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span> 
-          status-tag(:status="vault.VAULT_STATUS")
-        li.is-size-6.is-size-7-mobile(v-for="vault in weirdVaultsOther")
-          a( class="links" :href="'/' + vault.URL") {{ vault.LOGO }} <span class="text">{{ vault.TITLE }}</span>
           status-tag(:status="vault.VAULT_STATUS")
 
 </template>
@@ -53,7 +47,7 @@ export default {
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "experimental" && item.VAULT_STATUS === "active"
+            item.VAULT_TYPE === "experimental" && (item.VAULT_STATUS === "active" || item.VAULT_STATUS === "new")
         )
         .slice()
         .reverse();
@@ -69,6 +63,7 @@ export default {
           (item) =>
             item.VAULT_TYPE === "experimental" &&
             item.VAULT_STATUS != "active" &&
+            item.VAULT_STATUS != "new" &&
             item.VAULT_STATUS != "stealth"
         )
         .slice()
@@ -83,7 +78,7 @@ export default {
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
-            item.VAULT_TYPE === "weird" && item.VAULT_STATUS === "active"
+            item.VAULT_TYPE === "weird" && (item.VAULT_STATUS === "active" || item.VAULT_STATUS === "new")
         )
         .slice()
         .reverse();
@@ -99,6 +94,7 @@ export default {
           (item) =>
             item.VAULT_TYPE === "weird" &&
             item.VAULT_STATUS != "active" &&
+            item.VAULT_STATUS != "new" &&
             item.VAULT_STATUS != "stealth"
         )
         .slice()

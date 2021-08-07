@@ -68,7 +68,7 @@ const	toAddress = (address) => {
 
 let	defaultVaultABI = 'yVaultV2';
 let	defaultVaultType = 'experimental';
-let	defaultVaultStatus = 'active';
+let	defaultVaultStatus = 'new';
 let	defaultVaultChain = 1;
 let	questions = [];
 /******************************************************************************
@@ -157,8 +157,6 @@ if ((!args.abi || !(['yVaultV2', 'LidoVault']).includes(args.abi)) && !args.fast
 		choices: ['yVaultV2', 'LidoVault'],
 		default: 'yVaultV2'
 	});
-} else {
-	defaultVaultABI = args.abi;
 }
 
 /******************************************************************************
@@ -174,25 +172,21 @@ if ((!args.type || !(['experimental', 'weird']).includes(args.type)) && !args.fa
 		message: 'What kind of vault is it ?',
 		choices: ['experimental', 'weird'],
 	});
-} else {
-	defaultVaultType = args.type;
 }
 
 /******************************************************************************
 **	If the status is not in the arguments, let's prompt it.
 **	The status will be associated with the `VAULT_STATUS` key.
 **	Only if fast is not enabled.
-**	Possible value : experimental, weird
+**	Possible value : new, active, withdraw, stealth, endorsed
 ******************************************************************************/
-if ((!args.status || !(['active', 'withdraw', 'stealth', 'endorsed']).includes(args.status)) && !args.fast) {
+if ((!args.status || !(['new', 'active', 'withdraw', 'stealth', 'endorsed']).includes(args.status)) && !args.fast) {
 	questions.push({
 		type: 'list',
 		name: 'vaultStatus',
 		message: 'What is the status of vault is it ?',
-		choices: ['active', 'withdraw', 'stealth', 'endorsed'],
+		choices: ['new', 'active', 'withdraw', 'stealth', 'endorsed'],
 	});
-} else {
-	defaultVaultStatus = args.status;
 }
 
 inquirer.prompt(questions).then(async ({
@@ -239,7 +233,14 @@ inquirer.prompt(questions).then(async ({
 	if (Object.values(vaults).some(e => toAddress(e.VAULT_ADDR) === vaultAddress && e.CHAIN_ID === ENUM_CHAIN[vaultChain])) {
 		throw 'A vault with this address is already used !';
 	}
-	vaults[vaultSlug] = {
+	const	updatedVaults = {};
+	Object.entries(vaults).forEach(([key, vault]) => {
+		if (vault.VAULT_STATUS === 'new') {
+			vault.VAULT_STATUS = 'active';
+		}
+		updatedVaults[key] = vault;
+	})
+	updatedVaults[vaultSlug] = {
 		TITLE: vaultName,
 		LOGO: vaultLogo,
 		VAULT_ABI: vaultABI,
@@ -252,7 +253,7 @@ inquirer.prompt(questions).then(async ({
 		VAULT_STATUS: vaultStatus,
 		CHAIN_ID: ENUM_CHAIN[vaultChain]
 	};
-	const stringifiedVault = JSON.stringify(vaults, null, 2);
+	const stringifiedVault = JSON.stringify(updatedVaults, null, 2);
 	fs.writeFile(`${__dirname}/../src/vaults.json`, stringifiedVault, 'utf8', (err) => {
 		if (err) {
 			throw 'Impossible to update vaults.json';
