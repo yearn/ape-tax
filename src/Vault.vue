@@ -312,7 +312,7 @@ export default {
       return this.call("Vault", "totalAssets", []);
     },
     vault_available_limit() {
-      if (this.config.VAULT_STATUS == 'active' || this.config.VAULT_STATUS == 'stealth' || this.config.VAULT_STATUS == '') {
+      if (this.config.VAULT_STATUS !== 'withdraw') {
         return this.call("Vault", "availableDepositLimit", []);
       } else {
         return BN_ZERO;
