@@ -26,12 +26,24 @@
               <span class="text">{{ vault.TITLE }}</span> 
             </div>
           status-tag(:status="vault.VAULT_STATUS")
+    div.column.is-one-third.is-half-mobile
+      h2(v-show="vaultsInactive.length").title.is-size-4.is-size-6-mobile 🚨 Withdraw
+      ul
+        li(class="vaultLine" v-for="vault in vaultsInactive")
+          a.is-size-6.is-size-7-mobile(class="links" :href="'/' + vault.URL")
+            <div class="vault">
+              span( class="vaultLogo" v-for="letter in splitLogo(vault.LOGO)")
+                <span>{{ letter }}</span>
+              <span class="text">{{ vault.TITLE }}</span> 
+            </div>
+          status-tag(:status="vault.VAULT_STATUS")
 
 </template>
 
 <script>
-import StatusTag from "./components/StatusTag";
 import GraphemeSplitter from 'grapheme-splitter';
+import {ethers} from "ethers";
+import StatusTag from "./components/StatusTag";
 const splitter = new GraphemeSplitter();
 
 export default {
@@ -39,9 +51,11 @@ export default {
   components: {
     StatusTag,
   },
-  props: ["allConfig", "chainId"],
+  props: ["allConfig", "chainId", 'currentAccount'],
   data() {
     return {
+      withdrawVaults: [],
+      vaultsInactive: [],
       items: Object.keys(this.allConfig)
         .map((key) => ({
           ...this.allConfig[key],
@@ -58,9 +72,9 @@ export default {
   },
   computed: {
     experimentalVaultsActive() {
-      var items = this.items;
+      const items = this.items;
 
-      var result = items
+      const result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
@@ -72,26 +86,21 @@ export default {
       return result;
     },
     experimentalVaultsOther() {
-      var items = this.items;
+      const items = this.items;
 
-      var result = items
-        .filter((item) => item.CHAIN_ID === this.chainId)
-        .filter(
-          (item) =>
-            item.VAULT_TYPE === "experimental" &&
-            item.VAULT_STATUS != "active" &&
-            item.VAULT_STATUS != "new" &&
-            item.VAULT_STATUS != "stealth"
-        )
-        .slice()
-        .reverse();
+      const result = items
+        .filter((item) =>
+          item.CHAIN_ID === this.chainId &&
+          item.VAULT_TYPE === "experimental" &&
+          item.VAULT_STATUS === "endorsed"
+        ).reverse();
 
       return result;
     },
     weirdVaultsActive() {
-      var items = this.items;
+      const items = this.items;
 
-      var result = items
+      const result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
@@ -103,22 +112,35 @@ export default {
       return result;
     },
     weirdVaultsOther() {
-      var items = this.items;
+      const items = this.items;
 
-      var result = items
+      const result = items
         .filter((item) => item.CHAIN_ID === this.chainId)
         .filter(
           (item) =>
             item.VAULT_TYPE === "weird" &&
-            item.VAULT_STATUS != "active" &&
-            item.VAULT_STATUS != "new" &&
-            item.VAULT_STATUS != "stealth"
+            item.VAULT_STATUS === "endorsed"
         )
         .slice()
         .reverse();
 
       return result;
     },
+  },
+  async created() {
+    const items = this.items;
+    const result = items.filter(item => (item.CHAIN_ID === this.chainId) && (item.VAULT_STATUS === 'withdraw'))
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const currentAccount = '0xeafb3ee25b5a9a1b35f193a4662e3bdba7a95beb' || (await provider.listAccounts())[0];
+
+    const promises = await Promise.all(result.map(async ({VAULT_ADDR}) => {
+      const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
+      const balance = await vaultContract.balanceOf(currentAccount);
+      return balance.isZero() ? null : VAULT_ADDR;
+    }))
+
+    const needToWidthdraw = promises.filter(Boolean);
+    this.vaultsInactive = result.filter(item => needToWidthdraw.includes(item.VAULT_ADDR));
   },
 };
 </script>
