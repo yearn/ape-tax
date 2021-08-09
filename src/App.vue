@@ -149,6 +149,28 @@ button.unstyled {
   font-size: 5rem;
 }
 
+.grid {
+  display: grid;
+}
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.col-span-1 {
+  grid-column: span 1 / span 1;
+}
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+.max-w-5xl {
+	max-width: 64rem;
+}
+@media (min-width: 640px) {
+  .xs-col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+}
+
+
 .column {
   float: left;
   width: 40%;
