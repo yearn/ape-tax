@@ -113,7 +113,7 @@
     "WANT_SYMBOL": "steCRV",
     "COINGECKO_SYMBOL": "ethereum",
     "VAULT_DEV": "arbingsam",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "ironlender": {
@@ -597,7 +597,7 @@
     "WANT_SYMBOL": "LINK",
     "COINGECKO_SYMBOL": "chainlink",
     "VAULT_DEV": "jmonteer23",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "matic_woofy": {
@@ -649,7 +649,7 @@
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "weth",
     "VAULT_DEV": "fameal",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "coinsonfire": {
