@@ -126,7 +126,7 @@
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "ethereum",
     "VAULT_DEV": "arbingsam",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "mmwbtc": {
@@ -165,7 +165,7 @@
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "ethereum",
     "VAULT_DEV": "arbingsam",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "susdidle": {
@@ -178,7 +178,7 @@
     "WANT_SYMBOL": "sUSD",
     "COINGECKO_SYMBOL": "nusd",
     "VAULT_DEV": "emilianobonassi",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "creamyswords": {
@@ -308,7 +308,7 @@
     "WANT_SYMBOL": "USDT",
     "COINGECKO_SYMBOL": "tether",
     "VAULT_DEV": "emilianobonassi",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "trueidle": {
@@ -321,7 +321,7 @@
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
     "VAULT_DEV": "emilianobonassi",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "poolwithus": {
@@ -334,7 +334,7 @@
     "WANT_SYMBOL": "UNI",
     "COINGECKO_SYMBOL": "uniswap",
     "VAULT_DEV": "mattdwest",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "vesperusdc": {
@@ -412,7 +412,7 @@
     "WANT_SYMBOL": "ICE",
     "COINGECKO_SYMBOL": "ice-token",
     "VAULT_DEV": "poolpitako",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "bscfrappedape": {
@@ -792,7 +792,7 @@
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
     "VAULT_DEV": "GalloDaSballo",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "interstellarsushi": {
