@@ -14,7 +14,10 @@
   div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
   div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
-  div(v-if="gross_apr > 0").spacer Gross APR: {{ gross_apr | toPct(2) }}
+  div(v-if="gross_apr_week >= 0.01 || gross_apr_month >= 0.01 || gross_apr_inception >= 0.0001").spacer
+  div(v-if="gross_apr_week >= 0.01") Gross APR (last week): {{ gross_apr_week | toPct(2) }}
+  div(v-if="gross_apr_month >= 0.01") Gross APR (last month): {{ gross_apr_month | toPct(2) }}
+  div(v-if="gross_apr_inception >= 0.0001") Gross APR (inception): {{ gross_apr_inception | toPct(4) }}
   div.spacer
   div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
   div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
@@ -100,7 +103,6 @@ import Web3 from 'web3';
 import ProgressBar from './components/ProgressBar';
 import InfoMessage from './components/InfoMessage';
 import chains from './chains.json';
-import yVaultV2 from './abi/yVaultV2.json';
 import yStrategy from './abi/yStrategy.json';
 import {fetchCryptoPrice, fetchYearnVaults, fetchBlockTimestamp, asyncForEach} from './utils/tools';
 
@@ -125,13 +127,11 @@ export default {
 			username: null,
 			want_price: 0,
 			amount: 0,
-			amount_wrap: 0,
 			strategies: [],
-			strategies_balance: 0,
-			average_price: 0,
 			error: null,
-			vault_activation: 0,
-			gross_apr: 0,
+			gross_apr_week: 0,
+			gross_apr_month: 0,
+			gross_apr_inception: 0,
 			wrong_chain: false,
 		};
 	},
@@ -378,7 +378,42 @@ export default {
 			fetchYearnVaults(),
 		]);
 		this.want_price = response[0][this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
-		this.gross_apr = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr || 0;
+		const	grossFromYearn = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr;
+
+		//-------------------------------------------------------------------------
+		//- If the vault status is not endorsed, we need to calculate an expected
+		//- gross APR.
+		//- Else, we can just use the response for the yearn APY
+		//-------------------------------------------------------------------------
+		if (this.config.VAULT_STATUS !== 'endorsed' && !grossFromYearn) {
+			const	block = await provider.getBlockNumber();
+			const	activationTimestamp = Number(await vaultContract.activation());
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	averageBlockPerHour = 269;
+			const	averageBlockPerWeek = averageBlockPerHour * 24 * 7;
+			const	averageBlockPerMonth = averageBlockPerHour * 24 * 30;
+			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
+			const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
+
+			const [_decimals, _pricePerShare, _pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
+				vaultContract.decimals(),
+				vaultContract.pricePerShare(),
+				vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
+				vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
+			]);
+			const	currentPrice = ethers.utils.formatUnits(_pricePerShare, _decimals.toNumber());
+			const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, _decimals.toNumber());
+			const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, _decimals.toNumber());
+			const	weekRoi = (currentPrice / pastPriceWeek - 1);
+			const	monthRoi = (currentPrice / pastPriceMonth - 1);
+			const	inceptionROI = (currentPrice - 1);
+
+			this.gross_apr_week = weekRoi;
+			this.gross_apr_month = monthRoi;
+			this.gross_apr_inception = inceptionROI;
+		} else {
+			this.gross_apr_week = grossFromYearn || 0;
+		}
 
 		//-------------------------------------------------------------------------
 		//- If the user is connected, check if an ENS is activated for this
@@ -395,21 +430,21 @@ export default {
 		const	vaultContract = new ethers.Contract(this.vault, [
 			'function decimals() view returns (uint256)',
 			'function pricePerShare() view returns (uint256)',
-			'function expectedReturn(address strategy) view returns (uint256)',
-			'function withdrawalQueue(uint256 arg0) view returns (address)'
+			'function activation() view returns(uint256)',
+			'function withdrawalQueue(uint256 arg0) view returns (address)',
 		], provider);
 
 		//-------------------------------------------------------------------------
 		//- Checking the strategies
 		//-------------------------------------------------------------------------
 		const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
-		let   currentExpectedReturn = ethers.BigNumber.from(0);
 		let		shouldBreak = false;
 
 		asyncForEach(strategiesIndex, async (index) => {
 			if (shouldBreak) {
 				return;
 			}
+
 			//-----------------------------------------------------------------------
 			//- The fun part to get all the strategies addresses is that we need to
 			//- retrieve the address of the strategy from withdrawQueue, looping
@@ -421,72 +456,9 @@ export default {
 				return;
 			}
 			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
-			const [expectedReturn, name] = await Promise.all([
-				vaultContract.expectedReturn(strategyAddress),
-				strategyContract.name(),
-			]);
-
+			const name = await strategyContract.name();
 			this.$set(this.strategies, index, {address: strategyAddress, balance: null, name: name});
-			currentExpectedReturn = currentExpectedReturn.add(expectedReturn);
-
 		});
-
-		console.log(currentExpectedReturn.toString());
-
-		let Vault = new web3.eth.Contract(yVaultV2, this.vault);
-		// this.get_strategies(Vault);
-
-		const seconds_in_a_year = 31536000;
-		const now = Math.round(Date.now() / 1000);
-		const blockActivated = 1606599919;
-		const one_week_ago = (now - 60 * 60 * 24 * 7);
-		const ts_past = one_week_ago < blockActivated?blockActivated:one_week_ago;
-		const ts_diff = now - ts_past;
- 		const [_decimals, _pricePerShare, pastTimestamp] = await Promise.all([
-			vaultContract.decimals(),
-			vaultContract.pricePerShare(),
-			fetchBlockTimestamp(ts_past),
-		]);
-		const currentPrice = ethers.utils.formatUnits(_pricePerShare, _decimals.toNumber());
-
-		console.log(pastTimestamp);
-
-		console.log('TS Past: ' + one_week_ago);
-		console.log('TS Activation: ' + blockActivated);
-
-		console.log('Past block: ' + pastTimestamp.result);
-		Vault.methods.pricePerShare().call({}, pastTimestamp.result).then( pastPrice => {
-			let roi = (currentPrice / pastPrice - 1) * 100;
-			console.log('Current Price: ' + currentPrice);
-			console.log('Past Price: ' + pastPrice);
-			this.roi_week = roi/ts_diff*seconds_in_a_year;
-			console.log('ROI week: ' + roi);
-			console.log('ROI year: ' + this.roi_week);
-		});
-
-
-		// console.log(this.vault)
-
-		// const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-		// const	vaultContract = new ethers.Contract(this.vault, [
-		//   'function activation() view returns (uint256)',
-		//   'function decimals() view returns (uint256)',
-		//   'function pricePerShare() view returns (uint256)',
-		// ], provider);
-
-		// const [_activation, _decimals, _pricePerShare] = await Promise.all([
-		//   vaultContract.activation(),
-		//   vaultContract.decimals(),
-		//   vaultContract.pricePerShare(),
-		// ])
-
-		// const pricePerShare = ethers.utils.formatUnits(_pricePerShare, _decimals.toNumber());
-		// const	activation = ethers.BigNumber.from(_activation).toNumber();
-		// const now = new Date().valueOf() / 1000;
-		// const	daysSinceNow = (now - activation) / 86_400;
-		// const currentEvolvePerDay = (pricePerShare - 1) / daysSinceNow;
-		// const	apr = currentEvolvePerDay * 365.25;
-		// const aprPercent = ((apr) / 1) * 100
 	},
 };
 </script>

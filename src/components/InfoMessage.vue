@@ -14,29 +14,29 @@
 <script>
 
 export default {
-	name: "InfoMessage",
+	name: 'InfoMessage',
 	props: ['status'],
 	data() {
 		return {
 			message_type: '',
-		}
+		};
 	},
 
 	computed: {},
 	created() {
 		switch(this.status) {
-			case 'withdraw':
-				this.message_type = 'is-danger';
-				break;
-			case 'endorsed':
-				this.message_type = 'is-info';
-				break;
-			default:
-				this.message_type = '';
-			}
+		case 'withdraw':
+			this.message_type = 'is-danger';
+			break;
+		case 'endorsed':
+			this.message_type = 'is-info';
+			break;
+		default:
+			this.message_type = '';
+		}
 	},
 
-}
+};
 
 </script>
 <style>

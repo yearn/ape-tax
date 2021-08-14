@@ -57,95 +57,95 @@
 
 <script>
 import GraphemeSplitter from 'grapheme-splitter';
-import {ethers} from "ethers";
-import StatusTag from "./components/StatusTag";
+import {ethers} from 'ethers';
+import StatusTag from './components/StatusTag';
 const splitter = new GraphemeSplitter();
 
 export default {
-  name: "Home",
-  components: {StatusTag},
-  props: ["allConfig", "chainId", 'currentAccount'],
-  data() {
-    return {
-      withdrawVaults: [],
-      vaultsInactive: [],
-      items: Object.keys(this.allConfig)
-        .map((key) => ({
-          ...this.allConfig[key],
-          URL: key,
-        })),
-    };
-  },
-  filters: {},
-  methods: {
-    splitLogo(logo) {
-      const splitted = splitter.splitGraphemes(logo);
-      return ([splitted[0], `${splitted.slice(1).join('')}`])
-    },
-  },
-  computed: {
-    experimentalVaultsActive() {
-      const items = this.items;
+	name: 'Home',
+	components: {StatusTag},
+	props: ['allConfig', 'chainId', 'currentAccount'],
+	data() {
+		return {
+			withdrawVaults: [],
+			vaultsInactive: [],
+			items: Object.keys(this.allConfig)
+				.map((key) => ({
+					...this.allConfig[key],
+					URL: key,
+				})),
+		};
+	},
+	filters: {},
+	methods: {
+		splitLogo(logo) {
+			const splitted = splitter.splitGraphemes(logo);
+			return ([splitted[0], `${splitted.slice(1).join('')}`]);
+		},
+	},
+	computed: {
+		experimentalVaultsActive() {
+			const items = this.items;
 
-      const result = items
-        .filter((item) =>
-          item.CHAIN_ID === this.chainId &&
-          item.VAULT_TYPE === "experimental" && (item.VAULT_STATUS === "active" || item.VAULT_STATUS === "new")
-        ).reverse();
+			const result = items
+				.filter((item) =>
+					item.CHAIN_ID === this.chainId &&
+          item.VAULT_TYPE === 'experimental' && (item.VAULT_STATUS === 'active' || item.VAULT_STATUS === 'new')
+				).reverse();
 
-      return result;
-    },
-    experimentalVaultsOther() {
-      const items = this.items;
+			return result;
+		},
+		experimentalVaultsOther() {
+			const items = this.items;
 
-      const result = items
-        .filter((item) =>
-          item.CHAIN_ID === this.chainId &&
-          item.VAULT_TYPE === "experimental" &&
-          item.VAULT_STATUS === "endorsed"
-        ).reverse();
+			const result = items
+				.filter((item) =>
+					item.CHAIN_ID === this.chainId &&
+          item.VAULT_TYPE === 'experimental' &&
+          item.VAULT_STATUS === 'endorsed'
+				).reverse();
 
-      return result;
-    },
-    weirdVaultsActive() {
-      const items = this.items;
+			return result;
+		},
+		weirdVaultsActive() {
+			const items = this.items;
 
-      const result = items
-        .filter((item) =>
-          item.CHAIN_ID === this.chainId &&
-          item.VAULT_TYPE === "weird" && (item.VAULT_STATUS === "active" || item.VAULT_STATUS === "new")
-        ).reverse();
+			const result = items
+				.filter((item) =>
+					item.CHAIN_ID === this.chainId &&
+          item.VAULT_TYPE === 'weird' && (item.VAULT_STATUS === 'active' || item.VAULT_STATUS === 'new')
+				).reverse();
 
-      return result;
-    },
-    weirdVaultsOther() {
-      const items = this.items;
+			return result;
+		},
+		weirdVaultsOther() {
+			const items = this.items;
 
-      const result = items
-        .filter((item) =>
-          item.CHAIN_ID === this.chainId &&
-          item.VAULT_TYPE === "weird" &&
-          item.VAULT_STATUS === "endorsed"
-        ).reverse();
+			const result = items
+				.filter((item) =>
+					item.CHAIN_ID === this.chainId &&
+          item.VAULT_TYPE === 'weird' &&
+          item.VAULT_STATUS === 'endorsed'
+				).reverse();
 
-      return result;
-    },
-  },
-  async created() {
-    const items = this.items;
-    const result = items.filter(item => (item.CHAIN_ID === this.chainId) && (item.VAULT_STATUS === 'withdraw'))
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    const currentAccount = (await provider.listAccounts())[0];
+			return result;
+		},
+	},
+	async created() {
+		const items = this.items;
+		const result = items.filter(item => (item.CHAIN_ID === this.chainId) && (item.VAULT_STATUS === 'withdraw'));
+		const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+		const currentAccount = (await provider.listAccounts())[0];
 
-    const promises = await Promise.all(result.map(async ({VAULT_ADDR}) => {
-      const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
-      const balance = await vaultContract.balanceOf(currentAccount);
-      return balance.isZero() ? null : VAULT_ADDR;
-    }))
+		const promises = await Promise.all(result.map(async ({VAULT_ADDR}) => {
+			const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
+			const balance = await vaultContract.balanceOf(currentAccount);
+			return balance.isZero() ? null : VAULT_ADDR;
+		}));
 
-    const needToWidthdraw = promises.filter(Boolean);
-    this.vaultsInactive = result.filter(item => needToWidthdraw.includes(item.VAULT_ADDR));
-  },
+		const needToWidthdraw = promises.filter(Boolean);
+		this.vaultsInactive = result.filter(item => needToWidthdraw.includes(item.VAULT_ADDR));
+	},
 };
 </script>
 
