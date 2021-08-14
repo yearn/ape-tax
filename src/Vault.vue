@@ -381,6 +381,18 @@ export default {
 		const	grossFromYearn = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr;
 
 		//-------------------------------------------------------------------------
+		//- We will need to compute stuff from the contracts, so we need to init
+		//- the provider and the instance of the contract.
+		//-------------------------------------------------------------------------
+		const	provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+		const	vaultContract = new ethers.Contract(this.vault, [
+			'function decimals() view returns (uint256)',
+			'function pricePerShare() view returns (uint256)',
+			'function activation() view returns(uint256)',
+			'function withdrawalQueue(uint256 arg0) view returns (address)',
+		], provider);
+
+		//-------------------------------------------------------------------------
 		//- If the vault status is not endorsed, we need to calculate an expected
 		//- gross APR.
 		//- Else, we can just use the response for the yearn APY
@@ -421,18 +433,6 @@ export default {
 		//-------------------------------------------------------------------------
 		if (this.activeAccount !== undefined)
 			this.load_reverse_ens();
-
-		//-------------------------------------------------------------------------
-		//- We will need to compute stuff from the contracts, so we need to init
-		//- the provider and the instance of the contract.
-		//-------------------------------------------------------------------------
-		const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-		const	vaultContract = new ethers.Contract(this.vault, [
-			'function decimals() view returns (uint256)',
-			'function pricePerShare() view returns (uint256)',
-			'function activation() view returns(uint256)',
-			'function withdrawalQueue(uint256 arg0) view returns (address)',
-		], provider);
 
 		//-------------------------------------------------------------------------
 		//- Checking the strategies
