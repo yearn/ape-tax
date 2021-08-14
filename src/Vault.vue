@@ -423,7 +423,7 @@ export default {
 			this.gross_apr_week = weekRoi;
 			this.gross_apr_month = monthRoi;
 			this.gross_apr_inception = inceptionROI;
-		} else {
+		} else if (this.config.CHAIN_ID === 1) {
 			this.gross_apr_week = grossFromYearn || 0;
 		}
 
