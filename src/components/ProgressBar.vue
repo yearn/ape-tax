@@ -11,31 +11,31 @@
 </template>
 
 <script>
-	const part_char = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█", ];
-	const whole_char = "█";
+const part_char = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█',];
+const whole_char = '█';
 
 export default {
-  name: "ProgressBar",
-  props: ['progress', 'width'],
+	name: 'ProgressBar',
+	props: ['progress', 'width'],
 
-  computed: {
-	progress_pct () {
-		return (this.progress * 100).toFixed(2) + " %";
-	},
-	progress_line() {
-		let whole_width = Math.floor(this.progress * this.width);
-		let remainder_width = (this.progress * this.width) % 1;
-		let part_width = Math.floor(remainder_width * 9);
+	computed: {
+		progress_pct () {
+			return (this.progress * 100).toFixed(2) + ' %';
+		},
+		progress_line() {
+			let whole_width = Math.floor(this.progress * this.width);
+			let remainder_width = (this.progress * this.width) % 1;
+			let part_width = Math.floor(remainder_width * 9);
 		
-		let white_width = this.width - whole_width - 1;
-		if (this.progress == 1) white_width = 0;
+			let white_width = this.width - whole_width - 1;
+			if (this.progress == 1) white_width = 0;
 		
-		let line = "" + whole_char.repeat(whole_width) + part_char[part_width] + " ".repeat(white_width) + "";
+			let line = '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
 
-        return line;
+			return line;
+		}
 	}
-  }
-}
+};
 
 </script>
 <style>

@@ -16,89 +16,89 @@
 </template>
 
 <script>
-import config from './vaults.json'
-import chains from './chains.json'
-import Vault from './Vault'
-import LidoVault from './LidoVault'
-import stETHLPVault from './stETHLPVault'
-import Home from './Home'
-import NotFound from './NotFound'
-import { mapGetters } from 'vuex'
+import config from './vaults.json';
+import chains from './chains.json';
+import Vault from './Vault';
+import LidoVault from './LidoVault';
+import stETHLPVault from './stETHLPVault';
+import Home from './Home';
+import NotFound from './NotFound';
+import {mapGetters} from 'vuex';
 import Web3 from 'web3';
 
-const vaultPath = window.location.pathname.substring(1)
+const vaultPath = window.location.pathname.substring(1);
 const vaultConfig = config[vaultPath] || null;
 
 let VaultType;
 
 switch (window.location.pathname) {
-  case '/yvsteth':
-    VaultType = LidoVault;
-    break;
-  case '/stecrv':
-    VaultType = stETHLPVault;
-    break;
-  default:
-    VaultType = Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound;
+case '/yvsteth':
+	VaultType = LidoVault;
+	break;
+case '/stecrv':
+	VaultType = stETHLPVault;
+	break;
+default:
+	VaultType = Object.prototype.hasOwnProperty.call(config, vaultPath) ? Vault : NotFound;
 }
 
-const Section = window.location.pathname === '/' ? Home : VaultType
+const Section = window.location.pathname === '/' ? Home : VaultType;
 
 let web3 = new Web3(Web3.givenProvider);
-window.ethereum.on("chainChanged", () => {
-    window.location.reload();
-  }
+window.ethereum.on('chainChanged', () => {
+	window.location.reload();
+}
 );
 
 
 export default {
-  name: 'app',
-  components: {
-    Section,
-  },
-  data() {
-    return {
-      config: vaultConfig,
-      allConfig: config,
-      isHome: window.location.pathname === '/',
-      showApeTax: false,
-      chains: chains,
-      selectedChainId: null,
-    }
-  },
-  asyncComputed: {
-    ...mapGetters('drizzle', ['isDrizzleInitialized', 'drizzleInstance']),
-    chainId() {
-      if (this.isDrizzleInitialized) {
-        return this.drizzleInstance.web3.eth.getChainId();
-      }
-      return 0;
-    },
-    chainName() {
-      if (this.chainId) {
-        return chains[this.selectedChainId].name;
-      }
-    },
-    chainCoin() {
-      if (this.chainId) {
-        return chains[this.selectedChainId].coin;
-      }
-    },
-    chainExplorer() {
-      if (this.chainId) {
-        return chains[this.selectedChainId].block_explorer;
-      }
-    }
-  },
-  methods: {
-    async changeNetwork(event) {
-      this.selectedChainId = parseInt(event.target.value);
-    },
-  },
-  async created() {
-    this.selectedChainId = await web3.eth.getChainId();
-  }
-}
+	name: 'app',
+	components: {
+		Section,
+	},
+	data() {
+		return {
+			config: vaultConfig,
+			allConfig: config,
+			isHome: window.location.pathname === '/',
+			showApeTax: false,
+			chains: chains,
+			selectedChainId: null,
+		};
+	},
+	asyncComputed: {
+		...mapGetters('drizzle', ['isDrizzleInitialized', 'drizzleInstance']),
+		chainId() {
+			if (this.isDrizzleInitialized) {
+				return this.drizzleInstance.web3.eth.getChainId();
+			}
+			return 0;
+		},
+		chainName() {
+			if (this.chainId) {
+				return chains[this.selectedChainId].name;
+			}
+		},
+		chainCoin() {
+			if (this.chainId) {
+				return chains[this.selectedChainId].coin;
+			}
+		},
+		chainExplorer() {
+			if (this.chainId) {
+				return chains[this.selectedChainId].block_explorer;
+			}
+		}
+	},
+	methods: {
+		async changeNetwork(event) {
+			this.selectedChainId = parseInt(event.target.value);
+		},
+	},
+	async created() {
+		this.selectedChainId = await web3.eth.getChainId();
+	}
+};
 </script>
 
 <style>

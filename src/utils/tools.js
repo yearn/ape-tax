@@ -29,3 +29,16 @@ export async function	fetchYearnVaults() {
 	}
 	return null;
 }
+export async function	fetchBlockTimestamp(timestamp) {
+	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=JXRIIVMTAN887F9D7NCTVQ7NMGNT1A4KA3`);
+
+	if (result) {
+		return result.result;
+	}
+	return null;
+}
+export async function asyncForEach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array);
+	}
+}

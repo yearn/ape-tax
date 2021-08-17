@@ -11,42 +11,42 @@
 <script>
 
 export default {
-	name: "StatusTag",
+	name: 'StatusTag',
 	props: ['status'],
 	data() {
 		return {
 			tag_type: '',
 			tag_text: '',
-		}
+		};
 	},
 
 	computed: {},
 	created() {
 		switch(this.status) {
-			case 'disabled':
-				this.tag_text = 'Disabled';
-				this.tag_type = 'is-warning';
-				break;
-			case 'withdraw':
-				this.tag_text = 'Withdraw';
-				this.tag_type = 'is-danger';
-				break;
-			case 'endorsed':
-				this.tag_text = 'Use Production';
-				this.tag_type = 'is-info';
-				this.link = 'https://yearn.finance/vaults';
-				break;
-			case 'new':
-				this.tag_text = 'New';
-				this.tag_type = 'is-new';
-				break;
-			default:
-				this.tag_type = '';
-				this.tag_text = '';
-			}
+		case 'disabled':
+			this.tag_text = 'Disabled';
+			this.tag_type = 'is-warning';
+			break;
+		case 'withdraw':
+			this.tag_text = 'Withdraw';
+			this.tag_type = 'is-danger';
+			break;
+		case 'endorsed':
+			this.tag_text = 'Use Production';
+			this.tag_type = 'is-info';
+			this.link = 'https://yearn.finance/vaults';
+			break;
+		case 'new':
+			this.tag_text = 'New';
+			this.tag_type = 'is-new';
+			break;
+		default:
+			this.tag_type = '';
+			this.tag_text = '';
+		}
 	},
 
-}
+};
 
 </script>
 <style>
