@@ -854,6 +854,32 @@
     "WANT_SYMBOL": "sBTC",
     "COINGECKO_SYMBOL": "sbtc",
     "VAULT_DEV": "iearnfinance",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "yfi-wifey": {
+    "TITLE": "YFI Wifey",
+    "LOGO": "⚖️🤰",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xdb25cA703181E7484a155DD612b06f57E12Be5F0",
+    "WANT_ADDR": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+    "WANT_SYMBOL": "YFI",
+    "COINGECKO_SYMBOL": "yearn-finance",
+    "VAULT_DEV": "_tonkers",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "wether-aether": {
+    "TITLE": "wEther Aether",
+    "LOGO": "⚖️💫",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x5120FeaBd5C21883a4696dBCC5D123d6270637E9",
+    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_DEV": "_tonkers",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
