@@ -47,8 +47,7 @@ const Section = window.location.pathname === '/' ? Home : VaultType;
 let web3 = new Web3(Web3.givenProvider);
 window.ethereum.on('chainChanged', () => {
 	window.location.reload();
-}
-);
+});
 
 
 export default {

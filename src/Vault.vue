@@ -1,5 +1,7 @@
 <template lang="pug">
 #vault(v-if="isDrizzleInitialized && !wrong_chain")
+  div.mb-4
+    a(class="back" :href="'/'") << Back home
   .logo {{ config.LOGO }}
   h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
   div.container.is-max-desktop.warning.is-size-7-mobile(:class="config.VAULT_STATUS")
@@ -493,5 +495,15 @@ a,
 a:visited,
 a:hover {
   color: gray;
+}
+a.back,
+a.back:visited {
+  font-family: IBM Plex Mono, monospace;
+  font-weight: 500;
+  color: #2c3e50;
+  text-decoration: none;
+}
+a.back:hover {
+  border-bottom: 1px dotted #2c3e50;
 }
 </style>

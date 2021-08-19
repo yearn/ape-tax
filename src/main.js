@@ -11,17 +11,12 @@ import AsyncComputed from 'vue-async-computed';
 import Buefy from 'buefy';
 import 'buefy/dist/buefy.css';
 
-Vue.use(Buefy, {
-	defaultUseHtml5Validation: false,
-});
-
+Vue.use(Buefy, {defaultUseHtml5Validation: false,});
 Vue.use(VueKonami);
-
 Vue.use(Vuex);
 Vue.use(AsyncComputed);
 
 const store = new Vuex.Store({state: {}});
-
 const vaultPath = window.location.pathname.substring(1);
 const vaultConfig = config[vaultPath] || null;
 Vue.use(drizzleVuePlugin, {store, drizzleOptions: drizzleOptions(vaultConfig)});
