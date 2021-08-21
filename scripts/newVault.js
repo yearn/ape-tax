@@ -225,7 +225,7 @@ inquirer.prompt(questions).then(async ({
 		tokenInfo.id = wantID;
 	}
 	const	vaultSlug = getSlugFromString(vaultName);
-	const	vaults = require('../src/vaults.json');
+	const	vaults = require('../utils/vaults.json');
 	
 	if (vaults[vaultSlug] !== undefined) {
 		throw 'Vault already used. Please use another name !';
@@ -254,7 +254,7 @@ inquirer.prompt(questions).then(async ({
 		CHAIN_ID: ENUM_CHAIN[vaultChain]
 	};
 	const stringifiedVault = JSON.stringify(updatedVaults, null, 2);
-	fs.writeFile(`${__dirname}/../src/vaults.json`, stringifiedVault, 'utf8', (err) => {
+	fs.writeFile(`${__dirname}/../utils/vaults.json`, stringifiedVault, 'utf8', (err) => {
 		if (err) {
 			throw 'Impossible to update vaults.json';
 		}
