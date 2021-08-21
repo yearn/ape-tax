@@ -1,0 +1,509 @@
+<template lang="pug">
+#vault(v-if="isDrizzleInitialized && !wrong_chain")
+  div.mb-4
+    a(class="back" :href="'/'") << Back home
+  .logo {{ config.LOGO }}
+  h1.title.is-size-3.is-size-4-mobile {{ config.TITLE }}
+  div.container.is-max-desktop.warning.is-size-7-mobile(:class="config.VAULT_STATUS")
+    info-message(:status="config.VAULT_STATUS")
+  div Vault:&nbsp;
+    a(
+      :href="chainExplorer + '/address/' + config.VAULT_ADDR + '#code'",
+      target="_blank"
+    ) 📃Contract
+  div Version: {{ vault_version }}
+  div {{ config.WANT_SYMBOL }} price (CoinGecko 🦎): {{ want_price | toCurrency(4) }}
+  div Deposit Limit: {{ vault_deposit_limit | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
+  div Total Assets: {{ vault_total_assets | fromWei(2, vault_decimals) }}  {{ config.WANT_SYMBOL }}
+  div Total AUM: {{ vault_total_aum | toCurrency(2, vault_decimals) }}
+  div(v-if="gross_apr_week >= 0.01 || gross_apr_month >= 0.01 || gross_apr_inception >= 0.0001").spacer
+  div(v-if="gross_apr_week >= 0.01") Gross APR (last week): {{ gross_apr_week | toPct(2) }}
+  div(v-if="gross_apr_month >= 0.01") Gross APR (last month): {{ gross_apr_month | toPct(2) }}
+  div(v-if="gross_apr_inception >= 0.0001") Gross APR (inception): {{ gross_apr_inception | toPct(4) }}
+  div.spacer
+  div Price Per Share: {{ vault_price_per_share | fromWei(8, vault_decimals) }}
+  div Available limit: {{ vault_available_limit | fromWei(2, vault_decimals) }} {{ config.WANT_SYMBOL }}
+  progress-bar.is-hidden-mobile(:progress="progress_limit" :width="50")
+  progress-bar.is-hidden-tablet(:progress="progress_limit" :width="30")
+  div.spacer
+  h2.title.is-4 <strong>Strategies</strong>
+  div(v-for="(strategy, index) in strategies")
+    div <strong> Strat. {{ index }}: </strong> {{ strategy.name }}
+    div Address:&nbsp;
+      a(
+        :href="chainExplorer + '/address/' + strategy.address + '#code'",
+        target="_blank"
+      ) 📃Contract
+  div.spacer
+  h2.title.is-4 <strong>Wallet</strong>
+  div Your Account: <strong>{{ username || activeAccount }}</strong>
+  div Your Vault shares: {{ yvtoken_balance | fromWei(2, vault_decimals) }}
+  div Your shares value: {{ yvtoken_value | toCurrency(2, vault_decimals) }}
+  div Your {{ config.WANT_SYMBOL }} Balance: {{ want_balance | fromWei(2, vault_decimals) }}
+  div Your {{ chainCoin }} Balance: {{ coin_balance | fromWei(2) }}
+  div.spacer
+    b-field(label="Amount", custom-class="is-small", v-if="vault_available_limit > 0")
+      b-input(v-model.number="amount", size="is-small", type="number",min=0)
+      p.control
+        b-button.is-static(size="is-small") {{ config.WANT_SYMBOL }}
+
+    span(v-if="vault_available_limit <= 0") Deposits closed.
+    div.spacer
+    button.unstyled(
+      v-if="vault_available_limit > 0",
+      :disabled="has_allowance_vault",
+      @click.prevent="on_approve_vault"
+    ) {{ has_allowance_vault ? '✅ Approved' : '🚀 Approve Vault' }}
+    button.unstyled(
+      v-if="vault_available_limit > 0",
+      :disabled="!has_allowance_vault",
+      @click.prevent="on_deposit"
+    ) 🏦 Deposit
+    button.unstyled(
+      v-if="vault_available_limit > 0",
+      :disabled="!has_allowance_vault",
+      @click.prevent="on_deposit_all"
+    ) 🏦 Deposit All
+    button.unstyled(:disabled="!has_yvtoken_balance", @click.prevent="on_withdraw_all") 💸 Withdraw All
+  .red(v-if="error")
+    span {{ error }}
+  div.spacer
+    .muted
+      span Made with 💙
+      | 
+      span yVault:
+      | 
+      a(:href="'https://twitter.com/' + config.VAULT_DEV", target="_blank") {{ config.VAULT_DEV }}
+      | 
+      span - UI:
+      | 
+      a(href="https://twitter.com/fameal", target="_blank") fameal
+      |, 
+      a(href="https://twitter.com/emilianobonassi", target="_blank") emiliano
+      |, 
+      a(href="https://twitter.com/x48_crypto", target="_blank") x48
+      |, 
+      a(href="https://twitter.com/tbouder", target="_blank") Major
+div(v-else-if=("isDrizzleInitialized && wrong_chain"))
+  div(class="notFound")
+    p ❌⛓
+    p Wrong Chain
+    div
+      button.unstyled(
+        @click.prevent="on_switch_chain",
+      ) 🔀 Switch it on Metamask
+    a.smallish(href="/") Back Home
+div(v-else)
+  div Loading yApp...
+</template>
+
+<script>
+
+import {mapGetters} from 'vuex';
+import {ethers} from 'ethers';
+import Web3 from 'web3';
+import ProgressBar from './components/ProgressBar';
+import InfoMessage from './components/InfoMessage';
+import chains from './chains.json';
+import yStrategy from './abi/yStrategy.json';
+import {fetchCryptoPrice, fetchYearnVaults, fetchBlockTimestamp, asyncForEach} from './utils/tools';
+
+let web3 = new Web3(Web3.givenProvider);
+
+const max_uint = ethers.constants.MaxUint256;
+const BN_ZERO = ethers.constants.Zero;
+const ADDRESS_ZERO = ethers.constants.AddressZero;
+const ERROR_NEGATIVE = 'You have to deposit a positive number of tokens 🐀';
+const ERROR_NEGATIVE_ALL = "You don't have tokens to deposit 🐀";
+const ERROR_NEGATIVE_WITHDRAW = "You don't have any vault shares";
+
+export default {
+	name: 'Vault',
+	components: {
+		ProgressBar,
+		InfoMessage,
+	},
+	props: ['config', 'chainId', 'chainCoin', 'chainExplorer'],
+	data() {
+		return {
+			username: null,
+			want_price: 0,
+			amount: 0,
+			strategies: [],
+			error: null,
+			gross_apr_week: 0,
+			gross_apr_month: 0,
+			gross_apr_inception: 0,
+			wrong_chain: false,
+		};
+	},
+	filters: {
+		fromWei(data, precision, decimals) {
+			if (decimals === undefined) decimals = 18;
+			if (data === 'loading') return data;
+			if (data > 2 ** 255) return '♾️';
+			let value = ethers.utils.commify(ethers.utils.formatUnits(data, decimals));
+			let parts = value.split('.');
+
+			if (precision === 0) return parts[0];
+
+			return parts[0] + '.' + (parts[1]?.slice(0, precision) || '0');
+		},
+		toPct(data, precision) {
+			if (isNaN(data)) return '-';
+			return `${(data * 100).toFixed(precision)}%`;
+		},
+		toCurrency(data, precision) {
+			if ( !data ) return '-';
+      
+			if (typeof data !== 'number') {
+				data = parseFloat(data);
+			}
+			var formatter = new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: 'USD',
+				minimumFractionDigits: precision,
+			});
+			return formatter.format(data);
+		},
+	},
+	methods: {
+		on_approve_vault() {
+			this.drizzleInstance.contracts['WANT'].methods['approve'].cacheSend(
+				this.vault,
+				max_uint,
+				{from: this.activeAccount}
+			);
+		},
+		on_deposit() {
+			this.error = null;
+
+			if (this.amount <= 0) {
+				this.error = ERROR_NEGATIVE;
+				this.amount = 0;
+				return;
+			}
+
+			this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend(
+				ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals).toString(),
+				{
+					from: this.activeAccount,
+				}
+			);
+		},
+		on_deposit_all() {
+			if (this.want_balance <= 0) {
+				this.error = ERROR_NEGATIVE_ALL;
+				this.amount = 0;
+				return;
+			}
+
+			this.drizzleInstance.contracts['Vault'].methods['deposit'].cacheSend({
+				from: this.activeAccount,
+			});
+		},
+		on_withdraw_all() {
+			if (this.yvtoken_balance <= 0) {
+				this.error = ERROR_NEGATIVE_WITHDRAW;
+				this.amount = 0;
+				return;
+			}
+			this.drizzleInstance.contracts['Vault'].methods['withdraw'].cacheSend({
+				from: this.activeAccount,
+			});
+		},
+		async load_reverse_ens() {
+			let lookup = this.activeAccount.toLowerCase().substr(2) + '.addr.reverse';
+			let resolver = await this.drizzleInstance.web3.eth.ens.resolver(lookup);
+			let namehash = ethers.utils.namehash(lookup);
+			this.username = await resolver.methods.name(namehash).call();
+		},
+		async get_strategies(vault) {
+			for (let i = 0, p = Promise.resolve(); i < 20; i++) {
+				p = p.then(() =>
+					new Promise((resolve) =>
+						vault.methods
+							.withdrawalQueue(i)
+							.call()
+							.then((strat_addr) => {
+								if (strat_addr !== ADDRESS_ZERO) {
+									let Strategy = new web3.eth.Contract(yStrategy, strat_addr);
+									let data = {
+										address: strat_addr,
+										balance: null,
+									};
+
+									// Add to strat address to array
+									this.$set(this.strategies, i, data);
+
+									Strategy.methods
+										.name()
+										.call()
+										.then((name) => {
+											this.$set(this.strategies[i], 'name', name);
+										});
+								}
+
+								resolve();
+							})
+					)
+				);
+			}
+		},
+		call(contract, method, args, out = 'number') {
+			let key = this.drizzleInstance.contracts[contract].methods[
+				method
+			].cacheCall(...args);
+			let value;
+			try {
+				value = this.contractInstances[contract][method][key].value;
+			} catch (error) {
+				value = null;
+			}
+			switch (out) {
+			case 'number':
+				if (value === null) value = 0;
+				return ethers.BigNumber.from(value);
+			case 'address':
+				return value;
+			default:
+				return value;
+			}
+		},
+		on_switch_chain() {
+			if (!window.ethereum) {
+				console.error('window.ethereum not initialized');
+				return;
+			}
+			if (!chains[this.config.CHAIN_ID]) {
+				console.error('invalid chain_swap configuration');
+				return;
+			}
+			if (this.config.CHAIN_ID === 1) {
+				window.ethereum.request({
+					method: 'wallet_switchEthereumChain',
+					params: [{chainId: '0x1'}],
+				})
+					.catch((error) => console.error(error));
+			} else {
+				window.ethereum.request({
+					method: 'wallet_addEthereumChain',
+					params: [chains[this.config.CHAIN_ID].chain_swap, this.activeAccount],
+				})
+					.catch((error) => console.error(error));
+			}
+		}
+	},
+	computed: {
+		...mapGetters('accounts', ['activeAccount', 'activeBalance']),
+		...mapGetters('drizzle', ['drizzleInstance', 'isDrizzleInitialized']),
+		...mapGetters('contracts', ['contractInstances']),
+
+		vault() {
+			return this.drizzleInstance.contracts['Vault'].address;
+		},
+		vault_version() {
+			return this.call('Vault', 'apiVersion', [], 'string');
+		},
+		vault_deposit_limit() {
+			return this.call('Vault', 'depositLimit', []);
+		},
+		vault_total_assets() {
+			return this.call('Vault', 'totalAssets', []);
+		},
+		vault_available_limit() {
+			if (this.config.VAULT_STATUS !== 'withdraw') {
+				return this.call('Vault', 'availableDepositLimit', []);
+			} else {
+				return BN_ZERO;
+			}
+		},
+		vault_total_aum() {
+			if (this.vault_decimals.isZero()) {
+				return (0);
+			}
+			let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+			let numAum = this.vault_total_assets.div(toFloat).toNumber();
+			return (numAum / 100) * this.want_price;
+		},
+		vault_price_per_share() {
+			return this.call('Vault', 'pricePerShare', []);
+		},
+		vault_decimals() {
+			return this.call('Vault', 'decimals', []);
+		},
+		yvtoken_balance() {
+			return this.call('Vault', 'balanceOf', [this.activeAccount]);
+		},
+		yvtoken_value() {
+			if (this.vault_decimals.isZero()) {
+				return (0);
+			}
+			let toFloat = ethers.BigNumber.from(10).pow(this.vault_decimals.sub(2)).toString();
+			let numAum = this.yvtoken_balance.div(toFloat).toNumber();
+			return (numAum / 100) * this.want_price;
+		},
+		want_balance() {
+			return this.call('WANT', 'balanceOf', [this.activeAccount]);
+		},
+		coin_balance() {
+			return this.activeBalance;
+		},
+		progress_limit() {
+			return (this.vault_deposit_limit.isZero()?0:(this.vault_deposit_limit - this.vault_available_limit) / this.vault_deposit_limit);
+		},
+		has_allowance_vault() {
+			return !this.call('WANT', 'allowance', [
+				this.activeAccount,
+				this.vault,
+			]).isZero();
+		},
+		has_yvtoken_balance() {
+			return this.yvtoken_balance > 0;
+		}
+	},
+	async created() {
+		//-------------------------------------------------------------------------
+		//- Checking the connection to the Ethereum client, does the user uses the
+		//- correct chain ?
+		//-------------------------------------------------------------------------
+		if (this.chainId && this.config.CHAIN_ID !== this.chainId) {
+			this.wrong_chain = true;
+		}
+
+		//-------------------------------------------------------------------------
+		//- Fetching the current counter value price, and all the yearn vaults in
+		//- order to get the gross APR IF this vault is endorsed
+		//-------------------------------------------------------------------------
+		const response = await Promise.all([
+			fetchCryptoPrice(this.config.COINGECKO_SYMBOL.toLowerCase()),
+			fetchYearnVaults(),
+		]);
+		this.want_price = response[0][this.config.COINGECKO_SYMBOL.toLowerCase()].usd;
+		const	grossFromYearn = response[1].find((item) => item.address === this.vault)?.apy?.gross_apr;
+
+		//-------------------------------------------------------------------------
+		//- We will need to compute stuff from the contracts, so we need to init
+		//- the provider and the instance of the contract.
+		//-------------------------------------------------------------------------
+		const	provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+		const	vaultContract = new ethers.Contract(this.vault, [
+			'function decimals() view returns (uint256)',
+			'function pricePerShare() view returns (uint256)',
+			'function activation() view returns(uint256)',
+			'function withdrawalQueue(uint256 arg0) view returns (address)',
+		], provider);
+
+		//-------------------------------------------------------------------------
+		//- If the vault status is not endorsed, we need to calculate an expected
+		//- gross APR.
+		//- Else, we can just use the response for the yearn APY
+		//-------------------------------------------------------------------------
+		if (this.config.VAULT_STATUS !== 'endorsed' && !grossFromYearn) {
+			const	block = await provider.getBlockNumber();
+			const	activationTimestamp = Number(await vaultContract.activation());
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	averageBlockPerHour = 269;
+			const	averageBlockPerWeek = averageBlockPerHour * 24 * 7;
+			const	averageBlockPerMonth = averageBlockPerHour * 24 * 30;
+			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
+			const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
+
+			const [_decimals, _pricePerShare, _pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
+				vaultContract.decimals(),
+				vaultContract.pricePerShare(),
+				vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
+				vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
+			]);
+			const	currentPrice = ethers.utils.formatUnits(_pricePerShare, _decimals.toNumber());
+			const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, _decimals.toNumber());
+			const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, _decimals.toNumber());
+			const	weekRoi = (currentPrice / pastPriceWeek - 1);
+			const	monthRoi = (currentPrice / pastPriceMonth - 1);
+			const	inceptionROI = (currentPrice - 1);
+
+			this.gross_apr_week = weekRoi;
+			this.gross_apr_month = monthRoi;
+			this.gross_apr_inception = inceptionROI;
+		} else if (this.config.CHAIN_ID === 1) {
+			this.gross_apr_week = grossFromYearn || 0;
+		}
+
+		//-------------------------------------------------------------------------
+		//- If the user is connected, check if an ENS is activated for this
+		//- address.
+		//-------------------------------------------------------------------------
+		if (this.activeAccount !== undefined)
+			this.load_reverse_ens();
+
+		//-------------------------------------------------------------------------
+		//- Checking the strategies
+		//-------------------------------------------------------------------------
+		const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+		let		shouldBreak = false;
+
+		asyncForEach(strategiesIndex, async (index) => {
+			if (shouldBreak) {
+				return;
+			}
+
+			//-----------------------------------------------------------------------
+			//- The fun part to get all the strategies addresses is that we need to
+			//- retrieve the address of the strategy from withdrawQueue, looping
+			//- through the max number of strategies until we hit 0
+			//-----------------------------------------------------------------------
+			const	strategyAddress = await vaultContract.withdrawalQueue(index);
+			if (strategyAddress === ADDRESS_ZERO) {
+				shouldBreak = true;
+				return;
+			}
+			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
+			const name = await strategyContract.name();
+			this.$set(this.strategies, index, {address: strategyAddress, balance: null, name: name});
+		});
+	},
+};
+</script>
+
+<style>
+input {
+  height: 26px;
+}
+.muted {
+  color: gray;
+  font-size: 0.8em;
+}
+.muted a {
+  text-decoration: underline;
+}
+.red {
+  color: red;
+  font-weight: 700;
+}
+.blue {
+  color: blue;
+  font-weight: 700;
+}
+.spacer {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+.pointer {
+  cursor: pointer;
+}
+a,
+a:visited,
+a:hover {
+  color: gray;
+}
+a.back,
+a.back:visited {
+  font-family: IBM Plex Mono, monospace;
+  font-weight: 500;
+  color: #2c3e50;
+  text-decoration: none;
+}
+a.back:hover {
+  border-bottom: 1px dotted #2c3e50;
+}
+</style>
