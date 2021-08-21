@@ -13,7 +13,7 @@ module.exports = ({
 	],
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
-		VYEMPIRE_SWAPPER: process.env.VYEMPIRE_SWAPPER,
+		WEBSITE_URI: process.env.WEBSITE_URI,
 		SECRET: process.env.SECRET,
 	},
 	optimization: {
