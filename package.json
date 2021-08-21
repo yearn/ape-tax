@@ -12,6 +12,7 @@
     "lintfix": "eslint . --ext .js --fix"
   },
   "dependencies": {
+    "@headlessui/react": "^1.4.0",
     "@tailwindcss/forms": "^0.3.3",
     "@tailwindcss/typography": "^0.4.1",
     "@walletconnect/qrcode-modal": "^1.5.4",
