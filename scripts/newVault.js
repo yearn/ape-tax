@@ -2,7 +2,7 @@ const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
 const	fs = require('fs');
-const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv
+const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv;
 
 async function checkTokenCGID(tokenID) {
 	try {
@@ -21,22 +21,22 @@ async function getTokenInfo(tokenAddress) {
 	}
 }
 function	getSlugFromString(str) {
-    str = str.replace(/^\s+|\s+$/g, '');
-    str = str.toLowerCase();
-    var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-    var to   = "aaaaeeeeiiiioooouuuunc------";
-    for (var i=0, l=from.length ; i<l ; i++) {
-        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-    }
+	str = str.replace(/^\s+|\s+$/g, '');
+	str = str.toLowerCase();
+	var from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+	var to   = 'aaaaeeeeiiiioooouuuunc------';
+	for (var i=0, l=from.length ; i<l ; i++) {
+		str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+	}
 
-    str = str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-    return str;
+	str = str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+	return str;
 }
 function	getProvider(chain = 1) {
 	if (chain === 1) {
 		return new ethers.providers.AlchemyProvider('homestead');
 	} else if (chain === 137) {
-		return new ethers.providers.JsonRpcProvider(`https://rpc-mainnet.matic.network`);
+		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
 	} else if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools/');
 	} else if (chain === 56) {
@@ -50,7 +50,7 @@ const	ENUM_CHAIN = {
 	'BSC (56)': 56,
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
-}
+};
 const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
 	if (!address) {
@@ -216,7 +216,7 @@ inquirer.prompt(questions).then(async ({
 		tokenInfo = await getTokenInfo(tokenAddress);
 	}
 	if (!tokenInfo?.id) {
-		console.log('❌ Impossible to find corresponding token on coinGecko.')
+		console.log('❌ Impossible to find corresponding token on coinGecko.');
 		const	{wantID} = await inquirer.prompt([{
 			type: 'input',
 			name: 'wantSymbol',
@@ -239,7 +239,7 @@ inquirer.prompt(questions).then(async ({
 			vault.VAULT_STATUS = 'active';
 		}
 		updatedVaults[key] = vault;
-	})
+	});
 	updatedVaults[vaultSlug] = {
 		TITLE: vaultName,
 		LOGO: vaultLogo,
@@ -259,9 +259,9 @@ inquirer.prompt(questions).then(async ({
 			throw 'Impossible to update vaults.json';
 		}
 	});
-	console.log(`✅ Bravo !`)
+	console.log('✅ Bravo !');
 })
-.catch((error) => {
-	if (error)
-		console.error(error)
-});
+	.catch((error) => {
+		if (error)
+			console.error(error);
+	});

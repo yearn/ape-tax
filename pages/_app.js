@@ -39,7 +39,7 @@ function	AppWrapper(props) {
 				<meta name={'theme-color'} content={'#ffffff'} />
 				<meta charSet={'utf-8'} />
 				<link rel={'preconnect'} href={'https://fonts.googleapis.com'} />
-				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin />
+				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
 				<link href={'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'} rel={'stylesheet'} />
 			</Head>
 			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
@@ -51,7 +51,6 @@ function	AppWrapper(props) {
 						key={router.route}
 						element={props.element}
 						router={props.router}
-						hasSecret={active && hasSecretCode}
 						{...pageProps} />
 				</div>
 				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600'}>

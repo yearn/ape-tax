@@ -13,9 +13,21 @@ import	chains					from	'utils/chains.json';
 
 function	Navbar({router}) {
 	const	{active, address, provider, ens, chainID, deactivate, onDesactivate} = useWeb3();
-	const	[ModalLoginOpen, set_ModalLoginOpen] = useState(false);
+	const	[initialPopup, set_initialPopup] = useState(false);
+	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
 
-	const stringToColour = function(str) {
+	React.useEffect(() => {
+		if (initialPopup)
+			return;
+
+		if (!address) {
+			set_modalLoginOpen(true);
+		}
+		set_initialPopup(true);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [address]);
+
+	const		stringToColour = function(str) {
 		let hash = 0;
 		for (let i = 0; i < str.length; i++) {
 			hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -48,7 +60,7 @@ function	Navbar({router}) {
 		if (!active) {
 			return (
 				<button
-					onClick={() => set_ModalLoginOpen(true)}
+					onClick={() => set_modalLoginOpen(true)}
 					className={'inline-flex px-3 py-2 items-center leading-4 text-sm cursor-pointer whitespace-nowrap text-gay-900 border border-solid border-ygray-200 font-mono'}>
 					<span className={'hidden md:block'}>{'Connect wallet'}</span>
 					<span className={'block md:hidden'}>{'+'}</span>
@@ -89,7 +101,7 @@ function	Navbar({router}) {
 					{renderWalletButton()}
 				</div>
 			</div>
-			<ModalLogin open={ModalLoginOpen} set_open={set_ModalLoginOpen} />
+			<ModalLogin open={modalLoginOpen} set_open={set_modalLoginOpen} />
 		</nav>
 	);
 }

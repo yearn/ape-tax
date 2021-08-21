@@ -168,8 +168,16 @@ function	Index() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [vaultsInactive, active]);
 
+	if (!active) {
+		return (
+			<section>
+				<h1 className={'text-sm font-mono font-semibold text-ygray-900'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+			</section>
+		);
+	}
+
 	return (
-		<main lang={'pug'}>
+		<section>
 			<div>
 				<h1 className={'hidden lg:block text-3xl font-mono font-semibold text-ygray-900 leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
 				<h1 className={'block md:hidden text-3xl font-mono font-semibold text-ygray-900 leading-9'}>{'Ex'}<sup>{'2'}</sup>{' Registry'}</h1>
@@ -230,7 +238,7 @@ function	Index() {
 					</ul>
 				</div>
 			</div>
-		</main>
+		</section>
 	);
 }
 
