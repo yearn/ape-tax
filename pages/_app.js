@@ -25,6 +25,7 @@ const useSecretCode = () => {
 function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
+	const	WEBSITE_URI = process.env.WEBSITE_URI;
 
 	return (
 		<>
@@ -40,6 +41,25 @@ function	AppWrapper(props) {
 				<link rel={'preconnect'} href={'https://fonts.googleapis.com'} />
 				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
 				<link href={'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'} rel={'stylesheet'} />
+
+				<meta name={'robots'} content={'index,nofollow'} />
+				<meta name={'googlebot'} content={'index,nofollow'} />
+
+				{/* <!-- Open Graph / Facebook --> */}
+				<meta name={'og:type'} property={'og:type'} content={'website'} />
+				<meta name={'og:url'} property={'og:url'} content={WEBSITE_URI} />
+				<meta name={'og:title'} property={'og:title'} content={'ape.tax'} />
+				<meta name={'og:description'} property={'og:description'} content={'Experimental Experiments Registry'} />
+				<meta name={'og:image'} property={'og:image'} content={`${WEBSITE_URI}/og.jpg`} />
+
+				{/* <!-- Twitter --> */}
+				<meta name={'twitter:card'} property={'twitter:card'} content={'summary_large_image'} />
+				<meta name={'twitter:url'} property={'twitter:url'} content={WEBSITE_URI} />
+				<meta name={'twitter:title'} property={'twitter:title'} content={'ape.tax'} />
+				<meta name={'twitter:description'} property={'twitter:description'} content={'Experimental Experiments Registry'} />
+				<meta name={'twitter:image'} property={'twitter:image'} content={`${WEBSITE_URI}/og.jpg`} />
+				<meta name={'twitter:creator'} property={'twitter:creator'} content={'@ape_tax'} />
+				<meta charSet={'utf-8'} />
 			</Head>
 			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
