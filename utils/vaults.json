@@ -8,7 +8,6 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -21,7 +20,6 @@
     "WANT_ADDR": "0xcBc1065255cBc3aB41a6868c22d1f1C573AB89fd",
     "WANT_SYMBOL": "CRETH2",
     "COINGECKO_SYMBOL": "CRETH2",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -34,7 +32,6 @@
     "WANT_ADDR": "0x088ee5007C98a9677165D78dD2109AE4a3D04d0C",
     "WANT_SYMBOL": "SLP",
     "COINGECKO_SYMBOL": "SLP",
-    "VAULT_DEV": "andy8052",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -47,7 +44,6 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -60,7 +56,6 @@
     "WANT_ADDR": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "USDC",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -73,7 +68,6 @@
     "WANT_ADDR": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
     "WANT_SYMBOL": "stETH",
     "COINGECKO_SYMBOL": "staked-ether",
-    "VAULT_DEV": "bantg",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -86,7 +80,6 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -99,7 +92,6 @@
     "WANT_ADDR": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "WETH",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -112,7 +104,6 @@
     "WANT_ADDR": "0x06325440D014e39736583c165C2963BA99fAf14E",
     "WANT_SYMBOL": "steCRV",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
@@ -125,7 +116,6 @@
     "WANT_ADDR": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -138,7 +128,6 @@
     "WANT_ADDR": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_DEV": "mushroomsfinan1",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -151,7 +140,6 @@
     "WANT_ADDR": "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c",
     "WANT_SYMBOL": "eCRV",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "matkam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -164,7 +152,6 @@
     "WANT_ADDR": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -177,7 +164,6 @@
     "WANT_ADDR": "0x57ab1ec28d129707052df4df418d58a2d46d5f51",
     "WANT_SYMBOL": "sUSD",
     "COINGECKO_SYMBOL": "nusd",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -190,7 +176,6 @@
     "WANT_ADDR": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
     "WANT_SYMBOL": "SNX",
     "COINGECKO_SYMBOL": "havven",
-    "VAULT_DEV": "jmonteer23",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -203,7 +188,6 @@
     "WANT_ADDR": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
   },
@@ -216,7 +200,6 @@
     "WANT_ADDR": "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
     "WANT_SYMBOL": "WFTM",
     "COINGECKO_SYMBOL": "fantom",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -229,7 +212,6 @@
     "WANT_ADDR": "0xAd84341756Bf337f5a0164515b1f6F993D194E1f",
     "WANT_SYMBOL": "fUSD",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -242,7 +224,6 @@
     "WANT_ADDR": "0x0316eb71485b0ab14103307bf65a021042c6d380",
     "WANT_SYMBOL": "HBTC",
     "COINGECKO_SYMBOL": "huobi-btc",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
   },
@@ -255,7 +236,6 @@
     "WANT_ADDR": "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF",
     "WANT_SYMBOL": "ALCX",
     "COINGECKO_SYMBOL": "alchemix",
-    "VAULT_DEV": "akshaynexust",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -268,7 +248,6 @@
     "WANT_ADDR": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
   },
@@ -281,7 +260,6 @@
     "WANT_ADDR": "0x967da4048cD07aB37855c090aAF366e4ce1b9F48",
     "WANT_SYMBOL": "OCEAN",
     "COINGECKO_SYMBOL": "ocean-protocol",
-    "VAULT_DEV": "akshaynexust",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -294,7 +272,6 @@
     "WANT_ADDR": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
     "WANT_SYMBOL": "AAVE",
     "COINGECKO_SYMBOL": "aave",
-    "VAULT_DEV": "0xangelfish",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -307,7 +284,6 @@
     "WANT_ADDR": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     "WANT_SYMBOL": "USDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -320,7 +296,6 @@
     "WANT_ADDR": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -333,7 +308,6 @@
     "WANT_ADDR": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
     "WANT_SYMBOL": "UNI",
     "COINGECKO_SYMBOL": "uniswap",
-    "VAULT_DEV": "mattdwest",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -346,7 +320,6 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "real_mills",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -359,7 +332,6 @@
     "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
-    "VAULT_DEV": "akshaynexust",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -372,7 +344,6 @@
     "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
     "WANT_SYMBOL": "ICE",
     "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -385,7 +356,6 @@
     "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
     "WANT_SYMBOL": "ICE",
     "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 56
   },
@@ -398,7 +368,6 @@
     "WANT_ADDR": "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452",
     "WANT_SYMBOL": "3EPS",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "akshaynexust",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 56
   },
@@ -411,7 +380,6 @@
     "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
     "WANT_SYMBOL": "ICE",
     "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -424,7 +392,6 @@
     "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
     "WANT_SYMBOL": "fUSDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 56
   },
@@ -437,7 +404,6 @@
     "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
     "WANT_SYMBOL": "fUSDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 56
   },
@@ -450,7 +416,6 @@
     "WANT_ADDR": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
     "WANT_SYMBOL": "ETH",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 56
   },
@@ -463,7 +428,6 @@
     "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
     "WANT_SYMBOL": "fUSDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 250
   },
@@ -476,7 +440,6 @@
     "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
     "WANT_SYMBOL": "fUSDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -489,7 +452,6 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "_tonkers",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -502,7 +464,6 @@
     "WANT_ADDR": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "WANT_SYMBOL": "wBNB",
     "COINGECKO_SYMBOL": "binancecoin",
-    "VAULT_DEV": "poolpitako",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 56
   },
@@ -515,7 +476,6 @@
     "WANT_ADDR": "0x841fad6eae12c286d1fd18d1d525dffa75c7effe",
     "WANT_SYMBOL": "BOO",
     "COINGECKO_SYMBOL": "spookyswap",
-    "VAULT_DEV": "lance_upp",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -528,7 +488,6 @@
     "WANT_ADDR": "0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
     "WANT_SYMBOL": "RAI",
     "COINGECKO_SYMBOL": "rai",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -541,7 +500,6 @@
     "WANT_ADDR": "0x42F6f551ae042cBe50C739158b4f0CAC0Edb9096",
     "WANT_SYMBOL": "NRV",
     "COINGECKO_SYMBOL": "nerve-finance",
-    "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 56
   },
@@ -554,7 +512,6 @@
     "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
     "WANT_SYMBOL": "WOOFY",
     "COINGECKO_SYMBOL": "woofy",
-    "VAULT_DEV": "lance_upp",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -567,7 +524,6 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -580,7 +536,6 @@
     "WANT_ADDR": "0x514910771af9ca656af840dff83e8264ecf986ca",
     "WANT_SYMBOL": "LINK",
     "COINGECKO_SYMBOL": "chainlink",
-    "VAULT_DEV": "jmonteer23",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -593,7 +548,6 @@
     "WANT_ADDR": "0x514910771af9ca656af840dff83e8264ecf986ca",
     "WANT_SYMBOL": "LINK",
     "COINGECKO_SYMBOL": "chainlink",
-    "VAULT_DEV": "jmonteer23",
     "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
@@ -606,7 +560,6 @@
     "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
     "WANT_SYMBOL": "WOOFY",
     "COINGECKO_SYMBOL": "woofy",
-    "VAULT_DEV": "lance_upp",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -619,7 +572,6 @@
     "WANT_ADDR": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_DEV": "emilianobonassi",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -632,7 +584,6 @@
     "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     "WANT_SYMBOL": "WMATIC",
     "COINGECKO_SYMBOL": "wmatic",
-    "VAULT_DEV": "lance_upp",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -645,7 +596,6 @@
     "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "weth",
-    "VAULT_DEV": "fameal",
     "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
@@ -658,7 +608,6 @@
     "WANT_ADDR": "0x0316eb71485b0ab14103307bf65a021042c6d380",
     "WANT_SYMBOL": "HBTC",
     "COINGECKO_SYMBOL": "huobi-btc",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
   },
@@ -671,7 +620,6 @@
     "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -684,7 +632,6 @@
     "WANT_ADDR": "0x27E611FD27b276ACbd5Ffd632E5eAEBEC9761E40",
     "WANT_SYMBOL": "2CRV",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -697,7 +644,6 @@
     "WANT_ADDR": "0x92D5ebF3593a92888C25C0AbEF126583d4b5312E",
     "WANT_SYMBOL": "fUSDT+2CRV",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -710,7 +656,6 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -723,7 +668,6 @@
     "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
-    "VAULT_DEV": "dudesahn",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -736,7 +680,6 @@
     "WANT_ADDR": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
     "WANT_SYMBOL": "btcCRV",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   },
@@ -749,7 +692,6 @@
     "WANT_ADDR": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     "WANT_SYMBOL": "weth",
     "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_DEV": "therealmonoloco",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -762,7 +704,6 @@
     "WANT_ADDR": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
     "WANT_SYMBOL": "am3CRV",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "0xorb",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
@@ -775,7 +716,6 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "DAI",
-    "VAULT_DEV": "arbingsam",
     "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
@@ -788,7 +728,6 @@
     "WANT_ADDR": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_DEV": "GalloDaSballo",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
@@ -801,7 +740,6 @@
     "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
-    "VAULT_DEV": "dudesahn",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -814,7 +752,6 @@
     "WANT_ADDR": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "WANT_SYMBOL": "COMP",
     "COINGECKO_SYMBOL": "compound-governance-token",
-    "VAULT_DEV": "dudesahn",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -827,7 +764,6 @@
     "WANT_ADDR": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
     "WANT_SYMBOL": "AAVE",
     "COINGECKO_SYMBOL": "aave",
-    "VAULT_DEV": "dudesahn",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -840,7 +776,6 @@
     "WANT_ADDR": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
-    "VAULT_DEV": "fp_crypto",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -853,7 +788,6 @@
     "WANT_ADDR": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
     "WANT_SYMBOL": "sBTC",
     "COINGECKO_SYMBOL": "sbtc",
-    "VAULT_DEV": "iearnfinance",
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
@@ -866,7 +800,6 @@
     "WANT_ADDR": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
     "WANT_SYMBOL": "YFI",
     "COINGECKO_SYMBOL": "yearn-finance",
-    "VAULT_DEV": "_tonkers",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
@@ -879,7 +812,6 @@
     "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "weth",
-    "VAULT_DEV": "_tonkers",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }

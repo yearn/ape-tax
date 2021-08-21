@@ -132,34 +132,6 @@ if (!args.address) {
 }
 
 /******************************************************************************
-**	If the dev is not in the arguments, let's prompt it.
-**	The dev will be associated with the `VAULT_DEV` key.
-******************************************************************************/
-if (!args.dev) {
-	questions.push({
-		type: 'input',
-		name: 'vaultDev',
-		message: 'Who is the dev of this vault ?',
-	});
-}
-
-/******************************************************************************
-**	If the abi is not in the arguments, let's prompt it.
-**	The abi will be associated with the `VAULT_ABI` key.
-**	Only if fast is not enabled.
-**	Possible value : yVaultV2, LidoVault
-******************************************************************************/
-if ((!args.abi || !(['yVaultV2', 'LidoVault']).includes(args.abi)) && !args.fast) {
-	questions.push({
-		type: 'list',
-		name: 'vaultABI',
-		message: 'What is the ABI to use for this vault ?',
-		choices: ['yVaultV2', 'LidoVault'],
-		default: 'yVaultV2'
-	});
-}
-
-/******************************************************************************
 **	If the type is not in the arguments, let's prompt it.
 **	The type will be associated with the `VAULT_TYPE` key.
 **	Only if fast is not enabled.
@@ -193,9 +165,7 @@ inquirer.prompt(questions).then(async ({
 	vaultName = args.name,
 	vaultLogo = args.logo,
 	vaultAddress = args.address,
-	vaultDev = args.dev,
 	vaultChain = defaultVaultChain,
-	vaultABI = defaultVaultABI,
 	vaultType = defaultVaultType,
 	vaultStatus = defaultVaultStatus,
 }) => {
@@ -243,13 +213,12 @@ inquirer.prompt(questions).then(async ({
 	updatedVaults[vaultSlug] = {
 		TITLE: vaultName,
 		LOGO: vaultLogo,
-		VAULT_ABI: vaultABI,
+		VAULT_ABI: 'yVaultV2',
 		VAULT_TYPE: vaultType,
 		VAULT_ADDR: address,
 		WANT_ADDR: toAddress(tokenAddress),
 		WANT_SYMBOL: tokenSymbol,
 		COINGECKO_SYMBOL: tokenInfo.id,
-		VAULT_DEV: vaultDev,
 		VAULT_STATUS: vaultStatus,
 		CHAIN_ID: ENUM_CHAIN[vaultChain]
 	};
