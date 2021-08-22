@@ -8,10 +8,10 @@
 import	React, {useState, useEffect, useContext, createContext, useCallback}	from	'react';
 import	{ethers}																from	'ethers';
 import	QRCodeModal																from	'@walletconnect/qrcode-modal';
-import	{useWeb3React}															from	'@web3-react/core';
-import	{InjectedConnector}														from	'@web3-react/injected-connector';
-import	{ConnectorEvent}														from	'@web3-react/types';
-import	{WalletConnectConnector}												from	'@web3-react/walletconnect-connector';
+import	{useWeb3React}															from	'@web3-react-fork/core';
+import	{InjectedConnector}														from	'@web3-react-fork/injected-connector';
+import	{ConnectorEvent}														from	'@web3-react-fork/types';
+import	{WalletConnectConnector}												from	'@web3-react-fork/walletconnect-connector';
 import	useLocalStorage															from	'hook/useLocalStorage';
 import	{toAddress}																from	'utils';
 
@@ -30,7 +30,7 @@ function getProvider(chain = 'ethereum') {
 	} else if (chain === 'fantom') {
 		return new ethers.providers.JsonRpcProvider('https://rpcapi.fantom.network');
 	} else if (chain === 'bsc') {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
 	} else if (chain === 'major') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	}

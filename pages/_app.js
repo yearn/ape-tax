@@ -7,7 +7,7 @@
 
 import	React							from	'react';
 import	Head							from	'next/head';
-import	{Web3ReactProvider}				from	'@web3-react/core';
+import	{Web3ReactProvider}				from	'@web3-react-fork/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
 import	Navbar							from	'components/Navbar';

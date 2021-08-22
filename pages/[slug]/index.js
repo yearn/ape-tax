@@ -8,6 +8,7 @@
 import	React, {useState, useEffect, useCallback}					from	'react';
 import	{ethers}													from	'ethers';
 import	useWeb3														from	'contexts/useWeb3';
+import	ModalLogin													from	'components/ModalLogin';
 import	vaults														from	'utils/vaults.json';
 import	chains														from	'utils/chains.json';
 import	{fetchCryptoPrice, fetchYearnVaults, fetchBlockTimestamp}	from	'utils/API';
@@ -50,7 +51,7 @@ function	ProgressChart({progress, width}) {
 	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
 }
 
-function	Strategies({vault}) {
+function	Strategies({vault, chainID}) {
 	const	{provider, active, address} = useWeb3();
 	const	[strategiesData, set_strategiesData] = useState([]);
 	const	[, set_nonce] = useState(0);
@@ -61,6 +62,14 @@ function	Strategies({vault}) {
 	** elements for the UI.
 	**************************************************************************/
 	const prepreStrategiesData = useCallback(async () => {
+		if (chainID !== vault?.CHAIN_ID) {
+			return;
+		}
+		const	network = await provider.getNetwork();
+		if (network.chainId !== vault.CHAIN_ID) {
+			return;
+		}
+
 		const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, ['function withdrawalQueue(uint256 arg0) view returns (address)'], provider);
 		const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 		let		shouldBreak = false;
@@ -87,7 +96,7 @@ function	Strategies({vault}) {
 			});
 			set_nonce(n => n + 1);
 		});
-	}, [provider, vault?.VAULT_ADDR]);
+	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
 
 	useEffect(() => {
 		if (!vault || !active || !provider || !address) {
@@ -122,8 +131,7 @@ function	Strategies({vault}) {
 	);
 }
 
-function	Index({vault}) {
-	const	{provider, active, address, ens} = useWeb3();
+function	Index({vault, provider, active, address, ens, chainID}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -155,10 +163,15 @@ function	Index({vault}) {
 	** Retrieve the details of the vault and compute some of the elements for
 	** the UI.
 	**************************************************************************/
-	useEffect(() => {
-		if (!vault || !active || !provider || !address) {
+	const	prepareVaultData = useCallback(async () => {
+		if (!vault || !active || !provider || !address || chainID !== vault?.CHAIN_ID) {
 			return;
 		}
+		const	network = await provider.getNetwork();
+		if (network.chainId !== vault.CHAIN_ID) {
+			return;
+		}
+
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
@@ -179,7 +192,7 @@ function	Index({vault}) {
 			provider
 		);
 
-		Promise.all([
+		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, activation, wantPrice, yearnVaults, block, coinBalance, wantBalance, wantAllowance] = await Promise.all([
 			vaultContract.apiVersion(),
 			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
@@ -194,61 +207,65 @@ function	Index({vault}) {
 			provider.getBalance(address),
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
-		]).then(async ([apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, activation, wantPrice, yearnVaults, block, coinBalance, wantBalance, wantAllowance]) => {
-			const	price = wantPrice[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-			const	grossFromYearn = yearnVaults.find((item) => item.address === vault.VAULT_ADDR)?.apy?.gross_apr;
-			let		_grossAPRWeek = '-';
-			let		_grossAPRMonth = '-';
-			let		_grossAPRInception = '-';
+		]);
+		const	price = wantPrice[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		const	grossFromYearn = yearnVaults.find((item) => item.address === vault.VAULT_ADDR)?.apy?.gross_apr;
+		let		_grossAPRWeek = '-';
+		let		_grossAPRMonth = '-';
+		let		_grossAPRInception = '-';
 
-			if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn) {
-				const	activationTimestamp = Number(activation);
-				const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
-				const	averageBlockPerWeek = 269 * 24 * 7;
-				const	averageBlockPerMonth = 269 * 24 * 30;
-				const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
-				const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
-	
-				const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-					vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
-					vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
-				]);
-				const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
-				const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-				const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
-				const	weekRoi = (currentPrice / pastPriceWeek - 1);
-				const	monthRoi = (currentPrice / pastPriceMonth - 1);
-				const	inceptionROI = (currentPrice - 1);
-	
-				_grossAPRWeek = (weekRoi ? `${(weekRoi * 100).toFixed(2)}%` : '-');
-				_grossAPRMonth = (monthRoi ? `${(monthRoi * 100).toFixed(2)}%` : '-');
-				_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
-			} else if (vault.CHAIN_ID === 1) {
-				_grossAPRWeek = (grossFromYearn ? `${(grossFromYearn * 100).toFixed(4)}%` : '-');
-			}
+		//BSC node doesn't support theses blocktag
+		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
+			const	activationTimestamp = Number(activation);
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	averageBlockPerWeek = 269 * 24 * 7;
+			const	averageBlockPerMonth = 269 * 24 * 30;
+			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
+			const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
 
-			set_vaultData({
-				apiVersion: apiVersion,
-				depositLimit: Number(ethers.utils.formatUnits(depositLimit, decimals)).toFixed(2),
-				totalAssets: Number(ethers.utils.formatUnits(totalAssets, decimals)).toFixed(2),
-				availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, decimals)).toFixed(2),
-				pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, decimals)).toFixed(4),
-				decimals,
-				coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
-				balanceOf: Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(2),
-				balanceOfValue: (Number(ethers.utils.formatUnits(balanceOf, decimals)) * Number(ethers.utils.formatUnits(pricePerShare, decimals)) * price).toFixed(2),
-				wantBalance: Number(ethers.utils.formatUnits(wantBalance, decimals)).toFixed(2),
-				wantBalanceRaw: wantBalance,
-				wantPrice: price,
-				totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
-				progress: (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
-				grossAPRWeek: _grossAPRWeek,
-				grossAPRMonth: _grossAPRMonth,
-				grossAPRInception: _grossAPRInception,
-				allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
-			});
+			const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
+				vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
+				vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
+			]);
+			const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
+			const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
+			const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
+			const	weekRoi = (currentPrice / pastPriceWeek - 1);
+			const	monthRoi = (currentPrice / pastPriceMonth - 1);
+			const	inceptionROI = (currentPrice - 1);
+
+			_grossAPRWeek = (weekRoi ? `${(weekRoi * 100).toFixed(2)}%` : '-');
+			_grossAPRMonth = (monthRoi ? `${(monthRoi * 100).toFixed(2)}%` : '-');
+			_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
+		} else if (vault.CHAIN_ID === 1) {
+			_grossAPRWeek = (grossFromYearn ? `${(grossFromYearn * 100).toFixed(4)}%` : '-');
+		}
+
+		set_vaultData({
+			apiVersion: apiVersion,
+			depositLimit: Number(ethers.utils.formatUnits(depositLimit, decimals)).toFixed(2),
+			totalAssets: Number(ethers.utils.formatUnits(totalAssets, decimals)).toFixed(2),
+			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, decimals)).toFixed(2),
+			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, decimals)).toFixed(4),
+			decimals,
+			coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
+			balanceOf: Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(2),
+			balanceOfValue: (Number(ethers.utils.formatUnits(balanceOf, decimals)) * Number(ethers.utils.formatUnits(pricePerShare, decimals)) * price).toFixed(2),
+			wantBalance: Number(ethers.utils.formatUnits(wantBalance, decimals)).toFixed(2),
+			wantBalanceRaw: wantBalance,
+			wantPrice: price,
+			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
+			progress: (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
+			grossAPRWeek: _grossAPRWeek,
+			grossAPRMonth: _grossAPRMonth,
+			grossAPRInception: _grossAPRInception,
+			allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
 		});
-	}, [vault, active, provider, address]);
+	}, [vault, active, provider, address, chainID]);
+
+	useEffect(() => {
+		prepareVaultData();
+	}, [prepareVaultData]);
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
@@ -310,7 +327,7 @@ function	Index({vault}) {
 	}
 
 	return (
-		<main className={'mt-8 text-ygray-700'}>
+		<div className={'mt-8 text-ygray-700'}>
 			<div>
 				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 leading-120px'}>{vault.LOGO}</h1>
 				<h1 className={'text-3xl font-mono font-semibold text-ygray-900'}>{vault.TITLE}</h1>
@@ -347,7 +364,7 @@ function	Index({vault}) {
 						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : vaultData.totalAUM}`}</p>
 					</div>
 				</div>
-				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}`}>
+				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 					<div>
 						<p className={'inline'}>{'Gross APR (last week): '}</p>
 						<p className={'inline'}>{`${vaultData.grossAPRWeek}`}</p>
@@ -385,7 +402,7 @@ function	Index({vault}) {
 					</div>
 				</div>
 			</section>
-			<Strategies vault={vault} />
+			<Strategies vault={vault} chainID={chainID} />
 			<section aria-label={'WALLET'} className={'mt-8'}>
 				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 mb-6'}>{'Wallet'}</h1>
 				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
@@ -519,9 +536,64 @@ function	Index({vault}) {
 					</button>
 				</div>
 			</section>
-		</main>
+		</div>
 	);
 }
+
+function	Wrapper({vault}) {
+	const	{provider, active, address, ens, chainID} = useWeb3();
+	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
+
+	function	onSwitchChain(newChainID) {
+		if (newChainID === chainID) {
+			return;
+		}
+		if (!provider || !active) {
+			console.error('Not initialized');
+			return;
+		}
+		if (Number(newChainID) === 1) {
+			provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
+		} else {
+			provider.send('wallet_addEthereumChain', [chains[newChainID].chain_swap, address]).catch((error) => console.error(error));
+		}
+	}
+
+	if (!active) {
+		return (
+			<section aria-label={'NO_WALLET'}>
+				<div className={'flex flex-col justify-center items-center mt-8'}>
+					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌🔌'}</p>
+					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Not connected'}</p>
+					<button
+						onClick={() => set_modalLoginOpen(true)}
+						className={'bg-ygray-50 hover:bg-ygray-100 transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						{'🔌 Connect wallet'}
+					</button>
+				</div>
+				<ModalLogin open={modalLoginOpen} set_open={set_modalLoginOpen} />
+			</section>
+		);
+	}
+
+	if (chainID !== vault.CHAIN_ID) {
+		return (
+			<section aria-label={'WRONG_CHAIN'}>
+				<div className={'flex flex-col justify-center items-center mt-8'}>
+					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌⛓'}</p>
+					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Wrong Chain'}</p>
+					<button
+						onClick={() => onSwitchChain(vault.CHAIN_ID)}
+						className={'bg-ygray-50 hover:bg-ygray-100 transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						{'🔀 Change network'}
+					</button>
+				</div>
+			</section>
+		);
+	}
+	return (<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} />);
+}
+
 
 export async function getStaticPaths() {
 	const	slug = Object.keys(vaults).map((key) => ({params: {slug: key}})) || [];
@@ -533,4 +605,4 @@ export async function getStaticProps({params}) {
 	return {props: {vault: vaults[params.slug]}};
 }
 
-export default Index;
+export default Wrapper;

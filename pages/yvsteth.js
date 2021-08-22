@@ -163,7 +163,7 @@ function	Index() {
 	}
 
 	return (
-		<main className={'mt-8 text-ygray-700'}>
+		<section className={'mt-8 text-ygray-700'}>
 			<div>
 				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 leading-120px'}>{vault.LOGO}</h1>
 				<h1 className={'text-3xl font-mono font-semibold text-ygray-900'}>{vault.TITLE}</h1>
@@ -339,7 +339,7 @@ function	Index() {
 					</button>
 				</div>
 			</section>
-		</main>
+		</section>
 	);
 }
 

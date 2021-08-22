@@ -55,7 +55,6 @@ function	Navbar({router}) {
 		}
 	}
 
-
 	function	renderWalletButton() {
 		if (!active) {
 			return (
