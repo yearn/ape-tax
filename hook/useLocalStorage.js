@@ -1,3 +1,10 @@
+/******************************************************************************
+**	@Author:				The Ape Community
+**	@Twitter:				@ape_tax
+**	@Date:					Saturday June 5th 2021
+**	@Filename:				useLocalStorage.js
+******************************************************************************/
+
 import {useState} from 'react';
 
 function useLocalStorage(key, initialValue) {

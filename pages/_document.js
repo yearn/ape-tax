@@ -1,6 +1,6 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
+**	@Author:				The Ape Community
+**	@Twitter:				@ape_tax
 **	@Date:					Saturday August 21st 2021
 **	@Filename:				_document.js
 ******************************************************************************/

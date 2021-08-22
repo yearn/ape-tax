@@ -1,7 +1,7 @@
 /******************************************************************************
-**	@Author:				Thomas Bouder <Tbouder>
-**	@Email:					Tbouder@protonmail.com
-**	@Date:					Monday August 24th 2020
+**	@Author:				The Ape Community
+**	@Twitter:				@ape_tax
+**	@Date:					Wednesday August 11th 2021
 **	@Filename:				next.config.js
 ******************************************************************************/
 
