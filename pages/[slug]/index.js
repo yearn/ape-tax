@@ -36,7 +36,6 @@ function	InfoMessage({status}) {
 	);
 }
 
-
 function	ProgressChart({progress, width}) {
 	const	part_char = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
 	const	whole_char = '█';
@@ -123,9 +122,8 @@ function	Strategies({vault}) {
 	);
 }
 
-function	Index(props) {
+function	Index({vault}) {
 	const	{provider, active, address, ens} = useWeb3();
-	const	vault = vaults[props?.router?.query?.slug];
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -309,10 +307,6 @@ function	Index(props) {
 			progress: (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals)),
 
 		}));
-	}
-
-	if (!vault) {
-		return null;
 	}
 
 	return (
@@ -527,6 +521,16 @@ function	Index(props) {
 			</section>
 		</main>
 	);
+}
+
+export async function getStaticPaths() {
+	const	slug = Object.keys(vaults).map((key) => ({params: {slug: key}})) || [];
+
+	return	{paths: slug, fallback: false};
+}
+
+export async function getStaticProps({params}) {
+	return {props: {vault: vaults[params.slug]}};
 }
 
 export default Index;
