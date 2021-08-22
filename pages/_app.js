@@ -73,7 +73,9 @@ function	AppWrapper(props) {
 						{...pageProps} />
 				</div>
 				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600'}>
-					{'Made with 💙 by the 🦍 community'}
+					<a href={'https://twitter.com/ape_tax'} target={'_blank'} rel={'noreferrer'} className={'dashed-underline-gray'}>
+						{'Made with 💙 by the 🦍 community'}
+					</a>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
 			</main>
