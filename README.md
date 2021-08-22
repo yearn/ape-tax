@@ -11,7 +11,7 @@ yarn
 ### Compiles and hot-reloads for development
 
 ```bash
-yarn run start
+yarn run dev
 ```
 
 ### Compiles and minifies for production
