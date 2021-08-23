@@ -392,7 +392,13 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase()).then((wantPrice) => {
 				if (wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd) {
 					const	price = wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-					set_vaultData(v => ({...v, wantPrice: price, wantPriceError: false}));
+					set_vaultData(v => ({
+						...v,
+						wantPrice: price,
+						wantPriceError: false,
+						balanceOfValue: (v.balanceOf * v.pricePerShare * price).toFixed(2),
+						totalAUM: (v.totalAssets * price).toFixed(2),
+					}));
 				} else {
 					setTimeout(() => {
 						set_vaultData(v => ({...v, wantPriceError: true}));
