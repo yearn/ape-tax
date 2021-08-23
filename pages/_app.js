@@ -30,7 +30,7 @@ function	AppWrapper(props) {
 	const	hasSecretCode = useSecretCode();
 	const	WEBSITE_URI = process.env.WEBSITE_URI;
 	const	vaultsCGIds = [...new Set(Object.values(vaults).map(vault => vault.COINGECKO_SYMBOL.toLowerCase()))];
-	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 10000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
+	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	return (
 		<>
