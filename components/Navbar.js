@@ -83,7 +83,7 @@ function	Navbar({router}) {
 			<div className={'items-center justify-between flex flex-row w-full'}>
 				<div>
 					{router.route !== '/' ? <Link href={'/'}>
-						<p className={'text-sm text-ygray-700 dashed-underline-gray cursor-pointer transition-all'}>
+						<p className={'text-sm text-ygray-700 dashed-underline-gray cursor-pointer transition-all font-mono'}>
 							{'<< Back home'}
 						</p>
 					</Link> : null}

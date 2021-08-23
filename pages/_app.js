@@ -7,15 +7,19 @@
 
 import	React							from	'react';
 import	Head							from	'next/head';
+import	useSWR							from	'swr';
+import	{DefaultSeo}					from	'next-seo';
 import	{Web3ReactProvider}				from	'@web3-react-fork/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
 import	Navbar							from	'components/Navbar';
 import	useSecret						from	'hook/useSecret';
+import	vaults							from	'utils/vaults.json';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
 
+const fetcher = (...args) => fetch(...args).then(res => res.json());
 const useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
 	const success = useSecret(secretCode);
@@ -26,6 +30,8 @@ function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	WEBSITE_URI = process.env.WEBSITE_URI;
+	const	vaultsCGIds = [...new Set(Object.values(vaults).map(vault => vault.COINGECKO_SYMBOL.toLowerCase()))];
+	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	return (
 		<>
@@ -44,23 +50,33 @@ function	AppWrapper(props) {
 
 				<meta name={'robots'} content={'index,nofollow'} />
 				<meta name={'googlebot'} content={'index,nofollow'} />
-
-				{/* <!-- Open Graph / Facebook --> */}
-				<meta name={'og:type'} property={'og:type'} content={'website'} />
-				<meta name={'og:url'} property={'og:url'} content={WEBSITE_URI} />
-				<meta name={'og:title'} property={'og:title'} content={'ape.tax'} />
-				<meta name={'og:description'} property={'og:description'} content={'Experimental Experiments Registry'} />
-				<meta name={'og:image'} property={'og:image'} content={`${WEBSITE_URI}/og.jpg`} />
-
-				{/* <!-- Twitter --> */}
-				<meta name={'twitter:card'} property={'twitter:card'} content={'summary_large_image'} />
-				<meta name={'twitter:url'} property={'twitter:url'} content={WEBSITE_URI} />
-				<meta name={'twitter:title'} property={'twitter:title'} content={'ape.tax'} />
-				<meta name={'twitter:description'} property={'twitter:description'} content={'Experimental Experiments Registry'} />
-				<meta name={'twitter:image'} property={'twitter:image'} content={`${WEBSITE_URI}/og.jpg`} />
-				<meta name={'twitter:creator'} property={'twitter:creator'} content={'@ape_tax'} />
 				<meta charSet={'utf-8'} />
 			</Head>
+			<DefaultSeo
+				title={'Experimental Experiments Registry'}
+				defaultTitle={'Experimental Experiments Registry'}
+				description={'Experimental Experiments Registry'}
+				openGraph={{
+					type: 'website',
+					locale: 'en_US',
+					url: WEBSITE_URI,
+					site_name: 'ape.tax',
+					title: 'ape.tax',
+					description: 'Experimental Experiments Registry',
+					images: [
+						{
+							url: `${WEBSITE_URI}og.jpg`,
+							width: 1200,
+							height: 675,
+							alt: 'Apes',
+						}
+					]
+				}}
+				twitter={{
+					handle: '@ape_tax',
+					site: '@ape_tax',
+					cardType: 'summary_large_image',
+				}} />
 			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
 					<Navbar router={router} />
@@ -70,6 +86,7 @@ function	AppWrapper(props) {
 						key={router.route}
 						element={props.element}
 						router={props.router}
+						prices={data}
 						{...pageProps} />
 				</div>
 				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600'}>
