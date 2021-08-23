@@ -13,7 +13,7 @@ module.exports = ({
 	],
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
-		WEBSITE_URI: process.env.WEBSITE_URI,
+		WEBSITE_URI: process.env.WEBSITE_URI || 'https://ape.tax/',
 		SECRET: process.env.SECRET,
 	},
 	optimization: {
