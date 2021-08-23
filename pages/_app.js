@@ -7,15 +7,18 @@
 
 import	React							from	'react';
 import	Head							from	'next/head';
+import	useSWR							from	'swr';
 import	{Web3ReactProvider}				from	'@web3-react-fork/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
 import	Navbar							from	'components/Navbar';
 import	useSecret						from	'hook/useSecret';
+import	vaults							from	'utils/vaults.json';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
 
+const fetcher = (...args) => fetch(...args).then(res => res.json());
 const useSecretCode = () => {
 	const secretCode = process.env.SECRET.split(',');
 	const success = useSecret(secretCode);
@@ -26,6 +29,8 @@ function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	hasSecretCode = useSecretCode();
 	const	WEBSITE_URI = process.env.WEBSITE_URI;
+	const	vaultsCGIds = [...new Set(Object.values(vaults).map(vault => vault.COINGECKO_SYMBOL.toLowerCase()))];
+	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 10000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	return (
 		<>
@@ -70,6 +75,7 @@ function	AppWrapper(props) {
 						key={router.route}
 						element={props.element}
 						router={props.router}
+						prices={data}
 						{...pageProps} />
 				</div>
 				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600'}>

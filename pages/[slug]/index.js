@@ -11,7 +11,7 @@ import	useWeb3														from	'contexts/useWeb3';
 import	ModalLogin													from	'components/ModalLogin';
 import	vaults														from	'utils/vaults.json';
 import	chains														from	'utils/chains.json';
-import	{fetchCryptoPrice, fetchYearnVaults, fetchBlockTimestamp}	from	'utils/API';
+import	{fetchYearnVaults, fetchBlockTimestamp}						from	'utils/API';
 import	{ADDRESS_ZERO, asyncForEach, bigNumber}						from	'utils';
 import	{approveToken, depositToken, withdrawToken}					from	'utils/actions';
 
@@ -131,7 +131,7 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
-function	Index({vault, provider, active, address, ens, chainID}) {
+function	Index({vault, provider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -251,14 +251,13 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
 			vaultContract.balanceOf(address),
-			fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase()),
 			provider.getBalance(address),
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
 		];
 		const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
 		const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
-		let		[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantPrice, coinBalance, wantBalance, wantAllowance] = validResults;
+		let		[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, coinBalance, wantBalance, wantAllowance] = validResults;
 
 		/**********************************************************************
 		** If we got some errors from the promise, then we can try to get
@@ -278,8 +277,6 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			decimals = await vaultContract.decimals();
 		if (balanceOf === 'ERROR' || balanceOf === undefined)
 			balanceOf = await vaultContract.balanceOf(address);
-		if (wantPrice === 'ERROR' || wantPrice === undefined)
-			wantPrice = await fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase());
 		if (coinBalance === 'ERROR' || coinBalance === undefined)
 			coinBalance = await provider.getBalance(address);
 		if (wantBalance === 'ERROR' || wantBalance === undefined)
@@ -287,13 +284,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 		if (wantAllowance === 'ERROR' || wantAllowance === undefined)
 			wantAllowance = await wantContract.allowance(address, vault.VAULT_ADDR);
 
-		let	price = 0;
-		let priceError = false;
-		if (wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd) {
-			price = wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-		} else {
-			priceError = true;
-		}
+		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 		const	{_grossAPRWeek, _grossAPRMonth, _grossAPRInception} = await prepareVaultDataGross({vaultContract, pricePerShare, decimals});
 
 		set_vaultData({
@@ -309,7 +300,6 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			wantBalance: Number(ethers.utils.formatUnits(wantBalance, decimals)).toFixed(2),
 			wantBalanceRaw: wantBalance,
 			wantPrice: price,
-			wantPriceError: priceError,
 			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
 			progress: (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
 			grossAPRWeek: _grossAPRWeek,
@@ -387,26 +377,15 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 	** If we had some issues getting the prices ... Let's try again
 	**************************************************************************/
 	useEffect(() => {
-		if (vaultData.wantPriceError) {
-			set_vaultData(v => ({...v, wantPriceError: false}));
-			fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase()).then((wantPrice) => {
-				if (wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd) {
-					const	price = wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-					set_vaultData(v => ({
-						...v,
-						wantPrice: price,
-						wantPriceError: false,
-						balanceOfValue: (v.balanceOf * v.pricePerShare * price).toFixed(2),
-						totalAUM: (v.totalAssets * price).toFixed(2),
-					}));
-				} else {
-					setTimeout(() => {
-						set_vaultData(v => ({...v, wantPriceError: true}));
-					}, 1000);
-				}
-			});
-		}
-	}, [vault.COINGECKO_SYMBOL, vaultData.wantPriceError]);
+		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		set_vaultData(v => ({
+			...v,
+			wantPrice: price,
+			wantPriceError: false,
+			balanceOfValue: (v.balanceOf * v.pricePerShare * price).toFixed(2),
+			totalAUM: (v.totalAssets * price).toFixed(2),
+		}));
+	}, [prices, vault.COINGECKO_SYMBOL]);
 
 	return (
 		<div className={'mt-8 text-ygray-700'}>
@@ -435,7 +414,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 					</div>
 					<div>
 						<p className={'inline'}>{'Deposit Limit: '}</p>
-						<p className={'inline'}>{`${vaultData.depositLimit} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>{`${vaultData.depositLimit === -1 ? '-' : vaultData.depositLimit} ${vault.WANT_SYMBOL}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total Assets: '}</p>
@@ -622,7 +601,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 	);
 }
 
-function	Wrapper({vault}) {
+function	Wrapper({vault, prices}) {
 	const	{provider, active, address, ens, chainID} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
 
@@ -673,7 +652,7 @@ function	Wrapper({vault}) {
 			</section>
 		);
 	}
-	return (<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} />);
+	return (<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />);
 }
 
 
