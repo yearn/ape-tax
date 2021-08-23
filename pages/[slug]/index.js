@@ -174,8 +174,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 		//BSC node doesn't support theses blocktag
 		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
 			const promises = [vaultContract.activation(), provider.getBlockNumber()];
-			// eslint-disable-next-line no-unused-vars
-			const	results = await Promise.all(promises.map(p => p.catch(_ => 'ERROR')));
+			const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
 			const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
 			let		[activation, block] = validResults;
 	
@@ -257,7 +256,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
 		];
-		const	results = await Promise.all(promises.map(p => p.catch(e => 'ERROR')));
+		const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
 		const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
 		let		[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantPrice, coinBalance, wantBalance, wantAllowance] = validResults;
 
