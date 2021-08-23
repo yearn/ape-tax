@@ -8,6 +8,7 @@
 import	React							from	'react';
 import	Head							from	'next/head';
 import	useSWR							from	'swr';
+import	{DefaultSeo}					from	'next-seo';
 import	{Web3ReactProvider}				from	'@web3-react-fork/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
@@ -49,23 +50,33 @@ function	AppWrapper(props) {
 
 				<meta name={'robots'} content={'index,nofollow'} />
 				<meta name={'googlebot'} content={'index,nofollow'} />
-
-				{/* <!-- Open Graph / Facebook --> */}
-				<meta name={'og:type'} property={'og:type'} content={'website'} />
-				<meta name={'og:url'} property={'og:url'} content={WEBSITE_URI} />
-				<meta name={'og:title'} property={'og:title'} content={'ape.tax'} />
-				<meta name={'og:description'} property={'og:description'} content={'Experimental Experiments Registry'} />
-				<meta name={'og:image'} property={'og:image'} content={`${WEBSITE_URI}/og.jpg`} />
-
-				{/* <!-- Twitter --> */}
-				<meta name={'twitter:card'} property={'twitter:card'} content={'summary_large_image'} />
-				<meta name={'twitter:url'} property={'twitter:url'} content={WEBSITE_URI} />
-				<meta name={'twitter:title'} property={'twitter:title'} content={'ape.tax'} />
-				<meta name={'twitter:description'} property={'twitter:description'} content={'Experimental Experiments Registry'} />
-				<meta name={'twitter:image'} property={'twitter:image'} content={`${WEBSITE_URI}/og.jpg`} />
-				<meta name={'twitter:creator'} property={'twitter:creator'} content={'@ape_tax'} />
 				<meta charSet={'utf-8'} />
 			</Head>
+			<DefaultSeo
+				title={'Experimental Experiments Registry'}
+				defaultTitle={'Experimental Experiments Registry'}
+				description={'Experimental Experiments Registry'}
+				openGraph={{
+					type: 'website',
+					locale: 'en_US',
+					url: WEBSITE_URI,
+					site_name: 'ape.tax',
+					title: 'ape.tax',
+					description: 'Experimental Experiments Registry',
+					images: [
+						{
+							url: `${WEBSITE_URI}og.jpg`,
+							width: 1200,
+							height: 675,
+							alt: 'Apes',
+						}
+					]
+				}}
+				twitter={{
+					handle: '@ape_tax',
+					site: '@ape_tax',
+					cardType: 'summary_large_image',
+				}} />
 			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
 					<Navbar router={router} />

@@ -7,6 +7,7 @@
 
 import	React, {useState, useEffect, useCallback}					from	'react';
 import	{ethers}													from	'ethers';
+import	{NextSeo}													from	'next-seo';
 import	useWeb3														from	'contexts/useWeb3';
 import	ModalLogin													from	'components/ModalLogin';
 import	vaults														from	'utils/vaults.json';
@@ -623,6 +624,18 @@ function	Wrapper({vault, prices}) {
 	if (!active) {
 		return (
 			<section aria-label={'NO_WALLET'}>
+				<NextSeo
+					openGraph={{
+						title: vault.TITLE,
+						images: [
+							{
+								url: `https://og-image-tbouder.vercel.app/${vault.LOGO}.jpeg`,
+								width: 1200,
+								height: 1200,
+								alt: 'Apes',
+							}
+						]
+					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌🔌'}</p>
 					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Not connected'}</p>
@@ -640,6 +653,18 @@ function	Wrapper({vault, prices}) {
 	if (chainID !== vault.CHAIN_ID) {
 		return (
 			<section aria-label={'WRONG_CHAIN'}>
+				<NextSeo
+					openGraph={{
+						title: vault.TITLE,
+						images: [
+							{
+								url: `https://og.major.farm/${vault.LOGO}.jpeg`,
+								width: 800,
+								height: 600,
+								alt: 'Apes',
+							}
+						]
+					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌⛓'}</p>
 					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Wrong Chain'}</p>
@@ -652,7 +677,23 @@ function	Wrapper({vault, prices}) {
 			</section>
 		);
 	}
-	return (<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />);
+	return (
+		<>
+			<NextSeo
+				openGraph={{
+					title: vault.TITLE,
+					images: [
+						{
+							url: `https://og-image-tbouder.vercel.app/${vault.LOGO}.jpeg`,
+							width: 1200,
+							height: 1200,
+							alt: 'Apes',
+						}
+					]
+				}} />
+			<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
+		</>
+	);
 }
 
 
