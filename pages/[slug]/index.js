@@ -535,7 +535,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								</button>
 								<button
 									onClick={() => {
-										if (isDepositing)
+										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
 										depositToken({
@@ -555,7 +555,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								</button>
 								<button
 									onClick={() => {
-										if (isDepositing)
+										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
 										depositToken({
@@ -578,7 +578,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 					}
 					<button
 						onClick={() => {
-							if (isWithdrawing)
+							if (isWithdrawing || Number(vaultData.balanceOf) === 0)
 								return;
 							set_isWithdrawing(true);
 							withdrawToken({
@@ -598,7 +598,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 					</button>
 					<button
 						onClick={() => {
-							if (isWithdrawing)
+							if (isWithdrawing || Number(vaultData.balanceOf) === 0)
 								return;
 							set_isWithdrawing(true);
 							withdrawToken({
