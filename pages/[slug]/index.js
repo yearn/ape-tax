@@ -136,7 +136,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
 	const	[vaultData, set_vaultData] = useState({
-		depositLimit: 0,
+		depositLimit: -1,
 		totalAssets: 0,
 		availableDepositLimit: 0,
 		pricePerShare: 1,
@@ -146,6 +146,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 		balanceOfValue: 0,
 		wantBalance: 0,
 		wantPrice: 0,
+		wantPriceError: false,
 		totalAUM: 0,
 		progress:  0,
 		allowance: 0,
@@ -163,6 +164,57 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 	** Retrieve the details of the vault and compute some of the elements for
 	** the UI.
 	**************************************************************************/
+	async function prepareVaultDataGross({vaultContract, pricePerShare, decimals}) {
+		const	yearnVaults = await fetchYearnVaults();
+		const	grossFromYearn = yearnVaults.find((item) => item.address === vault.VAULT_ADDR)?.apy?.gross_apr;
+		let		_grossAPRWeek = '-';
+		let		_grossAPRMonth = '-';
+		let		_grossAPRInception = '-';
+
+		//BSC node doesn't support theses blocktag
+		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
+			const promises = [vaultContract.activation(), provider.getBlockNumber()];
+			// eslint-disable-next-line no-unused-vars
+			const	results = await Promise.all(promises.map(p => p.catch(_ => 'ERROR')));
+			const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
+			let		[activation, block] = validResults;
+	
+			/**********************************************************************
+			** If we got some errors from the promise, then we can try to get
+			** the data again.
+			**********************************************************************/
+			if (activation === 'ERROR' || activation === undefined)
+				activation = await vaultContract.activation();
+			if (block === 'ERROR' || block === undefined)
+				block = await provider.getBlockNumber();
+
+			const	activationTimestamp = Number(activation);
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	averageBlockPerWeek = 269 * 24 * 7;
+			const	averageBlockPerMonth = 269 * 24 * 30;
+			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
+			const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
+
+			const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
+				vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
+				vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
+			]);
+			const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
+			const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
+			const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
+			const	weekRoi = (currentPrice / pastPriceWeek - 1);
+			const	monthRoi = (currentPrice / pastPriceMonth - 1);
+			const	inceptionROI = (currentPrice - 1);
+
+			_grossAPRWeek = (weekRoi ? `${(weekRoi * 100).toFixed(2)}%` : '-');
+			_grossAPRMonth = (monthRoi ? `${(monthRoi * 100).toFixed(2)}%` : '-');
+			_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
+		} else if (vault.CHAIN_ID === 1) {
+			_grossAPRWeek = (grossFromYearn ? `${(grossFromYearn * 100).toFixed(4)}%` : '-');
+		}
+		return ({_grossAPRWeek, _grossAPRMonth, _grossAPRInception});
+	}
+
 	const	prepareVaultData = useCallback(async () => {
 		if (!vault || !active || !provider || !address || chainID !== vault?.CHAIN_ID) {
 			return;
@@ -192,7 +244,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			provider
 		);
 
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, activation, wantPrice, yearnVaults, block, coinBalance, wantBalance, wantAllowance] = await Promise.all([
+		const promises = [
 			vaultContract.apiVersion(),
 			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
@@ -200,46 +252,50 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
 			vaultContract.balanceOf(address),
-			vaultContract.activation(),
-			fetchCryptoPrice((vault.COINGECKO_SYMBOL.toLowerCase())),
-			fetchYearnVaults(),
-			provider.getBlockNumber(),
+			fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase()),
 			provider.getBalance(address),
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
-		]);
-		const	price = wantPrice[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-		const	grossFromYearn = yearnVaults.find((item) => item.address === vault.VAULT_ADDR)?.apy?.gross_apr;
-		let		_grossAPRWeek = '-';
-		let		_grossAPRMonth = '-';
-		let		_grossAPRInception = '-';
+		];
+		const	results = await Promise.all(promises.map(p => p.catch(e => 'ERROR')));
+		const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
+		let		[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantPrice, coinBalance, wantBalance, wantAllowance] = validResults;
 
-		//BSC node doesn't support theses blocktag
-		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
-			const	activationTimestamp = Number(activation);
-			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
-			const	averageBlockPerWeek = 269 * 24 * 7;
-			const	averageBlockPerMonth = 269 * 24 * 30;
-			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
-			const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
+		/**********************************************************************
+		** If we got some errors from the promise, then we can try to get
+		** the data again.
+		**********************************************************************/
+		if (apiVersion === 'ERROR' || apiVersion === undefined)
+			apiVersion = await vaultContract.apiVersion();
+		if (depositLimit === 'ERROR' || depositLimit === undefined)
+			depositLimit = await vaultContract.depositLimit();
+		if (totalAssets === 'ERROR' || totalAssets === undefined)
+			totalAssets = await vaultContract.totalAssets();
+		if (availableDepositLimit === 'ERROR' || availableDepositLimit === undefined)
+			availableDepositLimit = await vaultContract.availableDepositLimit();
+		if (pricePerShare === 'ERROR' || pricePerShare === undefined)
+			pricePerShare = await vaultContract.pricePerShare();
+		if (decimals === 'ERROR' || decimals === undefined)
+			decimals = await vaultContract.decimals();
+		if (balanceOf === 'ERROR' || balanceOf === undefined)
+			balanceOf = await vaultContract.balanceOf(address);
+		if (wantPrice === 'ERROR' || wantPrice === undefined)
+			wantPrice = await fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase());
+		if (coinBalance === 'ERROR' || coinBalance === undefined)
+			coinBalance = await provider.getBalance(address);
+		if (wantBalance === 'ERROR' || wantBalance === undefined)
+			wantBalance = await wantContract.balanceOf(address);
+		if (wantAllowance === 'ERROR' || wantAllowance === undefined)
+			wantAllowance = await wantContract.allowance(address, vault.VAULT_ADDR);
 
-			const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-				vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
-				vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
-			]);
-			const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
-			const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-			const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
-			const	weekRoi = (currentPrice / pastPriceWeek - 1);
-			const	monthRoi = (currentPrice / pastPriceMonth - 1);
-			const	inceptionROI = (currentPrice - 1);
-
-			_grossAPRWeek = (weekRoi ? `${(weekRoi * 100).toFixed(2)}%` : '-');
-			_grossAPRMonth = (monthRoi ? `${(monthRoi * 100).toFixed(2)}%` : '-');
-			_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
-		} else if (vault.CHAIN_ID === 1) {
-			_grossAPRWeek = (grossFromYearn ? `${(grossFromYearn * 100).toFixed(4)}%` : '-');
+		let	price = 0;
+		let priceError = false;
+		if (wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd) {
+			price = wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		} else {
+			priceError = true;
 		}
+		const	{_grossAPRWeek, _grossAPRMonth, _grossAPRInception} = await prepareVaultDataGross({vaultContract, pricePerShare, decimals});
 
 		set_vaultData({
 			apiVersion: apiVersion,
@@ -254,6 +310,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			wantBalance: Number(ethers.utils.formatUnits(wantBalance, decimals)).toFixed(2),
 			wantBalanceRaw: wantBalance,
 			wantPrice: price,
+			wantPriceError: priceError,
 			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
 			progress: (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
 			grossAPRWeek: _grossAPRWeek,
@@ -261,6 +318,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 			grossAPRInception: _grossAPRInception,
 			allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
 		});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [vault, active, provider, address, chainID]);
 
 	useEffect(() => {
@@ -325,6 +383,25 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 
 		}));
 	}
+
+	/**************************************************************************
+	** If we had some issues getting the prices ... Let's try again
+	**************************************************************************/
+	useEffect(() => {
+		if (vaultData.wantPriceError) {
+			set_vaultData(v => ({...v, wantPriceError: false}));
+			fetchCryptoPrice(vault.COINGECKO_SYMBOL.toLowerCase()).then((wantPrice) => {
+				if (wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd) {
+					const	price = wantPrice?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+					set_vaultData(v => ({...v, wantPrice: price, wantPriceError: false}));
+				} else {
+					setTimeout(() => {
+						set_vaultData(v => ({...v, wantPriceError: true}));
+					}, 1000);
+				}
+			});
+		}
+	}, [vault.COINGECKO_SYMBOL, vaultData.wantPriceError]);
 
 	return (
 		<div className={'mt-8 text-ygray-700'}>
@@ -448,7 +525,7 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 				</div>
 				<div className={'mt-10'}>
 					{
-						vaultData.depositLimit > 0 && vault.VAULT_STATUS !== 'withdraw' ?
+						vaultData.depositLimit !== 0 && vault.VAULT_STATUS !== 'withdraw' ?
 							<>
 								<button
 									onClick={() => {
@@ -467,9 +544,9 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 											fetchApproval();
 										});
 									}}
-									disabled={(vaultData.allowance >= Number(amount) && Number(amount) > 0) || isApproving}
-									className={`${(vaultData.allowance >= Number(amount) && Number(amount) > 0) || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-									{(vaultData.allowance >= Number(amount) && Number(amount) > 0) ? '✅ Approved' : '🚀 Approve Vault'}
+									disabled={(vaultData.allowance >= Number(amount) && Number(amount) !== 0) || isApproving}
+									className={`${(vaultData.allowance >= Number(amount) && Number(amount) !== 0) || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+									{(vaultData.allowance >= Number(amount) && Number(amount) !== 0) ? '✅ Approved' : '🚀 Approve Vault'}
 								</button>
 								<button
 									onClick={() => {
@@ -530,8 +607,8 @@ function	Index({vault, provider, active, address, ens, chainID}) {
 								fetchPostDepositOrWithdraw();
 							});
 						}}
-						disabled={vaultData.balanceOf <= 0}
-						className={`${vaultData.balanceOf <= 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
+						disabled={vaultData.balanceOf === 0}
+						className={`${vaultData.balanceOf === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>
