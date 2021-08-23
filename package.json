@@ -1,42 +1,44 @@
 {
-  "name": "experiments",
+  "name": "ape_tax",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --open",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "npm run open-browser && next dev",
+    "open-browser": "open http://localhost:3000",
+    "build": "next build",
+    "analyze": "ANALYZE=true next build",
+    "start": "next start",
+    "export": "next export",
+    "lint": "eslint . --ext .js",
+    "lintfix": "eslint . --ext .js --fix"
   },
   "dependencies": {
-    "@drizzle/store": "^1.5.3",
-    "@drizzle/vue-plugin": "^0.1.3",
-    "axios": "^0.21.0",
-    "buefy": "^0.9.4",
-    "core-js": "^3.6.5",
-    "ethers": "^5.4.1",
+    "@ethersproject/providers": "^5.4.4",
+    "@headlessui/react": "^1.4.0",
+    "@tailwindcss/forms": "^0.3.3",
+    "@tailwindcss/typography": "^0.4.1",
+    "@walletconnect/qrcode-modal": "^1.6.2",
+    "@web3-react-fork/core": "^2.0.5",
+    "@web3-react-fork/injected-connector": "^2.0.5",
+    "@web3-react-fork/network-connector": "^2.0.5",
+    "@web3-react-fork/types": "^2.0.5",
+    "@web3-react-fork/walletconnect-connector": "^2.0.5",
+    "autoprefixer": "^10.3.2",
+    "axios": "^0.21.1",
+    "dotenv-webpack": "^7.0.3",
+    "ethers": "^5.4.5",
     "grapheme-splitter": "^1.0.4",
-    "pug": "^3.0.0",
-    "pug-plain-loader": "^1.0.0",
-    "vue": "^2.6.11",
-    "vue-async-computed": "^3.9.0",
-    "vue-konami": "^1.0.10",
-    "vuex": "^3.5.1"
+    "next": "11.1.0",
+    "postcss": "^8.3.6",
+    "react": "17.0.2",
+    "react-dom": "^17.0.2",
+    "tailwindcss": "^2.2.7",
+    "web3": "^1.5.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^1.0.0",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "inquirer": "^8.1.2",
-    "vue-template-compiler": "^2.6.11",
-    "yargs": "^17.0.1"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+    "eslint": "^7.32.0",
+    "eslint-config-next": "^11.1.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0"
+  }
 }

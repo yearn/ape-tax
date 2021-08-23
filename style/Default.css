@@ -1,0 +1,126 @@
+/******************************************************************************
+**	@Author:				The Ape Community
+**	@Twitter:				@ape_tax
+**	@Date:					Wednesday August 11th 2021
+**	@Filename:				Default.css
+******************************************************************************/
+
+* {
+	scroll-behavior: smooth;
+}
+
+#__next {
+	width: 100%;
+	height: 100%
+}
+
+::placeholder {
+	color: #C5C6C7 !important;
+}
+:-ms-input-placeholder,
+::-ms-input-placeholder {
+	color: #C5C6C7 !important;
+}
+
+.whitePlaceholder {
+	caret-color: #FFFFFF !important;
+}
+.whitePlaceholder::placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
+}
+.whitePlaceholder:-ms-input-placeholder,
+.whitePlaceholder::-ms-input-placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
+}
+
+/******************************************************************************
+**	Styled button style
+******************************************************************************/
+.button {
+	will-change: transform, opacity;
+	contain: content;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: fit-content;
+	transition: 0.1s;
+	outline: none;
+	cursor: pointer;
+	font-weight: 600;
+	border-radius: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 16px;
+	padding-right: 16px;
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+}
+
+/******************************************************************************
+**	TAILWIND CSS ++
+******************************************************************************/
+.transition-all {
+	transition-duration: 150ms;
+}
+.animation-delay-500 {
+	animation-delay: 1000ms !important;
+}
+.text-xxs {
+	font-size: 10px;
+	line-height: 12px;
+}
+.text-ybase {
+	font-family: Roboto;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 16px;
+	letter-spacing: 0em;
+}
+
+.text-ylarge {
+	font-family: Roboto;
+	font-size: 24px;
+	font-style: normal;
+	line-height: 32px;
+	letter-spacing: 0em;
+	text-align: center;
+}
+
+
+.text-yerror {
+	font-family: SF Pro Display;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 17px;
+	letter-spacing: 0em;
+}
+
+
+*, ::before, ::after {
+    --tw-ring-color: transparent !important;
+}
+
+.dashed-underline-white {
+	border-bottom: 1px dashed transparent;
+}
+.dashed-underline-white:hover {
+	border-bottom: 1px dashed #FFFFFF;
+}
+
+.dashed-underline-gray {
+	border-bottom: 1px dashed transparent;
+}
+.dashed-underline-gray:hover {
+	border-bottom: 1px dashed #2c3e50;
+}
+.progress-bar { 
+	display: inline-block;
+	white-space: pre-wrap;
+}
+.progress-body {
+	background-color: #f0f0f0;
+	color: black;
+}

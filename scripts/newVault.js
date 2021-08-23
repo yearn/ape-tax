@@ -1,8 +1,15 @@
+/******************************************************************************
+**	@Author:				The Ape Community
+**	@Twitter:				@ape_tax
+**	@Date:					Saturday August 21st 2021
+**	@Filename:				newVault.js
+******************************************************************************/
+
 const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
 const	fs = require('fs');
-const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv
+const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv;
 
 async function checkTokenCGID(tokenID) {
 	try {
@@ -21,22 +28,22 @@ async function getTokenInfo(tokenAddress) {
 	}
 }
 function	getSlugFromString(str) {
-    str = str.replace(/^\s+|\s+$/g, '');
-    str = str.toLowerCase();
-    var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-    var to   = "aaaaeeeeiiiioooouuuunc------";
-    for (var i=0, l=from.length ; i<l ; i++) {
-        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-    }
+	str = str.replace(/^\s+|\s+$/g, '');
+	str = str.toLowerCase();
+	var from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+	var to   = 'aaaaeeeeiiiioooouuuunc------';
+	for (var i=0, l=from.length ; i<l ; i++) {
+		str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+	}
 
-    str = str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-    return str;
+	str = str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+	return str;
 }
 function	getProvider(chain = 1) {
 	if (chain === 1) {
 		return new ethers.providers.AlchemyProvider('homestead');
 	} else if (chain === 137) {
-		return new ethers.providers.JsonRpcProvider(`https://rpc-mainnet.matic.network`);
+		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
 	} else if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools/');
 	} else if (chain === 56) {
@@ -50,7 +57,7 @@ const	ENUM_CHAIN = {
 	'BSC (56)': 56,
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
-}
+};
 const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
 	if (!address) {
@@ -132,34 +139,6 @@ if (!args.address) {
 }
 
 /******************************************************************************
-**	If the dev is not in the arguments, let's prompt it.
-**	The dev will be associated with the `VAULT_DEV` key.
-******************************************************************************/
-if (!args.dev) {
-	questions.push({
-		type: 'input',
-		name: 'vaultDev',
-		message: 'Who is the dev of this vault ?',
-	});
-}
-
-/******************************************************************************
-**	If the abi is not in the arguments, let's prompt it.
-**	The abi will be associated with the `VAULT_ABI` key.
-**	Only if fast is not enabled.
-**	Possible value : yVaultV2, LidoVault
-******************************************************************************/
-if ((!args.abi || !(['yVaultV2', 'LidoVault']).includes(args.abi)) && !args.fast) {
-	questions.push({
-		type: 'list',
-		name: 'vaultABI',
-		message: 'What is the ABI to use for this vault ?',
-		choices: ['yVaultV2', 'LidoVault'],
-		default: 'yVaultV2'
-	});
-}
-
-/******************************************************************************
 **	If the type is not in the arguments, let's prompt it.
 **	The type will be associated with the `VAULT_TYPE` key.
 **	Only if fast is not enabled.
@@ -193,9 +172,7 @@ inquirer.prompt(questions).then(async ({
 	vaultName = args.name,
 	vaultLogo = args.logo,
 	vaultAddress = args.address,
-	vaultDev = args.dev,
 	vaultChain = defaultVaultChain,
-	vaultABI = defaultVaultABI,
 	vaultType = defaultVaultType,
 	vaultStatus = defaultVaultStatus,
 }) => {
@@ -216,7 +193,7 @@ inquirer.prompt(questions).then(async ({
 		tokenInfo = await getTokenInfo(tokenAddress);
 	}
 	if (!tokenInfo?.id) {
-		console.log('❌ Impossible to find corresponding token on coinGecko.')
+		console.log('❌ Impossible to find corresponding token on coinGecko.');
 		const	{wantID} = await inquirer.prompt([{
 			type: 'input',
 			name: 'wantSymbol',
@@ -225,7 +202,7 @@ inquirer.prompt(questions).then(async ({
 		tokenInfo.id = wantID;
 	}
 	const	vaultSlug = getSlugFromString(vaultName);
-	const	vaults = require('../src/vaults.json');
+	const	vaults = require('../utils/vaults.json');
 	
 	if (vaults[vaultSlug] !== undefined) {
 		throw 'Vault already used. Please use another name !';
@@ -239,29 +216,28 @@ inquirer.prompt(questions).then(async ({
 			vault.VAULT_STATUS = 'active';
 		}
 		updatedVaults[key] = vault;
-	})
+	});
 	updatedVaults[vaultSlug] = {
 		TITLE: vaultName,
 		LOGO: vaultLogo,
-		VAULT_ABI: vaultABI,
+		VAULT_ABI: 'yVaultV2',
 		VAULT_TYPE: vaultType,
 		VAULT_ADDR: address,
 		WANT_ADDR: toAddress(tokenAddress),
 		WANT_SYMBOL: tokenSymbol,
 		COINGECKO_SYMBOL: tokenInfo.id,
-		VAULT_DEV: vaultDev,
 		VAULT_STATUS: vaultStatus,
 		CHAIN_ID: ENUM_CHAIN[vaultChain]
 	};
 	const stringifiedVault = JSON.stringify(updatedVaults, null, 2);
-	fs.writeFile(`${__dirname}/../src/vaults.json`, stringifiedVault, 'utf8', (err) => {
+	fs.writeFile(`${__dirname}/../utils/vaults.json`, stringifiedVault, 'utf8', (err) => {
 		if (err) {
 			throw 'Impossible to update vaults.json';
 		}
 	});
-	console.log(`✅ Bravo !`)
+	console.log('✅ Bravo !');
 })
-.catch((error) => {
-	if (error)
-		console.error(error)
-});
+	.catch((error) => {
+		if (error)
+			console.error(error);
+	});

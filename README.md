@@ -5,25 +5,25 @@ If you want to run the UI yourself, check the following steps:
 ## Project setup
 
 ```bash
-npm install
+yarn
 ```
 
 ### Compiles and hot-reloads for development
 
 ```bash
-npm run serve
+yarn run dev
 ```
 
 ### Compiles and minifies for production
 
 ```bash
-npm run build
+yarn build
 ```
 
 ### Lints and fixes files
 
 ```bash
-npm run lint
+yarn lint
 ```
 
 ## Add an experimental experiment
