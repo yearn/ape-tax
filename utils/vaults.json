@@ -740,7 +740,7 @@
     "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "compoundingcosmos": {
@@ -752,7 +752,7 @@
     "WANT_ADDR": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "WANT_SYMBOL": "COMP",
     "COINGECKO_SYMBOL": "compound-governance-token",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "spookystars": {
@@ -764,7 +764,7 @@
     "WANT_ADDR": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
     "WANT_SYMBOL": "AAVE",
     "COINGECKO_SYMBOL": "aave",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "truecereal": {
@@ -776,7 +776,7 @@
     "WANT_ADDR": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "synthetic-btc": {
