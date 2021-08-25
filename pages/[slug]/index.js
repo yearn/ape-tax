@@ -63,11 +63,11 @@ function	Strategies({vault, chainID}) {
 	** elements for the UI.
 	**************************************************************************/
 	const prepreStrategiesData = useCallback(async () => {
-		if (chainID !== vault?.CHAIN_ID) {
+		if (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID) {
+		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
 			return;
 		}
 
@@ -216,11 +216,11 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 	}
 
 	const	prepareVaultData = useCallback(async () => {
-		if (!vault || !active || !provider || !address || chainID !== vault?.CHAIN_ID) {
+		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337))) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID) {
+		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
 			return;
 		}
 
@@ -535,7 +535,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								</button>
 								<button
 									onClick={() => {
-										if (isDepositing)
+										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
 										depositToken({
@@ -555,7 +555,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								</button>
 								<button
 									onClick={() => {
-										if (isDepositing)
+										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
 										depositToken({
@@ -578,7 +578,27 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 					}
 					<button
 						onClick={() => {
-							if (isWithdrawing)
+							if (isWithdrawing || Number(vaultData.balanceOf) === 0)
+								return;
+							set_isWithdrawing(true);
+							withdrawToken({
+								provider,
+								contractAddress: vault.VAULT_ADDR,
+								amount: ethers.utils.parseUnits(amount, vaultData.decimals),
+							}, ({error}) => {
+								set_isWithdrawing(false);
+								if (error)
+									return;
+								fetchPostDepositOrWithdraw();
+							});
+						}}
+						disabled={Number(vaultData.balanceOf) === 0}
+						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						{'💸 Withdraw'}
+					</button>
+					<button
+						onClick={() => {
+							if (isWithdrawing || Number(vaultData.balanceOf) === 0)
 								return;
 							set_isWithdrawing(true);
 							withdrawToken({
@@ -592,8 +612,8 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								fetchPostDepositOrWithdraw();
 							});
 						}}
-						disabled={vaultData.balanceOf === 0}
-						className={`${vaultData.balanceOf === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
+						disabled={Number(vaultData.balanceOf) === 0}
+						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>
@@ -650,7 +670,7 @@ function	Wrapper({vault, prices}) {
 		);
 	}
 
-	if (chainID !== vault.CHAIN_ID) {
+	if (chainID !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
 		return (
 			<section aria-label={'WRONG_CHAIN'}>
 				<NextSeo
