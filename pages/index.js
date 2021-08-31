@@ -7,13 +7,14 @@
 
 import	React, {useState, useEffect}						from	'react';
 import	Link												from	'next/link';
-import	{ethers}											from	'ethers';
+import	{Provider, Contract}								from	'ethcall';
 import	useWeb3												from	'contexts/useWeb3';
 import	vaults												from	'utils/vaults.json';
 import	GraphemeSplitter									from	'grapheme-splitter';
 
 const	splitter = new GraphemeSplitter();
 const	sortBy = (arr, k) => arr.concat().sort((a, b) => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
+const	ERC20ABI = [{'constant':true,'inputs':[],'name':'name','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_spender','type':'address'},{'name':'_value','type':'uint256'}],'name':'approve','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'totalSupply','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_from','type':'address'},{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transferFrom','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[],'name':'decimals','outputs':[{'name':'','type':'uint8'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'}],'name':'balanceOf','outputs':[{'name':'balance','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':true,'inputs':[],'name':'symbol','outputs':[{'name':'','type':'string'}],'payable':false,'stateMutability':'view','type':'function'},{'constant':false,'inputs':[{'name':'_to','type':'address'},{'name':'_value','type':'uint256'}],'name':'transfer','outputs':[{'name':'','type':'bool'}],'payable':false,'stateMutability':'nonpayable','type':'function'},{'constant':true,'inputs':[{'name':'_owner','type':'address'},{'name':'_spender','type':'address'}],'name':'allowance','outputs':[{'name':'','type':'uint256'}],'payable':false,'stateMutability':'view','type':'function'},{'payable':true,'stateMutability':'payable','type':'fallback'},{'anonymous':false,'inputs':[{'indexed':true,'name':'owner','type':'address'},{'indexed':true,'name':'spender','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'name':'from','type':'address'},{'indexed':true,'name':'to','type':'address'},{'indexed':false,'name':'value','type':'uint256'}],'name':'Transfer','type':'event'}];
 
 function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -91,7 +92,7 @@ function	DisabledVaults({vaultsInactive}) {
 }
 
 function	Index() {
-	const	{provider, active, address, chainID} = useWeb3();
+	const	{provider, active, address, chainID, getProvider} = useWeb3();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState([]);
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
@@ -152,21 +153,38 @@ function	Index() {
 		set_nonce(n => n + 1);
 	}, [chainID, active]);
 
+	async function	detectWithdrawVaults() {		
+		const	_vaultsInactiveAddresses = vaultsInactive.map(e => e.VAULT_ADDR);
+		const	ethcallProvider = new Provider();
+		const	{chainId} = await provider.getNetwork();
+		if (chainId === 1337) {
+			await ethcallProvider.init(getProvider('facuNet'));
+			ethcallProvider.multicallAddress = '0xeefba1e63905ef1d7acba5a8513c70307c1ce441';
+		} else {
+			await ethcallProvider.init(provider);
+		}
+
+		const	multiCalls = [];
+		_vaultsInactiveAddresses.forEach((vaultAddress) => {
+			const	contract = new Contract(vaultAddress, ERC20ABI);
+			multiCalls.push(contract.balanceOf(address));
+		});
+		const callResult = await ethcallProvider.all(multiCalls);
+		const _vaultsInactiveForUser = [];
+		vaultsInactive.forEach((vault, index) => {
+			if (!callResult[index].isZero()) {
+				_vaultsInactiveForUser.push(vault);
+			}
+		});
+		set_vaultsInactiveForUser(_vaultsInactiveForUser);
+	}
+
 	useEffect(() => {
-		if (active) {
-			Promise.all(vaultsInactive.map(async ({VAULT_ADDR}) => {
-				const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
-				const	balance = await vaultContract.balanceOf(address);
-				return balance.isZero() ? null : VAULT_ADDR;
-			})).then((promises) => {
-				const needToWidthdraw = promises.filter(Boolean);
-				set_vaultsInactiveForUser(vaultsInactive.filter(v => needToWidthdraw.includes(v.VAULT_ADDR)));
-			}).catch((e) => {
-				console.error(e);
-			});
+		if (active && provider) {
+			detectWithdrawVaults();
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vaultsInactive, active]);
+	}, [vaultsInactive, active, provider]);
 
 	if (!active) {
 		return (

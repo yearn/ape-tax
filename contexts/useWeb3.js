@@ -31,7 +31,7 @@ function getProvider(chain = 'ethereum') {
 		return new ethers.providers.JsonRpcProvider('https://rpcapi.fantom.network');
 	} else if (chain === 'bsc') {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
-	} else if (chain === 'major') {
+	} else if (chain === 'facuNet') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
