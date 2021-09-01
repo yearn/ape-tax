@@ -63,11 +63,11 @@ function	Strategies({vault, chainID}) {
 	** elements for the UI.
 	**************************************************************************/
 	const prepreStrategiesData = useCallback(async () => {
-		if (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
+		if (chainID !== vault?.CHAIN_ID && !(chainID === 1337)) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
+		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
 
@@ -216,11 +216,11 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 	}
 
 	const	prepareVaultData = useCallback(async () => {
-		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337))) {
+		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
+		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
 
@@ -517,40 +517,31 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 										if (isApproving)
 											return;
 										set_isApproving(true);
-										approveToken({
-											provider,
-											contractAddress: vault.WANT_ADDR,
-											amount: amount === 0 ? ethers.constants.MaxUint256 : ethers.utils.parseUnits(amount, vaultData.decimals),
-											from: vault.VAULT_ADDR
-										}, ({error}) => {
+										approveToken({provider, contractAddress: vault.WANT_ADDR, amount: ethers.constants.MaxUint256, from: vault.VAULT_ADDR}, ({error}) => {
 											set_isApproving(false);
 											if (error)
 												return;
 											fetchApproval();
 										});
 									}}
-									disabled={(vaultData.allowance >= Number(amount) && Number(amount) !== 0) || isApproving}
-									className={`${(vaultData.allowance >= Number(amount) && Number(amount) !== 0) || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-									{(vaultData.allowance >= Number(amount) && Number(amount) !== 0) ? '✅ Approved' : '🚀 Approve Vault'}
+									disabled={vaultData.allowance > 0 || isApproving}
+									className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+									{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
 								</button>
 								<button
 									onClick={() => {
 										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
-										depositToken({
-											provider,
-											contractAddress: vault.VAULT_ADDR,
-											amount: ethers.utils.parseUnits(amount, vaultData.decimals),
-										}, ({error}) => {
+										depositToken({provider, contractAddress: vault.VAULT_ADDR, amount: ethers.utils.parseUnits(amount, vaultData.decimals)}, ({error}) => {
 											set_isDepositing(false);
 											if (error)
 												return;
 											fetchPostDepositOrWithdraw();
 										});
 									}}
-									disabled={(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing}
-									className={`${(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+									disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
+									className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 									{'🏦 Deposit'}
 								</button>
 								<button
@@ -558,19 +549,15 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
 											return;
 										set_isDepositing(true);
-										depositToken({
-											provider,
-											contractAddress: vault.VAULT_ADDR,
-											amount: vaultData.wantBalanceRaw,
-										}, ({error}) => {
+										depositToken({provider, contractAddress: vault.VAULT_ADDR, amount: vaultData.wantBalanceRaw}, ({error}) => {
 											set_isDepositing(false);
 											if (error)
 												return;
 											fetchPostDepositOrWithdraw();
 										});
 									}}
-									disabled={(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing}
-									className={`${(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+									disabled={vaultData.allowance === 0 || isDepositing}
+									className={`${vaultData.allowance === 0 || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 									{'🏦 Deposit All'}
 								</button>
 							</>
@@ -670,7 +657,7 @@ function	Wrapper({vault, prices}) {
 		);
 	}
 
-	if (chainID !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
+	if (chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
 		return (
 			<section aria-label={'WRONG_CHAIN'}>
 				<NextSeo
