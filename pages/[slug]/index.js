@@ -63,11 +63,11 @@ function	Strategies({vault, chainID}) {
 	** elements for the UI.
 	**************************************************************************/
 	const prepreStrategiesData = useCallback(async () => {
-		if (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
+		if (chainID !== vault?.CHAIN_ID && !(chainID === 1337)) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
+		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
 
@@ -216,11 +216,11 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 	}
 
 	const	prepareVaultData = useCallback(async () => {
-		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337))) {
+		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
 			return;
 		}
 		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && network.chainId === 1337)) {
+		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
 
@@ -670,7 +670,7 @@ function	Wrapper({vault, prices}) {
 		);
 	}
 
-	if (chainID !== vault.CHAIN_ID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
+	if (chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
 		return (
 			<section aria-label={'WRONG_CHAIN'}>
 				<NextSeo
