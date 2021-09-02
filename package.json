@@ -28,6 +28,7 @@
     "dotenv-webpack": "^7.0.3",
     "ethers": "^5.4.5",
     "grapheme-splitter": "^1.0.4",
+    "inquirer": "^8.1.2",
     "next": "11.1.0",
     "next-seo": "^4.26.0",
     "postcss": "^8.3.6",
