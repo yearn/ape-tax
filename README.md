@@ -73,7 +73,7 @@ The following options are available:
 
 The returned data is cached for 10 minutes.
 This route returns a JSON object with the following structure:
-```
+```json
 {
   "success": true|false,
   "generatedTimeMs": 1630861673753,
