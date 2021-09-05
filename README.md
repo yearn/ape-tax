@@ -57,7 +57,7 @@ All in one :
 node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --address=0xFD0877d9095789cAF24c98F7CCe092fa8E120775 --dev=emilianobonassi --abi=yVaultV2 --type=experimental --status=active --coingecko=true-usd
 ```
 
-## Use the AP(e)I 🤖
+## Use the API 🤖
 The ape.tax API is build to help third parties to interact with the experimental vaults we are building.  
 This API is subject to change as for the vault we are building.  
 For now, you can use the following route to retrieve the list of experimental vaults:
