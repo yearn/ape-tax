@@ -66,7 +66,7 @@ https://ape.tax/api/vaults
 ```
 
 The following options are available:
-- `?network=1` for Mainnet
+- `?network=1` for Mainnet (default)
 - `?network=56` for BSC
 - `?network=137` for Polygon
 - `?network=250` for Fantom Opera
