@@ -58,9 +58,8 @@ node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --ad
 ```
 
 ## Use the API 🤖
-The ape.tax API is build to help third parties to interact with the experimental vaults we are building.  
-This API is subject to change as for the vault we are building.  
-For now, you can use the following route to retrieve the list of experimental vaults:
+The API helps third parties interact with the experimental vaults we are building. This API is subject to change as for the vault we are building.  
+For now, you can use the following route to retrieve the list of experimental vaults:  
 ```
 https://ape.tax/api/vaults
 ```
