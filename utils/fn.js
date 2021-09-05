@@ -9,6 +9,7 @@ import memoize from 'memoizee';
 
 const formatJsonSuccess = (data) => ({
 	success: true,
+	generatedTimeMs: +Date.now(),
 	data,
 });
 
@@ -17,23 +18,18 @@ const formatJsonError = (err) => ({
 	err: err.toString ? err.toString() : err,
 });
 
-const addGeneratedTime = async (res) => ({
-	...await res,
-	generatedTimeMs: +Date.now(),
-});
-
 const fn = (cb, options = {}) => {
 	const {
 		maxAge: maxAgeSec = null, // Caching duration, in seconds
 	} = options;
 
 	const callback = maxAgeSec !== null ?
-		memoize(async (query) => addGeneratedTime(cb(query)), {
+		memoize(async (query) => cb(query), {
 			promise: true,
 			maxAge: maxAgeSec * 1000,
 			normalizer: ([query]) => JSON.stringify(query), // Separate cache entries for each route & query params,
 		}) :
-		async (query) => addGeneratedTime(cb(query));
+		async (query) => cb(query);
 
 	return async (req, res) => (
 		Promise.resolve(callback(req.query))
