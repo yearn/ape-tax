@@ -78,30 +78,30 @@ This route returns a JSON object with the following structure:
   "success": true|false,
   "generatedTimeMs": 1630861673753,
   "data": {
-		"0": {
-			"title": "Fantom's Fury",
-			"logo":"👻⚡",
-			"displayName":"👻⚡ Fantom's Fury",
-			"src":"https://ape.tax/fantomsfury",
-			"status":"active",
-			"type":"experimental",
-			"address":"0x36e7aF39b921235c4b01508BE38F27A535851a5c",
-			"network":250,
-			"data": {
-				"apiVersion":"0.3.2",
-				"depositLimit":"5000000.0",
-				"totalAssets":"716771.395316817876930412",
-				"availableDepositLimit":"4283228.604683182123069588",
-				"pricePerShare":"1.133355773675367656",
-				"decimals":18
-			},
-			"want": {
-				"address":"0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
-				"symbol":"WFTM",
-				"cgID":"fantom"
-			}
-		}
-	}
+    "0": {
+      "title": "Fantom's Fury",
+      "logo":"👻⚡",
+      "displayName":"👻⚡ Fantom's Fury",
+      "src":"https://ape.tax/fantomsfury",
+      "status":"active",
+      "type":"experimental",
+      "address":"0x36e7aF39b921235c4b01508BE38F27A535851a5c",
+      "network":250,
+      "data": {
+        "apiVersion":"0.3.2",
+        "depositLimit":"5000000.0",
+        "totalAssets":"716771.395316817876930412",
+        "availableDepositLimit":"4283228.604683182123069588",
+        "pricePerShare":"1.133355773675367656",
+        "decimals":18
+      },
+      "want": {
+        "address":"0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
+        "symbol":"WFTM",
+        "cgID":"fantom"
+      }
+    }
+  }
 }	
 ```
 
