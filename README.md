@@ -56,3 +56,51 @@ All in one :
 ```
 node scripts/newVault.js --name="Hardrock Farmer" --logo=🌾🌾 --chain=1 --address=0xFD0877d9095789cAF24c98F7CCe092fa8E120775 --dev=emilianobonassi --abi=yVaultV2 --type=experimental --status=active --coingecko=true-usd
 ```
+
+## Use the API 🤖
+The API helps third parties interact with the experimental vaults we are building. This API is subject to change as for the vault we are building.  
+For now, you can use the following route to retrieve the list of experimental vaults:  
+```
+https://ape.tax/api/vaults
+```
+
+The following options are available:
+- `?network=1` for Mainnet (default)
+- `?network=56` for BSC
+- `?network=137` for Polygon
+- `?network=250` for Fantom Opera
+
+The returned data is cached for 10 minutes.
+This route returns a JSON object with the following structure:
+```json
+{
+  "success": true,
+  "generatedTimeMs": 1630861673753,
+  "data": {
+    "0": {
+      "title": "Fantom's Fury",
+      "logo":"👻⚡",
+      "displayName":"👻⚡ Fantom's Fury",
+      "src":"https://ape.tax/fantomsfury",
+      "status":"active",
+      "type":"experimental",
+      "address":"0x36e7aF39b921235c4b01508BE38F27A535851a5c",
+      "network":250,
+      "data": {
+        "apiVersion":"0.3.2",
+        "depositLimit":"5000000.0",
+        "totalAssets":"716771.395316817876930412",
+        "availableDepositLimit":"4283228.604683182123069588",
+        "pricePerShare":"1.133355773675367656",
+        "decimals":18
+      },
+      "want": {
+        "address":"0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
+        "symbol":"WFTM",
+        "cgID":"fantom"
+      }
+    }
+  }
+}	
+```
+

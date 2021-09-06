@@ -546,7 +546,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 								</button>
 								<button
 									onClick={() => {
-										if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
+										if (isDepositing || (vaultData.allowance < Number(amount)) || isDepositing || vaultData.wantBalanceRaw.isZero())
 											return;
 										set_isDepositing(true);
 										depositToken({provider, contractAddress: vault.VAULT_ADDR, amount: vaultData.wantBalanceRaw}, ({error}) => {
@@ -556,8 +556,8 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 											fetchPostDepositOrWithdraw();
 										});
 									}}
-									disabled={vaultData.allowance === 0 || isDepositing}
-									className={`${vaultData.allowance === 0 || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+									disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
+									className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 									{'🏦 Deposit All'}
 								</button>
 							</>
