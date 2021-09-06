@@ -800,7 +800,7 @@
     "WANT_ADDR": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
     "WANT_SYMBOL": "YFI",
     "COINGECKO_SYMBOL": "yearn-finance",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "wether-aether": {
@@ -812,6 +812,18 @@
     "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "hedged-dollar": {
+    "TITLE": "Hedged Dollar",
+    "LOGO": "🦔🦅",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x7158c1Bee7a0Fa5BD6AFFc77b2309991D7ADCdd4",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
