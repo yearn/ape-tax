@@ -65,10 +65,14 @@ https://ape.tax/api/vaults
 ```
 
 The following options are available:
-- `?network=1` for Mainnet (default)
-- `?network=56` for BSC
-- `?network=137` for Polygon
-- `?network=250` for Fantom Opera
+- *network*
+	- `?network=1` for Mainnet (default)
+	- `?network=56` for BSC
+	- `?network=137` for Polygon
+	- `?network=250` for Fantom Opera
+- *rpc*
+	- `?rpc=YOU_CUSTOM_RPC` to use a specific RPC for this request
+
 
 The returned data is cached for 10 minutes.
 This route returns a JSON object with the following structure:
