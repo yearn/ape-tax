@@ -132,7 +132,7 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
-function	Index({vault, provider, active, address, ens, chainID, prices}) {
+function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -224,6 +224,11 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 			return;
 		}
 
+		let		providerToUse = provider;
+		if (vault.CHAIN_ID === 250) {
+			providerToUse = getProvider('fantom');
+		}
+
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
@@ -241,7 +246,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 				'function balanceOf(address) public view returns (uint256)',
 				'function activation() public view returns(uint256)',
 			],
-			provider
+			providerToUse
 		);
 
 		const promises = [
@@ -610,7 +615,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 }
 
 function	Wrapper({vault, prices}) {
-	const	{provider, active, address, ens, chainID} = useWeb3();
+	const	{provider, getProvider, active, address, ens, chainID} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
 
 	function	onSwitchChain(newChainID) {
@@ -698,7 +703,7 @@ function	Wrapper({vault, prices}) {
 						}
 					]
 				}} />
-			<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
+			<Index vault={vault} provider={provider} getProvider={getProvider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
 		</>
 	);
 }
