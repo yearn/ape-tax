@@ -233,7 +233,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)'
-			], provider
+			], providerToUse
 		);
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
@@ -257,7 +257,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
 			vaultContract.balanceOf(address),
-			provider.getBalance(address),
+			providerToUse.getBalance(address),
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
 		];
@@ -337,11 +337,16 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (!vault || !active || !provider || !address) {
 			return;
 		}
+		let		providerToUse = provider;
+		if (vault.CHAIN_ID === 250) {
+			providerToUse = getProvider('fantom');
+		}
+
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)'
-			], provider
+			], providerToUse
 		);
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
@@ -350,12 +355,12 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				'function totalAssets() public view returns (uint256)',
 				'function availableDepositLimit() public view returns (uint256)',
 				'function pricePerShare() public view returns (uint256)',
-			], provider);
+			], providerToUse);
 		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, depositLimit, totalAssets, availableDepositLimit, pricePerShare] = await Promise.all([
 			wantContract.allowance(address, vault.VAULT_ADDR),
 			wantContract.balanceOf(address),
 			vaultContract.balanceOf(address),
-			provider.getBalance(address),
+			providerToUse.getBalance(address),
 			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
 			vaultContract.availableDepositLimit(),
