@@ -132,7 +132,7 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
-function	Index({vault, provider, active, address, ens, chainID, prices}) {
+function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -189,7 +189,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 				block = await provider.getBlockNumber();
 
 			const	activationTimestamp = Number(activation);
-			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp, vault.CHAIN_ID) || 0);
 			const	averageBlockPerWeek = 269 * 24 * 7;
 			const	averageBlockPerMonth = 269 * 24 * 30;
 			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
@@ -224,11 +224,16 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 			return;
 		}
 
+		let		providerToUse = provider;
+		if (vault.CHAIN_ID === 250) {
+			providerToUse = getProvider('fantom');
+		}
+
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)'
-			], provider
+			], providerToUse
 		);
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
@@ -241,7 +246,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 				'function balanceOf(address) public view returns (uint256)',
 				'function activation() public view returns(uint256)',
 			],
-			provider
+			providerToUse
 		);
 
 		const promises = [
@@ -252,7 +257,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
 			vaultContract.balanceOf(address),
-			provider.getBalance(address),
+			providerToUse.getBalance(address),
 			wantContract.balanceOf(address),
 			wantContract.allowance(address, vault.VAULT_ADDR),
 		];
@@ -332,11 +337,16 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 		if (!vault || !active || !provider || !address) {
 			return;
 		}
+		let		providerToUse = provider;
+		if (vault.CHAIN_ID === 250) {
+			providerToUse = getProvider('fantom');
+		}
+
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)'
-			], provider
+			], providerToUse
 		);
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
@@ -345,12 +355,12 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 				'function totalAssets() public view returns (uint256)',
 				'function availableDepositLimit() public view returns (uint256)',
 				'function pricePerShare() public view returns (uint256)',
-			], provider);
+			], providerToUse);
 		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, depositLimit, totalAssets, availableDepositLimit, pricePerShare] = await Promise.all([
 			wantContract.allowance(address, vault.VAULT_ADDR),
 			wantContract.balanceOf(address),
 			vaultContract.balanceOf(address),
-			provider.getBalance(address),
+			providerToUse.getBalance(address),
 			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
 			vaultContract.availableDepositLimit(),
@@ -609,7 +619,7 @@ function	Index({vault, provider, active, address, ens, chainID, prices}) {
 }
 
 function	Wrapper({vault, prices}) {
-	const	{provider, active, address, ens, chainID} = useWeb3();
+	const	{provider, getProvider, active, address, ens, chainID} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
 
 	function	onSwitchChain(newChainID) {
@@ -697,7 +707,7 @@ function	Wrapper({vault, prices}) {
 						}
 					]
 				}} />
-			<Index vault={vault} provider={provider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
+			<Index vault={vault} provider={provider} getProvider={getProvider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
 		</>
 	);
 }

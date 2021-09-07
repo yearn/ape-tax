@@ -15,6 +15,8 @@ module.exports = ({
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
 		WEBSITE_URI: process.env.WEBSITE_URI || 'https://ape.tax/',
 		SECRET: process.env.SECRET,
+		FTMSCAN_API: process.env.FTMSCAN_API,
+		ETHERSCAN_API: process.env.ETHERSCAN_API,
 	},
 	optimization: {
 		minimize: true,

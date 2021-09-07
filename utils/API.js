@@ -38,8 +38,33 @@ export async function	fetchCryptoPrice(from, to = 'usd') {
 	return null;
 }
 
-export async function	fetchBlockTimestamp(timestamp) {
-	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=JXRIIVMTAN887F9D7NCTVQ7NMGNT1A4KA3`);
+export async function	fetchBlockTimestamp(timestamp, network = 1) {
+	if (network === 250) {
+		const	result = await performGet(`https://api.ftmscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.FTMSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
+	if (network === 56) {
+		const	result = await performGet(`https://api.bscscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.BSCSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
+	if (network === 137) {
+		const	result = await performGet(`https://api.polygonscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.POLYGONSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
+
+	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
 
 	if (result) {
 		return result.result;

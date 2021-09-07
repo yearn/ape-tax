@@ -28,7 +28,7 @@ function getProvider(chain = 'ethereum') {
 	} else if (chain === 'polygon') {
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
 	} else if (chain === 'fantom') {
-		return new ethers.providers.JsonRpcProvider('https://rpcapi.fantom.network');
+		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
 	} else if (chain === 'bsc') {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
 	} else if (chain === 'major') {
