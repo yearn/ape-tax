@@ -47,6 +47,7 @@ export async function	fetchBlockTimestamp(timestamp, network = 1) {
 		}
 		return null;
 	}
+
 	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
 
 	if (result) {
