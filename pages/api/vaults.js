@@ -44,9 +44,13 @@ async function newEthCallProvider(provider) {
 	return ethcallProvider;
 }
 
-export default fn(async ({network = 1}) => {
+export default fn(async ({network = 1, rpc}) => {
 	network = Number(network);
-	const	ethcallProvider = await newEthCallProvider(getProvider(network));
+	let		provider = getProvider(network);
+	if (rpc !== undefined) {
+		provider = new ethers.providers.JsonRpcProvider(rpc);
+	}
+	const	ethcallProvider = await newEthCallProvider(provider);
 	const	_vaults = [];
 	const	_calls = [];
 
