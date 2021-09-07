@@ -189,7 +189,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				block = await provider.getBlockNumber();
 
 			const	activationTimestamp = Number(activation);
-			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp) || 0);
+			const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp, vault.CHAIN_ID) || 0);
 			const	averageBlockPerWeek = 269 * 24 * 7;
 			const	averageBlockPerMonth = 269 * 24 * 30;
 			const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
