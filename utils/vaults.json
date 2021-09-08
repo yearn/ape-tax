@@ -828,8 +828,8 @@
     "CHAIN_ID": 1
   },
   "fantom-tarrot": {
-    "TITLE": "Fantom Tarrot",
-    "LOGO": "F🇹",
+    "TITLE": "The Fantom",
+    "LOGO": "👻👻",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0x0DEC85e74A92c52b7F708c4B10207D9560CEFaf0",
