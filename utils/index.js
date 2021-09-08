@@ -39,7 +39,9 @@ export async function asyncForEach(array, callback) {
 }
 
 export function	formatAmount(amount, decimals = 2) {
-	const	locale = navigator?.language || 'fr-FR';
+	let		locale = 'fr-FR';
+	if (typeof(navigator) !== 'undefined')
+		locale = navigator?.language || 'fr-FR';
 	return (new Intl.NumberFormat([locale, 'en-US'], {minimumFractionDigits: 0, maximumFractionDigits: decimals}).format(amount));
 }
 
