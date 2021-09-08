@@ -850,5 +850,17 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "fantom-dai": {
+    "TITLE": "Fantom's Dai Hard",
+    "LOGO": "👻⚰️",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x637eC617c86D24E421328e6CAEa1d92114892439",
+    "WANT_ADDR": "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 250
   }
 }
