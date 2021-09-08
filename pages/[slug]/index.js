@@ -13,7 +13,7 @@ import	ModalLogin													from	'components/ModalLogin';
 import	vaults														from	'utils/vaults.json';
 import	chains														from	'utils/chains.json';
 import	{fetchYearnVaults, fetchBlockTimestamp}						from	'utils/API';
-import	{ADDRESS_ZERO, asyncForEach, bigNumber}						from	'utils';
+import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}		from	'utils';
 import	{approveToken, depositToken, withdrawToken}					from	'utils/actions';
 
 function	InfoMessage({status}) {
@@ -420,19 +420,19 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 					<div>
 						<p className={'inline'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
-						<p className={'inline'}>{`$${vaultData.wantPrice || '-'}`}</p>
+						<p className={'inline'}>{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Deposit Limit: '}</p>
-						<p className={'inline'}>{`${vaultData.depositLimit === -1 ? '-' : vaultData.depositLimit} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>{`${vaultData.depositLimit === -1 ? '-' : formatAmount(vaultData?.depositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total Assets: '}</p>
-						<p className={'inline'}>{`${vaultData.totalAssets} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.totalAssets || 0, 2)} ${vault.WANT_SYMBOL}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total AUM: '}</p>
-						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : vaultData.totalAUM}`}</p>
+						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData.totalAUM, 2)}`}</p>
 					</div>
 				</div>
 				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
@@ -456,7 +456,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 					<div>
 						<p className={'inline'}>{'Available limit: '}</p>
-						<p className={'inline'}>{`${vaultData.availableDepositLimit} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}</p>
 					</div>
 					<div className={'progress-bar'}>
 						<span className={'progress-body mr-2 hidden md:inline'}>
@@ -483,19 +483,19 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 					<div>
 						<p className={'inline'}>{'Your vault shares: '}</p>
-						<p className={'inline'}>{`${vaultData.balanceOf}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.balanceOf || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Your shares value: '}</p>
-						<p className={'inline'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : vaultData.balanceOfValue}`}</p>
+						<p className={'inline'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : formatAmount(vaultData?.balanceOfValue || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-						<p className={'inline'}>{`${vaultData.wantBalance}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.wantBalance || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{`Your ${chainCoin} Balance: `}</p>
-						<p className={'inline'}>{`${vaultData.coinBalance}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.coinBalance || 0, 2)}`}</p>
 					</div>
 				</div>
 			</section>
