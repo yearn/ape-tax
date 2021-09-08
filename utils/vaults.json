@@ -212,7 +212,7 @@
     "WANT_ADDR": "0xAd84341756Bf337f5a0164515b1f6F993D194E1f",
     "WANT_SYMBOL": "fUSD",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "hotcoins": {
@@ -440,7 +440,7 @@
     "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
     "WANT_SYMBOL": "fUSDT",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "grandmastersdai": {
