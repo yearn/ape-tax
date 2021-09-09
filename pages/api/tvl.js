@@ -5,13 +5,27 @@
 **	@Filename:				vaults.js
 ******************************************************************************/
 
+import	axios					from	'axios';
 import	{ethers}				from	'ethers';
 import	{Provider, Contract}	from	'ethcall';
-import	{fn}						from	'utils/fn';
+import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/yVault.abi.json';
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
+
+export const	performGet = (url) => {
+	return (
+		axios.get(url)
+			.then(function (response) {
+				return response.data;
+			})
+			.catch(function (error) {
+				console.warn(error);
+				return null;
+			})
+	);
+};
 
 async function asyncForEach(array, callback) {
 	for (let index = 0; index < array.length; index++) {
@@ -51,58 +65,36 @@ export default fn(async ({network = 1, rpc}) => {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
 	const	ethcallProvider = await newEthCallProvider(provider);
-	const	_vaults = [];
 	const	_calls = [];
+	const	_cgIDS = [];
+	let		_tvl = 0;
 
 	Object.values(vaults).forEach((v) => {
-		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
+		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
 		_calls.push(...[
-			vaultContract.apiVersion(),
-			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
-			vaultContract.availableDepositLimit(),
-			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
 		]);
+		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});
 	const	callResult = await ethcallProvider.all(_calls);
-	const	chunkedCallResult = chunk(callResult, 6);
+	const	chunkedCallResult = chunk(callResult, 2);
+	const	prices = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${_cgIDS}&vs_currencies=usd`);
 	let		index = 0;
 
-	await asyncForEach(Object.entries(vaults), async ([k, v]) => {
-		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
+	await asyncForEach(Object.entries(vaults), async ([, v]) => {
+		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals] = chunkedCallResult[index];
+		const	[totalAssets, decimals] = chunkedCallResult[index];
+		const	price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
 		const	dec = Number(decimals);
 		index++;
 
-		_vaults.push({
-			title: v.TITLE,
-			logo: v.LOGO,
-			displayName: `${v.LOGO} ${v.TITLE}`,
-			src: `https://ape.tax/${k}`,
-			status: v.VAULT_STATUS,
-			type: v.VAULT_TYPE,
-			address: v.VAULT_ADDR,
-			network: v.CHAIN_ID,
-			data: {
-				apiVersion: apiVersion,
-				depositLimit: ethers.utils.formatUnits(depositLimit, dec),
-				totalAssets: ethers.utils.formatUnits(totalAssets, dec),
-				availableDepositLimit: ethers.utils.formatUnits(availableDepositLimit, dec),
-				pricePerShare: ethers.utils.formatUnits(pricePerShare, dec),
-				decimals: dec,
-			},
-			want: {
-				address: v.WANT_ADDR,
-				symbol: v.WANT_SYMBOL,
-				cgID: v.COINGECKO_SYMBOL,
-			}
-		});
+		_tvl += Number(ethers.utils.formatUnits(totalAssets, dec)) * price;
 	});
-	return _vaults;
-}, {maxAge: 10 * 60}); //10 mn
+	return _tvl;
+}, {maxAge: 1 * 60}); //1 mn

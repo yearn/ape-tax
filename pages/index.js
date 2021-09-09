@@ -7,13 +7,17 @@
 
 import	React, {useState, useEffect}						from	'react';
 import	Link												from	'next/link';
+import	useSWR												from	'swr';
 import	{ethers}											from	'ethers';
 import	useWeb3												from	'contexts/useWeb3';
+import	{formatAmount}										from	'utils';
 import	vaults												from	'utils/vaults.json';
+import	chains												from	'utils/chains.json';
 import	GraphemeSplitter									from	'grapheme-splitter';
 
 const	splitter = new GraphemeSplitter();
 const	sortBy = (arr, k) => arr.concat().sort((a, b) => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
+const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
 function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -97,6 +101,7 @@ function	Index() {
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
 	const	[vaultsInactive, set_vaultsInactive] = useState([]);
 	const	[vaultsInactiveForUser, set_vaultsInactiveForUser] = useState([]);
+	const	{data: tvl} = useSWR(`/api/tvl?network=${chainID}`, fetcher);
 
 	useEffect(() => {
 		if (!active) {
@@ -186,6 +191,15 @@ function	Index() {
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
+			<div className={'max-w-5xl my-8'}>
+				<span className={'text-base font-semibold text-ygray-900 font-mono'}>
+					{`${chains[chainID].displayName} TVL:`}
+				</span>
+				<span className={'text-base font-normal text-ygray-900 font-mono'}>
+					{` $${formatAmount(tvl?.data || 0, 2)}`}
+				</span>
+			</div>
+
 			<div className={'max-w-5xl grid grid-cols-2 gap-2'}>
 				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
 					<h2 className={'text-2xl text-gray-900 font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
