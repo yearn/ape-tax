@@ -5,7 +5,13 @@
 **	@Filename:				fn.js
 ******************************************************************************/
 
-import memoize from 'memoizee';
+import	memoize					from	'memoizee';
+import	Cors					from	'cors';
+import	initMiddleware			from	'utils/apiMiddleware';
+
+const cors = initMiddleware(
+	Cors({methods: ['GET', 'POST', 'OPTIONS']})
+);
 
 const formatJsonSuccess = (data) => ({
 	success: true,
@@ -31,11 +37,12 @@ const fn = (cb, options = {}) => {
 		}) :
 		async (query) => cb(query);
 
-	return async (req, res) => (
-		Promise.resolve(callback(req.query))
+	return async (req, res) => {
+		await cors(req, res);
+		return Promise.resolve(callback(req.query))
 			.then((data) => res.status(200).json(formatJsonSuccess(data)))
-			.catch((err) => res.status(500).json(formatJsonError(err)))
-	);
+			.catch((err) => res.status(500).json(formatJsonError(err)));
+	};
 };
 
 export {
