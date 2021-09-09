@@ -11,7 +11,7 @@ import	useWeb3											from	'contexts/useWeb3';
 import	vaults											from	'utils/vaults.json';
 import	chains											from	'utils/chains.json';
 import	{fetchCryptoPrice}								from	'utils/API';
-import	{bigNumber}										from	'utils';
+import	{bigNumber, formatAmount}						from	'utils';
 import	{approveToken, depositToken, withdrawToken}		from	'utils/actions';
 
 function	InfoMessage() {
@@ -185,7 +185,7 @@ function	Index() {
 					</div>
 					<div>
 						<p className={'inline'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
-						<p className={'inline'}>{`$${vaultData.wantPrice || '-'}`}</p>
+						<p className={'inline'}>{`$${vaultData.wantPrice ? formatAmount(vaultData?.wantPrice || 0, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Deposit Limit: '}</p>
@@ -193,11 +193,11 @@ function	Index() {
 					</div>
 					<div>
 						<p className={'inline'}>{'Total Assets: '}</p>
-						<p className={'inline'}>{`${vaultData.totalSupply} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.totalSupply || 0, 2)} ${vault.WANT_SYMBOL}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total AUM: '}</p>
-						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : vaultData.totalAUM}`}</p>
+						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData?.totalAUM || 0, 2)}`}</p>
 					</div>
 				</div>
 				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
@@ -221,19 +221,19 @@ function	Index() {
 					</div>
 					<div>
 						<p className={'inline'}>{'Your vault shares: '}</p>
-						<p className={'inline'}>{`${vaultData.balanceOf}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.balanceOf || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Your shares value: '}</p>
-						<p className={'inline'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : vaultData.balanceOfValue}`}</p>
+						<p className={'inline'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : formatAmount(vaultData?.balanceOfValue || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-						<p className={'inline'}>{`${vaultData.wantBalance}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.wantBalance || 0, 2)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{`Your ${chainCoin} Balance: `}</p>
-						<p className={'inline'}>{`${vaultData.coinBalance}`}</p>
+						<p className={'inline'}>{`${formatAmount(vaultData?.coinBalance || 0, 2)}`}</p>
 					</div>
 				</div>
 			</section>

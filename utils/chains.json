@@ -2,19 +2,21 @@
   "1": {
     "chainID": "1",
     "name": "ETH Mainnet",
+    "displayName": "Ethereum",
     "coin": "ETH",
     "block_explorer": "https://etherscan.io"
   },
   "250": {
     "chainID": "250",
     "name": "FTM Mainnet",
+    "displayName": "Fantom",
     "coin": "FTM",
     "block_explorer": "https://ftmscan.com",
     "chain_swap": {
       "chainId": "0xFA",
       "blockExplorerUrls": ["https://ftmscan.com"],
       "chainName": "Fantom Opera",
-      "rpcUrls": ["https://rpcapi.fantom.network"],
+      "rpcUrls": ["https://rpc.ftm.tools"],
       "nativeCurrency": {
         "name": "Fantom",
         "symbol": "FTM",
@@ -25,6 +27,7 @@
   "56": {
     "chainID": "56",
     "name": "BSC Mainnet",
+    "displayName": "Binance Smart Chain",
     "coin": "BNB",
     "block_explorer": "https://bscscan.com",
     "chain_swap": {
@@ -42,6 +45,7 @@
   "137": {
     "chainID": "137",
     "name": "Matic Mainnet",
+    "displayName": "Polygon",
     "coin": "MATIC",
     "block_explorer": "https://polygonscan.com",
     "chain_swap": {

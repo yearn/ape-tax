@@ -132,7 +132,7 @@ export const Web3ContextApp = ({children}) => {
 					1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
 					56: 'https://bsc-dataseed.binance.org/',
 					137: 'https://rpc-mainnet.matic.network',
-					250: 'https://rpcapi.fantom.network',
+					250: 'https://rpc.ftm.tools',
 					1337: 'http://localhost:8545',
 				},
 				chainId: 1,
