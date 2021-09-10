@@ -85,3 +85,51 @@ export async function	withdrawToken({provider, contractAddress, amount}, callbac
 		callback({error: true, data: undefined});
 	}
 }
+
+export async function	apeInVault({provider, contractAddress, amount}, callback) {
+	const	signer = provider.getSigner();
+	const	zap = new ethers.Contract(
+		contractAddress,
+		['function deposit() public payable'],
+		signer
+	);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		const	transaction = await zap.deposit({value: amount});
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			callback({error: false, data: undefined});
+		} else {
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		callback({error, data: undefined});
+	}
+}
+
+export async function	apeOutVault({provider, contractAddress, amount}, callback) {
+	const	signer = provider.getSigner();
+	const	zap = new ethers.Contract(
+		contractAddress,
+		['function withdraw(uint256 amount) public'],
+		signer
+	);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		const	transaction = await zap.withdraw(amount);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			callback({error: false, data: undefined});
+		} else {
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		callback({error, data: undefined});
+	}
+}
