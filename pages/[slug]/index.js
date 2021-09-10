@@ -225,7 +225,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}
 
 		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 250) {
+		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
 			providerToUse = getProvider('fantom');
 		}
 
