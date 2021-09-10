@@ -122,7 +122,6 @@ export async function	apeOutVault({provider, contractAddress, amount}, callback)
 	**	If the call is successful, try to perform the actual TX
 	**********************************************************************/
 	try {
-		console.log(amount.toString());
 		const	transaction = await zap.withdraw(amount);
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 1) {
