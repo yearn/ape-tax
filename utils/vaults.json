@@ -344,7 +344,7 @@
     "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
     "WANT_SYMBOL": "ICE",
     "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "bscbaby": {
@@ -512,7 +512,7 @@
     "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
     "WANT_SYMBOL": "WOOFY",
     "COINGECKO_SYMBOL": "woofy",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "complifiusdc": {
