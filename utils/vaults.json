@@ -512,7 +512,7 @@
     "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
     "WANT_SYMBOL": "WOOFY",
     "COINGECKO_SYMBOL": "woofy",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "complifiusdc": {
