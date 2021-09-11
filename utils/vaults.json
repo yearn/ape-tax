@@ -632,7 +632,7 @@
     "WANT_ADDR": "0x27E611FD27b276ACbd5Ffd632E5eAEBEC9761E40",
     "WANT_SYMBOL": "2CRV",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "tiedtyler": {
@@ -861,7 +861,19 @@
     "WANT_ADDR": "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 250
+  },
+  "fantom-2crv": {
+    "TITLE": "Split Cameron V2",
+    "LOGO": "🕴🖖",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A",
+    "WANT_ADDR": "0x27E611FD27b276ACbd5Ffd632E5eAEBEC9761E40",
+    "WANT_SYMBOL": "2CRV",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 250
   }
 }
