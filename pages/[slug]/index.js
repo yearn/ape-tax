@@ -124,10 +124,13 @@ function	Strategies({vault, chainID}) {
 			{
 				strategiesData.map((strategy, index) => (
 
-					<div key={index} className={'font-mono text-ygray-700 text-sm'}>
+					<div key={index} className={'font-mono text-ygray-700 text-sm mb-2'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline'}>{strategy.name}</p>
+						</div>
+						<div className={'max-w-xl w-full text-justify'}>
+							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 						<div>
 							<p className={'inline'}>{'Address: '}</p>
@@ -136,9 +139,6 @@ function	Strategies({vault, chainID}) {
 								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
 								{'📃 Contract'}
 							</a>
-						</div>
-						<div className={'mb-2 max-w-xl w-full text-justify'}>
-							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 					</div>
 				))
