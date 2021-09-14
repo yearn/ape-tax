@@ -7,9 +7,9 @@
 
 import	{ethers}				from	'ethers';
 import	{Provider, Contract}	from	'ethcall';
-import	{fn}						from	'utils/fn';
+import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
-import	yVaultABI				from	'utils/yVault.abi.json';
+import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
