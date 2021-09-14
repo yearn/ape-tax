@@ -13,10 +13,13 @@ module.exports = ({
 	],
 	env: {
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
+		ALCHEMY_KEY_POLYGON: process.env.ALCHEMY_KEY_POLYGON,
 		WEBSITE_URI: process.env.WEBSITE_URI || 'https://ape.tax/',
 		SECRET: process.env.SECRET,
 		FTMSCAN_API: process.env.FTMSCAN_API,
 		ETHERSCAN_API: process.env.ETHERSCAN_API,
+		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
+		BSCSCAN_API: process.env.BSCSCAN_API,
 	},
 	optimization: {
 		minimize: true,

@@ -5,16 +5,19 @@
 **	@Filename:				index.js
 ******************************************************************************/
 
-import	React, {useState, useEffect, useCallback}					from	'react';
-import	{ethers}													from	'ethers';
-import	{NextSeo}													from	'next-seo';
-import	useWeb3														from	'contexts/useWeb3';
-import	ModalLogin													from	'components/ModalLogin';
-import	vaults														from	'utils/vaults.json';
-import	chains														from	'utils/chains.json';
-import	{fetchYearnVaults, fetchBlockTimestamp}						from	'utils/API';
-import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}		from	'utils';
-import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}		from	'utils/actions';
+import	React, {useState, useEffect, useCallback}								from	'react';
+import	{ethers}																from	'ethers';
+import	{NextSeo}																from	'next-seo';
+import	{Provider, Contract}													from	'ethcall';
+import	useWeb3																	from	'contexts/useWeb3';
+import	ModalLogin																from	'components/ModalLogin';
+import	vaults																	from	'utils/vaults.json';
+import	chains																	from	'utils/chains.json';
+import	{fetchYearnVaults, fetchBlockTimestamp, performGet}						from	'utils/API';
+import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}					from	'utils';
+import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
+import	ERC20ABI				from	'utils/ABI/erc20.abi.json';
+import	YVAULTABI				from	'utils/ABI/yVault.abi.json';
 
 function	InfoMessage({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -50,6 +53,13 @@ function	ProgressChart({progress, width}) {
 		white_width = 0;
 	
 	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
+}
+
+function	parseMarkdown(markdownText) {
+	const htmlText = markdownText
+		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
+
+	return htmlText.trim();
 }
 
 function	Strategies({vault, chainID}) {
@@ -89,10 +99,12 @@ function	Strategies({vault, chainID}) {
 				shouldBreak = true;
 				return;
 			}
+			const	details = await performGet(`https://meta.yearn.network/strategies/${strategyAddress}`);
 			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
 			const	name = await strategyContract.name();
+			
 			set_strategiesData((s) => {
-				s[index] = {address: strategyAddress, name};
+				s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
 				return (s);
 			});
 			set_nonce(n => n + 1);
@@ -112,15 +124,17 @@ function	Strategies({vault, chainID}) {
 			{
 				strategiesData.map((strategy, index) => (
 
-					<div key={index} className={'font-mono text-ygray-700 text-sm'}>
+					<div key={index} className={'font-mono text-ygray-700 text-sm mb-4'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
-							<p className={'inline'}>{strategy.name}</p>
+							<p className={'inline font-bold'}>{strategy.name}</p>
+						</div>
+						<div className={'max-w-xl w-full text-justify'}>
+							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 						<div>
-							<p className={'inline'}>{'Address: '}</p>
 							<a
-								className={'dashed-underline-gray'}
+								className={'dashed-underline-gray text-xs'}
 								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
 								{'📃 Contract'}
 							</a>
@@ -176,7 +190,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		let		_grossAPRMonth = '-';
 		let		_grossAPRInception = '-';
 
-		//BSC node doesn't support theses blocktag
+		//BSC + matic node doesn't support theses blocktag
 		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
 			const promises = [vaultContract.activation(), provider.getBlockNumber()];
 			const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
@@ -232,6 +246,12 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		return ({_grossAPRWeek, _grossAPRMonth, _grossAPRInception});
 	}
 
+	async function newEthCallProvider(provider) {
+		const	ethcallProvider = new Provider();
+		await ethcallProvider.init(provider);
+		return ethcallProvider;
+	}
+
 	const	prepareVaultData = useCallback(async () => {
 		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
 			return;
@@ -245,13 +265,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
 			providerToUse = getProvider('fantom');
 		}
-
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)'
-			], providerToUse
-		);
+		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
+			providerToUse = getProvider('polygon');
+		}
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
 				'function apiVersion() public view returns (string)',
@@ -266,48 +282,22 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			],
 			providerToUse
 		);
-
-		const promises = [
-			vaultContract.apiVersion(),
-			vaultContract.depositLimit(),
-			vaultContract.totalAssets(),
-			vaultContract.availableDepositLimit(),
-			vaultContract.pricePerShare(),
-			vaultContract.decimals(),
-			vaultContract.balanceOf(address),
-			providerToUse.getBalance(address),
-			wantContract.balanceOf(address),
-			wantContract.allowance(address, vault.VAULT_ADDR),
-		];
-		const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
-		const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
-		let		[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, coinBalance, wantBalance, wantAllowance] = validResults;
-
-		/**********************************************************************
-		** If we got some errors from the promise, then we can try to get
-		** the data again.
-		**********************************************************************/
-		if (apiVersion === 'ERROR' || apiVersion === undefined)
-			apiVersion = await vaultContract.apiVersion();
-		if (depositLimit === 'ERROR' || depositLimit === undefined)
-			depositLimit = await vaultContract.depositLimit();
-		if (totalAssets === 'ERROR' || totalAssets === undefined)
-			totalAssets = await vaultContract.totalAssets();
-		if (availableDepositLimit === 'ERROR' || availableDepositLimit === undefined)
-			availableDepositLimit = await vaultContract.availableDepositLimit();
-		if (pricePerShare === 'ERROR' || pricePerShare === undefined)
-			pricePerShare = await vaultContract.pricePerShare();
-		if (decimals === 'ERROR' || decimals === undefined)
-			decimals = await vaultContract.decimals();
-		if (balanceOf === 'ERROR' || balanceOf === undefined)
-			balanceOf = await vaultContract.balanceOf(address);
-		if (coinBalance === 'ERROR' || coinBalance === undefined)
-			coinBalance = await provider.getBalance(address);
-		if (wantBalance === 'ERROR' || wantBalance === undefined)
-			wantBalance = await wantContract.balanceOf(address);
-		if (wantAllowance === 'ERROR' || wantAllowance === undefined)
-			wantAllowance = await wantContract.allowance(address, vault.VAULT_ADDR);
-
+		const	ethcallProvider = await newEthCallProvider(providerToUse);
+		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
+		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI);
+		const	callResult = await ethcallProvider.all([
+			vaultContractMultiCall.apiVersion(),
+			vaultContractMultiCall.depositLimit(),
+			vaultContractMultiCall.totalAssets(),
+			vaultContractMultiCall.availableDepositLimit(),
+			vaultContractMultiCall.pricePerShare(),
+			vaultContractMultiCall.decimals(),
+			vaultContractMultiCall.balanceOf(address),
+			wantContractMultiCall.balanceOf(address),
+			wantContractMultiCall.allowance(address, vault.VAULT_ADDR),
+		]);
+		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult;
+		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 		const	{_grossAPRWeek, _grossAPRMonth, _grossAPRInception} = await prepareVaultDataGross({vaultContract, pricePerShare, decimals});
 
@@ -375,6 +365,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
 			providerToUse = getProvider('fantom');
+		}
+		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
+			providerToUse = getProvider('polygon');
 		}
 
 		const	wantContract = new ethers.Contract(
