@@ -135,7 +135,7 @@ function	Strategies({vault, chainID}) {
 							</a>
 						</div>
 						<div className={'mb-2 max-w-xl w-full text-justify'}>
-							<p className={'inline'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
+							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 					</div>
 				))
