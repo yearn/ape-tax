@@ -124,7 +124,7 @@ function	Strategies({vault, chainID}) {
 			{
 				strategiesData.map((strategy, index) => (
 
-					<div key={index} className={'font-mono text-ygray-700 text-sm mb-3'}>
+					<div key={index} className={'font-mono text-ygray-700 text-sm mb-4'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>
