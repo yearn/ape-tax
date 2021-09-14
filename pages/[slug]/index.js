@@ -12,7 +12,7 @@ import	useWeb3														from	'contexts/useWeb3';
 import	ModalLogin													from	'components/ModalLogin';
 import	vaults														from	'utils/vaults.json';
 import	chains														from	'utils/chains.json';
-import	{fetchYearnVaults, fetchBlockTimestamp}						from	'utils/API';
+import	{fetchYearnVaults, fetchBlockTimestamp, performGet}						from	'utils/API';
 import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}		from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}		from	'utils/actions';
 
@@ -52,6 +52,13 @@ function	ProgressChart({progress, width}) {
 	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
 }
 
+function parseMarkdown(markdownText) {
+	const htmlText = markdownText
+		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
+
+	return htmlText.trim();
+}
+
 function	Strategies({vault, chainID}) {
 	const	{provider, active, address} = useWeb3();
 	const	[strategiesData, set_strategiesData] = useState([]);
@@ -89,10 +96,12 @@ function	Strategies({vault, chainID}) {
 				shouldBreak = true;
 				return;
 			}
+			const	details = await performGet(`https://meta.yearn.network/strategies/${strategyAddress}`);
 			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
 			const	name = await strategyContract.name();
+			
 			set_strategiesData((s) => {
-				s[index] = {address: strategyAddress, name};
+				s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
 				return (s);
 			});
 			set_nonce(n => n + 1);
@@ -124,6 +133,9 @@ function	Strategies({vault, chainID}) {
 								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
 								{'📃 Contract'}
 							</a>
+						</div>
+						<div className={'mb-2 max-w-xl w-full'}>
+							<i className={'inline'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 					</div>
 				))
