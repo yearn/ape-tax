@@ -134,8 +134,8 @@ function	Strategies({vault, chainID}) {
 								{'📃 Contract'}
 							</a>
 						</div>
-						<div className={'mb-2 max-w-xl w-full'}>
-							<i className={'inline'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
+						<div className={'mb-2 max-w-xl w-full text-justify'}>
+							<p className={'inline'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 					</div>
 				))

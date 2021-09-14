@@ -101,6 +101,7 @@ export default fn(async ({address, network = 1, rpc}) => {
 	const	[pricePerShare, decimals, activation] = callResult;
 
 	const	vaultContract = new ethers.Contract(vaultToUse.VAULT_ADDR, yVaultABI, provider);
+	// eslint-disable-next-line no-unused-vars
 	const	block = await provider.getBlockNumber();
 	let		_grossAPRWeek = '-';
 	let		_grossAPRMonth = '-';
