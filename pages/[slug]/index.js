@@ -227,7 +227,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			} else {
 				const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
 				const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault.CHAIN_ID) || 0);
-				console.log({blockOneWeekAgo, blockOneMonthAgo});
 				const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
 					vaultContract.pricePerShare({blockTag: blockOneWeekAgo}),
 					vaultContract.pricePerShare({blockTag: blockOneMonthAgo}),
@@ -367,6 +366,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
 			providerToUse = getProvider('fantom');
+		}
+		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
+			providerToUse = getProvider('polygon');
 		}
 
 		const	wantContract = new ethers.Contract(

@@ -104,37 +104,12 @@ export default fn(async ({address, network = 1, rpc}) => {
 	const	[pricePerShare, decimals, activation] = callResult;
 
 	const	vaultContract = new ethers.Contract(vaultToUse.VAULT_ADDR, yVaultABI, provider);
-	// eslint-disable-next-line no-unused-vars
-	const	block = await provider.getBlockNumber();
 	let		_grossAPRWeek = '-';
 	let		_grossAPRMonth = '-';
 	let		_grossAPRInception = '-';
-	// const	activationTimestamp = Number(activation);
-	// const	blockActivated = Number(await fetchBlockTimestamp(activationTimestamp, vaultToUse.CHAIN_ID) || 0);
-	// const	averageBlockPerWeek = 269 * 24 * 7;
-	// const	averageBlockPerMonth = 269 * 24 * 30;
-	// const	blockLastWeekRef = (block - averageBlockPerWeek) < blockActivated ? blockActivated : (block - averageBlockPerWeek);
-	// const	blockLastMonthRef = (block - averageBlockPerMonth) < blockActivated ? blockActivated : (block - averageBlockPerMonth);
-
-	// const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-	// 	vaultContract.pricePerShare({blockTag: blockLastWeekRef}),
-	// 	vaultContract.pricePerShare({blockTag: blockLastMonthRef}),
-	// ]);
-	// const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
-	// const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-	// const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
-	// const	weekRoi = (currentPrice / pastPriceWeek - 1);
-	// const	monthRoi = (currentPrice / pastPriceMonth - 1);
-	// const	inceptionROI = (currentPrice - 1);
-
-	// const	_grossAPRWeek = (weekRoi ? `${(weekRoi * 100)}` : 0);
-	// const	_grossAPRMonth = (monthRoi ? `${(monthRoi * 100)}` : 0);
-	// const	_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100)}` : 0);
-
 	const	activationTimestamp = Number(activation);
 	const	oneWeekAgo = (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
 	const	oneMonthAgo = (new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
-	const	now = (new Date(Date.now()).valueOf() / 1000).toFixed(0);
 	const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
@@ -164,9 +139,8 @@ export default fn(async ({address, network = 1, rpc}) => {
 		_grossAPRMonth = (monthRoi ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
 	}
 
-	const	inceptionROI = (currentPrice - 1) / (now - activationTimestamp) * (365 * 24 * 60 * 60 * 1);
+	const	inceptionROI = (currentPrice - 1);
 	_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
-
 
 	return {
 		week: _grossAPRWeek,
