@@ -191,7 +191,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		let		_grossAPRInception = '-';
 
 		//BSC + matic node doesn't support theses blocktag
-		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56) {
+		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56 && vault.CHAIN_ID !== 42161) {
 			const promises = [vaultContract.activation(), provider.getBlockNumber()];
 			const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
 			const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
@@ -268,6 +268,10 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
 			providerToUse = getProvider('polygon');
 		}
+		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
+			providerToUse = getProvider('arbitrum');
+		}
+
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
 				'function apiVersion() public view returns (string)',
@@ -282,7 +286,16 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			],
 			providerToUse
 		);
-		const	ethcallProvider = await newEthCallProvider(providerToUse);
+		let	ethcallProvider = await newEthCallProvider(providerToUse);
+
+		if (Number(network.chainId) === 1337) {
+			ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+			ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		} else if (vault.CHAIN_ID === 42161) {
+			ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+		}
+
+
 		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
 		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI);
 		const	callResult = await ethcallProvider.all([
@@ -368,6 +381,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}
 		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
 			providerToUse = getProvider('polygon');
+		}
+		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
+			providerToUse = getProvider('arbitrum');
 		}
 
 		const	wantContract = new ethers.Contract(

@@ -863,5 +863,17 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 250
+  },
+  "arbi-one": {
+    "TITLE": "Arbi One",
+    "LOGO": "🥇🥇",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x237f7928364f291fc52b57945f487d726eff5660",
+    "WANT_ADDR": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
   }
 }

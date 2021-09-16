@@ -33,7 +33,7 @@ To add a new vault to the list, you need to run the following command : `node sc
 This will prompt you with several information:  
 - What's the name of your vault ? (*ex: Hardrock Farmer*)
 - What's the logo for your vault ? (*ex: 🎸👨‍🌾*)
-- Which chain ? (*oneOf: Mainnet (1), BSC (56), Polygon (137), Fantom Opera (250)*)
+- Which chain ? (*oneOf: Mainnet (1), BSC (56), Polygon (137), Fantom Opera (250), Arbitrum One (42161)*)
 - What's the address of your vault ? (*ex: 0x33bd0f9618cf38fea8f7f01e1514ab63b9bde64b*)
 - Who is the dev of this vault ? (*ex: emilianobonassi*)
 
@@ -70,6 +70,7 @@ The following options are available:
 	- `?network=56` for BSC
 	- `?network=137` for Polygon
 	- `?network=250` for Fantom Opera
+	- `?network=42161` for Arbitrum One
 - *rpc*
 	- `?rpc=YOU_CUSTOM_RPC` to use a specific RPC for this request
 

@@ -36,7 +36,10 @@ function getProvider(chain = 'ethereum') {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
 	} else if (chain === 'major') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
+	} else if (chain === 'arbitrum') {
+		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	}
+
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
@@ -121,7 +124,8 @@ export const Web3ContextApp = ({children}) => {
 					56, // BSC MAINNET
 					137, // MATIC MAINNET
 					250, // FANTOM MAINNET
-					1337, // MAJORNET
+					1337, // MAJORNET,
+					42161, // ARBITRUM MAINNET
 				]
 			});
 			activate(injected, undefined, true);
@@ -137,6 +141,7 @@ export const Web3ContextApp = ({children}) => {
 					137: 'https://rpc-mainnet.matic.network',
 					250: 'https://rpc.ftm.tools',
 					1337: 'http://localhost:8545',
+					42161: `https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`,
 				},
 				chainId: 1,
 				bridge: 'https://bridge.walletconnect.org',

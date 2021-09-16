@@ -20,6 +20,7 @@ module.exports = ({
 		ETHERSCAN_API: process.env.ETHERSCAN_API,
 		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
 		BSCSCAN_API: process.env.BSCSCAN_API,
+		MORALIS_ARBITRUM_KEY: process.env.MORALIS_ARBITRUM_KEY
 	},
 	optimization: {
 		minimize: true,
