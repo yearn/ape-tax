@@ -57,6 +57,7 @@ const	ENUM_CHAIN = {
 	'BSC (56)': 56,
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
+	'Arbitrum One (42161)': 42161,
 };
 const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
@@ -73,7 +74,6 @@ const	toAddress = (address) => {
 	}
 };
 
-let	defaultVaultABI = 'yVaultV2';
 let	defaultVaultType = 'experimental';
 let	defaultVaultStatus = 'new';
 let	defaultVaultChain = 1;
@@ -112,7 +112,7 @@ if (!args.chain || !([1, 56, 137, 250]).includes(args.chain)) {
 		type: 'list',
 		name: 'vaultChain',
 		message: 'Which chain ?',
-		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)'],
+		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)'],
 	},);
 } else {
 	if (args.chain === 1)
@@ -123,6 +123,8 @@ if (!args.chain || !([1, 56, 137, 250]).includes(args.chain)) {
 		defaultVaultChain = 'Polygon (137)';
 	if (args.chain === 250)
 		defaultVaultChain = 'Fantom Opera (250)';
+	if (args.chain === 42161)
+		defaultVaultChain = 'Arbitrum One (42161)';
 }
 
 /******************************************************************************

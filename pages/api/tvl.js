@@ -64,7 +64,13 @@ export default fn(async ({network = 1, rpc}) => {
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await newEthCallProvider(provider);
+	let		ethcallProvider = await newEthCallProvider(provider);
+	if (network === 1337) {
+		ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+	} else if (network === 42161) {
+		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
 	const	_calls = [];
 	const	_cgIDS = [];
 	let		_tvl = 0;

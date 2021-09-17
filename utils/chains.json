@@ -59,5 +59,23 @@
         "decimals": 18
       }
     }
+  },
+  "42161": {
+    "chainID": "42161",
+    "name": "Arbitrum One",
+    "displayName": "Arbitrum",
+    "coin": "AETH",
+    "block_explorer": "https://arbiscan.io",
+    "chain_swap": {
+      "chainId": "0xA4B1",
+      "blockExplorerUrls": ["https://arbiscan.io"],
+      "chainName": "Arbitrum One",
+      "rpcUrls": ["https://arb1.arbitrum.io/rpc"],
+      "nativeCurrency": {
+        "name": "AETH",
+        "symbol": "AETH",
+        "decimals": 18
+      }
+    }
   }
 }

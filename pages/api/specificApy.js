@@ -37,6 +37,14 @@ async function	fetchBlockTimestamp(timestamp, network = 1) {
 		}
 		return null;
 	}
+	if (network === 42161) {
+		const	result = await performGet(`https://api.arbiscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
 
 	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
 
@@ -66,7 +74,7 @@ function getProvider(chain = 1) {
 		} else {
 			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
 		}
-	} else if (chain === 'polygon') {
+	} else if (chain === 'polygon' || chain === 137) {
 		if (process.env.ALCHEMY_KEY_POLYGON) {
 			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
 		}
@@ -75,6 +83,8 @@ function getProvider(chain = 1) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
 	} else if (chain === 56) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
+	} else if (chain === 42161) {
+		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	}
@@ -93,7 +103,15 @@ export default fn(async ({address, network = 1, rpc}) => {
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await newEthCallProvider(provider);
+	let		ethcallProvider = await newEthCallProvider(provider);
+
+	if (network === 1337) {
+		ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+	} else if (network === 42161) {
+		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
+
 	const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 	const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
 	const	callResult = await ethcallProvider.all([

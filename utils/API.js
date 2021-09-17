@@ -63,6 +63,14 @@ export async function	fetchBlockTimestamp(timestamp, network = 1) {
 		}
 		return null;
 	}
+	if (network === 42161) {
+		const	result = await performGet(`https://api.arbiscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
 
 	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
 
