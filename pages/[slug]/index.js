@@ -9,15 +9,16 @@ import	React, {useState, useEffect, useCallback}								from	'react';
 import	{ethers}																from	'ethers';
 import	{NextSeo}																from	'next-seo';
 import	{Provider, Contract}													from	'ethcall';
+import	useSWR																	from	'swr';
 import	useWeb3																	from	'contexts/useWeb3';
 import	ModalLogin																from	'components/ModalLogin';
 import	vaults																	from	'utils/vaults.json';
 import	chains																	from	'utils/chains.json';
-import	{fetchYearnVaults, fetchBlockTimestamp, performGet}						from	'utils/API';
+import	{performGet}															from	'utils/API';
 import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}					from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
-import	ERC20ABI				from	'utils/ABI/erc20.abi.json';
-import	YVAULTABI				from	'utils/ABI/yVault.abi.json';
+import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
+import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
 
 function	InfoMessage({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -148,6 +149,7 @@ function	Strategies({vault, chainID}) {
 
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
+	const	{data: vaultAPY} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`);
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
 	const	[zapAmount, set_zapAmount] = useState(0);
@@ -168,9 +170,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		progress:  0,
 		allowance: 0,
 		apiVersion: '-',
-		grossAPRWeek: '-',
-		grossAPRMonth: '-',
-		grossAPRInception: '-',
 		wantBalanceRaw: bigNumber.from(0),
 		allowanceZapOut: 0
 	});
@@ -179,72 +178,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	const	[isDepositing, set_isDepositing] = useState(false);
 	const	[isWithdrawing, set_isWithdrawing] = useState(false);
 	
-	/**************************************************************************
-	** Retrieve the details of the vault and compute some of the elements for
-	** the UI.
-	**************************************************************************/
-	async function prepareVaultDataGross({vaultContract, pricePerShare, decimals}) {
-		const	yearnVaults = await fetchYearnVaults();
-		const	grossFromYearn = yearnVaults.find((item) => item.address === vault.VAULT_ADDR)?.apy?.gross_apr;
-		let		_grossAPRWeek = '-';
-		let		_grossAPRMonth = '-';
-		let		_grossAPRInception = '-';
-
-		//BSC + matic node doesn't support theses blocktag
-		if (vault.VAULT_STATUS !== 'endorsed' && !grossFromYearn && vault.CHAIN_ID !== 56 && vault.CHAIN_ID !== 42161) {
-			const promises = [vaultContract.activation(), provider.getBlockNumber()];
-			const	results = await Promise.all(promises.map(p => p.catch(() => 'ERROR')));
-			const	validResults = results.map(result => (result instanceof Error) ? undefined : result);
-			let		[activation, block] = validResults;
-	
-			/**********************************************************************
-			** If we got some errors from the promise, then we can try to get
-			** the data again.
-			**********************************************************************/
-			if (activation === 'ERROR' || activation === undefined)
-				activation = await vaultContract.activation();
-			if (block === 'ERROR' || block === undefined)
-				block = await provider.getBlockNumber();
-
-			const	activationTimestamp = Number(activation);
-			const	oneWeekAgo = (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
-			const	oneMonthAgo = (new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
-			const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
-			if (activationTimestamp > oneWeekAgo) {
-				_grossAPRWeek = '-';
-				_grossAPRMonth = '-';
-			} else if (activationTimestamp > oneMonthAgo) {
-				const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
-				const [_pastPricePerShareWeek] = await Promise.all([
-					vaultContract.pricePerShare({blockTag: blockOneWeekAgo}),
-				]);
-
-				const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-				const	weekRoi = (currentPrice / pastPriceWeek - 1);
-				_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-				_grossAPRMonth = '-';
-			} else {
-				const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
-				const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault.CHAIN_ID) || 0);
-				const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-					vaultContract.pricePerShare({blockTag: blockOneWeekAgo}),
-					vaultContract.pricePerShare({blockTag: blockOneMonthAgo}),
-				]);
-				const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-				const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
-				const	weekRoi = (currentPrice / pastPriceWeek - 1);
-				const	monthRoi = (currentPrice / pastPriceMonth - 1);
-				_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-				_grossAPRMonth = (monthRoi ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-			}
-
-			const	inceptionROI = (currentPrice - 1);
-			_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
-		} else if (vault.CHAIN_ID === 1) {
-			_grossAPRWeek = (grossFromYearn ? `${(grossFromYearn * 100).toFixed(4)}%` : '-');
-		}
-		return ({_grossAPRWeek, _grossAPRMonth, _grossAPRInception});
-	}
 
 	async function newEthCallProvider(provider) {
 		const	ethcallProvider = new Provider();
@@ -312,7 +245,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult;
 		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-		const	{_grossAPRWeek, _grossAPRMonth, _grossAPRInception} = await prepareVaultDataGross({vaultContract, pricePerShare, decimals});
 
 		set_vaultData({
 			apiVersion: apiVersion,
@@ -330,9 +262,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			wantPrice: price,
 			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
 			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
-			grossAPRWeek: _grossAPRWeek,
-			grossAPRMonth: _grossAPRMonth,
-			grossAPRInception: _grossAPRInception,
 			allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
 		});
 
@@ -449,6 +378,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}));
 	}, [prices, vault.COINGECKO_SYMBOL]);
 
+	console.log(vaultAPY?.data);
 	return (
 		<div className={'mt-8 text-ygray-700'}>
 			<div>
@@ -490,15 +420,15 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 					<div>
 						<p className={'inline'}>{'Gross APR (last week): '}</p>
-						<p className={'inline'}>{`${vaultData.grossAPRWeek}`}</p>
+						<p className={'inline'}>{`${vaultAPY?.data?.inception || '-'}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (last month): '}</p>
-						<p className={'inline'}>{`${vaultData.grossAPRMonth}`}</p>
+						<p className={'inline'}>{`${vaultAPY?.data?.month || '-'}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (inception): '}</p>
-						<p className={'inline'}>{`${vaultData.grossAPRInception}`}</p>
+						<p className={'inline'}>{`${vaultAPY?.data?.week || '-'}`}</p>
 					</div>
 				</div>
 				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>

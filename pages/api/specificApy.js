@@ -11,6 +11,7 @@ import	{Provider, Contract}	from	'ethcall';
 import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
+import	Web3Contract			from	'web3-eth-contract';
 
 async function	fetchBlockTimestamp(timestamp, network = 1) {
 	if (network === 250) {
@@ -82,13 +83,29 @@ function getProvider(chain = 1) {
 	} else if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
 	} else if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
+		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org');
 	} else if (chain === 42161) {
 		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
+}
+function getWeb3Provider(chain = 1) {
+	if (chain === 1) {
+		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
+	} else if (chain === 'polygon' || chain === 137) {
+		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
+	} else if (chain === 250) {
+		return ('https://rpc.ftm.tools');
+	} else if (chain === 56) {
+		return ('https://bsc-dataseed1.defibit.io/');
+	} else if (chain === 42161) {
+		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+	} else if (chain === 1337) {
+		return ('http://localhost:8545');
+	}
+	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
 }
 
 async function newEthCallProvider(provider) {
@@ -121,7 +138,6 @@ export default fn(async ({address, network = 1, rpc}) => {
 	]);
 	const	[pricePerShare, decimals, activation] = callResult;
 
-	const	vaultContract = new ethers.Contract(vaultToUse.VAULT_ADDR, yVaultABI, provider);
 	let		_grossAPRWeek = '-';
 	let		_grossAPRMonth = '-';
 	let		_grossAPRInception = '-';
@@ -129,15 +145,16 @@ export default fn(async ({address, network = 1, rpc}) => {
 	const	oneWeekAgo = (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
 	const	oneMonthAgo = (new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
 	const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
+
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
 		_grossAPRMonth = '-';
 	} else if (activationTimestamp > oneMonthAgo) {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vaultToUse.CHAIN_ID) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vaultToUse.CHAIN_ID));
 		const [_pastPricePerShareWeek] = await Promise.all([
-			vaultContract.pricePerShare({blockTag: blockOneWeekAgo}),
+			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
 		]);
-
 		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
@@ -145,9 +162,10 @@ export default fn(async ({address, network = 1, rpc}) => {
 	} else {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vaultToUse.CHAIN_ID) || 0);
 		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vaultToUse.CHAIN_ID) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vaultToUse.CHAIN_ID));
 		const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-			vaultContract.pricePerShare({blockTag: blockOneWeekAgo}),
-			vaultContract.pricePerShare({blockTag: blockOneMonthAgo}),
+			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
+			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
 		]);
 		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
 		const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
