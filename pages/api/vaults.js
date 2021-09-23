@@ -10,6 +10,7 @@ import	{Provider, Contract}	from	'ethcall';
 import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
+import	{prepareGrossData}		from	'pages/api/specificApy';
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
@@ -44,7 +45,7 @@ async function newEthCallProvider(provider) {
 	return ethcallProvider;
 }
 
-export default fn(async ({network = 1, rpc}) => {
+export default fn(async ({network = 1, rpc, status = 'active'}) => {
 	network = Number(network);
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
@@ -65,6 +66,9 @@ export default fn(async ({network = 1, rpc}) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
 		}
+		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+			return;	
+		}
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
 		_calls.push(...[
 			vaultContract.apiVersion(),
@@ -73,19 +77,30 @@ export default fn(async ({network = 1, rpc}) => {
 			vaultContract.availableDepositLimit(),
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
+			vaultContract.activation(),
 		]);
 	});
 	const	callResult = await ethcallProvider.all(_calls);
-	const	chunkedCallResult = chunk(callResult, 6);
+	const	chunkedCallResult = chunk(callResult, 7);
 	let		index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([k, v]) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals] = chunkedCallResult[index];
+		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+			return;	
+		}
+		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, activation] = chunkedCallResult[index];
 		const	dec = Number(decimals);
 		index++;
+
+		const	grossData = await prepareGrossData({
+			vault: v,
+			pricePerShare,
+			decimals,
+			activation,
+		});
 
 		_vaults.push({
 			title: v.TITLE,
@@ -103,6 +118,12 @@ export default fn(async ({network = 1, rpc}) => {
 				availableDepositLimit: ethers.utils.formatUnits(availableDepositLimit, dec),
 				pricePerShare: ethers.utils.formatUnits(pricePerShare, dec),
 				decimals: dec,
+				activation: Number(activation)
+			},
+			APY: {
+				week: grossData.week,
+				month: grossData.month,
+				inception: grossData.inception,
 			},
 			want: {
 				address: v.WANT_ADDR,
