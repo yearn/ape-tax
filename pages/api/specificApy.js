@@ -114,6 +114,58 @@ async function newEthCallProvider(provider) {
 	return ethcallProvider;
 }
 
+async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
+	let		_grossAPRWeek = '-';
+	let		_grossAPRMonth = '-';
+	let		_grossAPRInception = '-';
+	const	activationTimestamp = Number(activation);
+	const	oneWeekAgo = (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
+	const	oneMonthAgo = (new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
+	const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
+
+	if (activationTimestamp > oneWeekAgo) {
+		_grossAPRWeek = '-';
+		_grossAPRMonth = '-';
+	} else if (activationTimestamp > oneMonthAgo) {
+		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vault.CHAIN_ID));
+		const [_pastPricePerShareWeek] = await Promise.all([
+			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
+		]);
+		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
+		const	weekRoi = (currentPrice / pastPriceWeek - 1);
+		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
+		_grossAPRMonth = '-';
+	} else {
+		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
+		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault.CHAIN_ID) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vault.CHAIN_ID));
+		const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
+			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
+			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
+		]);
+		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
+		const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
+		const	weekRoi = (currentPrice / pastPriceWeek - 1);
+		const	monthRoi = (currentPrice / pastPriceMonth - 1);
+		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
+		_grossAPRMonth = (monthRoi ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
+	}
+
+	const	inceptionROI = (currentPrice - 1);
+	_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
+
+	return {
+		week: _grossAPRWeek,
+		month: _grossAPRMonth,
+		inception: _grossAPRInception,
+		extra: {
+			pricePerShare: currentPrice,
+			decimals: Number(decimals)
+		}
+	};
+}
+
 export default fn(async ({address, network = 1, rpc}) => {
 	network = Number(network);
 	let		provider = getProvider(network);
@@ -137,54 +189,12 @@ export default fn(async ({address, network = 1, rpc}) => {
 		vaultContractMultiCall.activation(),
 	]);
 	const	[pricePerShare, decimals, activation] = callResult;
-
-	let		_grossAPRWeek = '-';
-	let		_grossAPRMonth = '-';
-	let		_grossAPRInception = '-';
-	const	activationTimestamp = Number(activation);
-	const	oneWeekAgo = (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
-	const	oneMonthAgo = (new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0);
-	const	currentPrice = ethers.utils.formatUnits(pricePerShare, decimals.toNumber());
-
-	if (activationTimestamp > oneWeekAgo) {
-		_grossAPRWeek = '-';
-		_grossAPRMonth = '-';
-	} else if (activationTimestamp > oneMonthAgo) {
-		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vaultToUse.CHAIN_ID) || 0);
-		Web3Contract.setProvider(getWeb3Provider(vaultToUse.CHAIN_ID));
-		const [_pastPricePerShareWeek] = await Promise.all([
-			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
-		]);
-		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-		const	weekRoi = (currentPrice / pastPriceWeek - 1);
-		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-		_grossAPRMonth = '-';
-	} else {
-		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vaultToUse.CHAIN_ID) || 0);
-		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vaultToUse.CHAIN_ID) || 0);
-		Web3Contract.setProvider(getWeb3Provider(vaultToUse.CHAIN_ID));
-		const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
-			new Web3Contract(yVaultABI, vaultToUse.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
-		]);
-		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
-		const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
-		const	weekRoi = (currentPrice / pastPriceWeek - 1);
-		const	monthRoi = (currentPrice / pastPriceMonth - 1);
-		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-		_grossAPRMonth = (monthRoi ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-	}
-
-	const	inceptionROI = (currentPrice - 1);
-	_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
-
-	return {
-		week: _grossAPRWeek,
-		month: _grossAPRMonth,
-		inception: _grossAPRInception,
-		extra: {
-			pricePerShare: currentPrice,
-			decimals: Number(decimals)
-		}
-	};
+	return prepareGrossData({
+		vault: vaultToUse,
+		pricePerShare,
+		decimals,
+		activation,
+	});
 }, {maxAge: 10 * 60}); //10 mn
+
+export {prepareGrossData};
