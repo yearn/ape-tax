@@ -420,7 +420,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 					<div>
 						<p className={'inline'}>{'Gross APR (last week): '}</p>
-						<p className={'inline'}>{`${vaultAPY?.data?.inception || '-'}`}</p>
+						<p className={'inline'}>{`${vaultAPY?.data?.week || '-'}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (last month): '}</p>
@@ -428,7 +428,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (inception): '}</p>
-						<p className={'inline'}>{`${vaultAPY?.data?.week || '-'}`}</p>
+						<p className={'inline'}>{`${vaultAPY?.data?.inception || '-'}`}</p>
 					</div>
 				</div>
 				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
