@@ -105,11 +105,11 @@ const getLibrary = (provider) => {
 };
 
 function	MyApp(props) {
-	const	{Component, pageProps} = props;
+	const	{Component, router, pageProps} = props;
 	
 	return (
 		<Web3ReactProvider getLibrary={getLibrary}>
-			<Web3ContextApp>
+			<Web3ContextApp router={router}>
 				<AppWrapper
 					Component={Component}
 					pageProps={pageProps}

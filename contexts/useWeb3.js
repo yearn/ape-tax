@@ -6,14 +6,15 @@
 ******************************************************************************/
 
 import	React, {useState, useEffect, useContext, createContext, useCallback}	from	'react';
-import	{ethers}																from	'ethers';
-import	QRCodeModal																from	'@walletconnect/qrcode-modal';
-import	{useWeb3React}															from	'@web3-react-fork/core';
-import	{InjectedConnector}														from	'@web3-react-fork/injected-connector';
-import	{ConnectorEvent}														from	'@web3-react-fork/types';
-import	{WalletConnectConnector}												from	'@web3-react-fork/walletconnect-connector';
-import	useLocalStorage															from	'hook/useLocalStorage';
-import	{toAddress}																from	'utils';
+import	{ethers}							from	'ethers';
+import	QRCodeModal							from	'@walletconnect/qrcode-modal';
+import	{useWeb3React}						from	'@web3-react-fork/core';
+import	{InjectedConnector}					from	'@web3-react-fork/injected-connector';
+import	{ConnectorEvent}					from	'@web3-react-fork/types';
+import	{WalletConnectConnector}			from	'@web3-react-fork/walletconnect-connector';
+import	useLocalStorage						from	'hook/useLocalStorage';
+import	useWindowInFocus					from	'hook/useWindowInFocus';
+import	{toAddress}							from	'utils';
 
 const walletType = {NONE: -1, METAMASK: 0, WALLET_CONNECT: 1};
 const Web3Context = createContext();
@@ -43,8 +44,9 @@ function getProvider(chain = 'ethereum') {
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
-export const Web3ContextApp = ({children}) => {
+export const Web3ContextApp = ({children, router}) => {
 	const	web3 = useWeb3React();
+	const	windowInFocus = useWindowInFocus();
 	const	[initialized, set_initialized] = useState(false);
 	const	[provider, set_provider] = useState(undefined);
 	const	[address, set_address] = useLocalStorage('address', '');
@@ -99,6 +101,29 @@ export const Web3ContextApp = ({children}) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [account, chainId, connector, library, onDesactivate, onUpdate]);
 
+	const onSwitchChain = useCallback(() => {
+		const	isCompatibleChain = (
+			Number(chainID) === 1 ||
+			Number(chainID) === 56 ||
+			Number(chainID) === 137 ||
+			Number(chainID) === 250 ||
+			Number(chainID) === 1337 ||
+			Number(chainID) === 42161
+		);
+		if (isCompatibleChain) {
+			return;
+		}
+		if (!provider || !active) {
+			console.error('Not initialized');
+			return;
+		}
+		provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
+	}, [active, chainID, provider]);
+
+	useEffect(() => {
+		if (router.pathname !== '/[slug]')
+			onSwitchChain();
+	}, [windowInFocus, onSwitchChain, router]);
 
 	/**************************************************************************
 	**	connect
@@ -118,16 +143,7 @@ export const Web3ContextApp = ({children}) => {
 			if (active) {
 				deactivate();
 			}
-			const	injected = new InjectedConnector({
-				supportedChainIds: [
-					1, // ETH MAINNET
-					56, // BSC MAINNET
-					137, // MATIC MAINNET
-					250, // FANTOM MAINNET
-					1337, // MAJORNET,
-					42161, // ARBITRUM MAINNET
-				]
-			});
+			const	injected = new InjectedConnector();
 			activate(injected, undefined, true);
 			set_lastWallet(walletType.METAMASK);
 		} else if (_providerType === walletType.WALLET_CONNECT) {
