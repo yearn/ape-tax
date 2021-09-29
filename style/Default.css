@@ -127,3 +127,10 @@
 .noBr {
 	border-radius: 0 !important;
 }
+.noShadow {
+	box-shadow: none !important;
+}
+.toaster {
+	height: 34px !important;
+	margin-top: -0.5rem !important;
+}

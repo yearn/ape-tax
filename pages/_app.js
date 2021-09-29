@@ -96,7 +96,7 @@ function	AppWrapper(props) {
 					</a>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
-				<Toaster position={'top-center'} toastOptions={{className: 'font-mono text-ygray-700 font-medium text-sm border border-solid border-ygray-200 bg-white noBr shadow-xl'}} />
+				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-ygray-700 font-semibold border border-solid border-ygray-200 font-mono bg-white noBr noShadow toaster'}} />
 			</main>
 		</>
 	);
