@@ -193,7 +193,7 @@ function	Index() {
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 			<div className={'max-w-5xl my-8'}>
 				<span className={'text-base font-semibold text-ygray-900 font-mono'}>
-					{`${chains[chainID]?.displayName} TVL:`}
+					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 				</span>
 				<span className={'text-base font-normal text-ygray-900 font-mono'}>
 					{` $${formatAmount(tvl?.data || 0, 2)}`}
