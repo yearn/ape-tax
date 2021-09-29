@@ -20,7 +20,6 @@ import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
 
-
 function AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
 	const [index, setIndex] = useState(0);
@@ -198,7 +197,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	const	[isZapOutApproving, set_isZapOutApproving] = useState(false);
 	const	[isDepositing, set_isDepositing] = useState(false);
 	const	[isWithdrawing, set_isWithdrawing] = useState(false);
-	
 
 	async function newEthCallProvider(provider) {
 		const	ethcallProvider = new Provider();
