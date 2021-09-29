@@ -45,7 +45,7 @@ async function newEthCallProvider(provider) {
 	return ethcallProvider;
 }
 
-export default fn(async ({network = 1, rpc, status = 'active'}) => {
+export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 	network = Number(network);
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
@@ -66,7 +66,7 @@ export default fn(async ({network = 1, rpc, status = 'active'}) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new' && v.VAULT_STATUS !== 'endorsed')) {
 			return;	
 		}
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
@@ -88,49 +88,75 @@ export default fn(async ({network = 1, rpc, status = 'active'}) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new' && v.VAULT_STATUS !== 'endorsed')) {
 			return;	
 		}
 		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, activation] = chunkedCallResult[index];
 		const	dec = Number(decimals);
 		index++;
 
-		const	grossData = await prepareGrossData({
-			vault: v,
-			pricePerShare,
-			decimals,
-			activation,
-		});
-
-		_vaults.push({
-			title: v.TITLE,
-			logo: v.LOGO,
-			displayName: `${v.LOGO} ${v.TITLE}`,
-			src: `https://ape.tax/${k}`,
-			status: v.VAULT_STATUS,
-			type: v.VAULT_TYPE,
-			address: v.VAULT_ADDR,
-			network: v.CHAIN_ID,
-			data: {
-				apiVersion: apiVersion,
-				depositLimit: ethers.utils.formatUnits(depositLimit, dec),
-				totalAssets: ethers.utils.formatUnits(totalAssets, dec),
-				availableDepositLimit: ethers.utils.formatUnits(availableDepositLimit, dec),
-				pricePerShare: ethers.utils.formatUnits(pricePerShare, dec),
-				decimals: dec,
-				activation: Number(activation)
-			},
-			APY: {
-				week: grossData.week,
-				month: grossData.month,
-				inception: grossData.inception,
-			},
-			want: {
-				address: v.WANT_ADDR,
-				symbol: v.WANT_SYMBOL,
-				cgID: v.COINGECKO_SYMBOL,
-			}
-		});
+		if (apy === 1) {
+			const	grossData = await prepareGrossData({
+				vault: v,
+				pricePerShare,
+				decimals,
+				activation,
+			});
+			_vaults.push({
+				title: v.TITLE,
+				logo: v.LOGO,
+				displayName: `${v.LOGO} ${v.TITLE}`,
+				src: `https://ape.tax/${k}`,
+				status: v.VAULT_STATUS,
+				type: v.VAULT_TYPE,
+				address: v.VAULT_ADDR,
+				network: v.CHAIN_ID,
+				data: {
+					apiVersion: apiVersion,
+					depositLimit: ethers.utils.formatUnits(depositLimit, dec),
+					totalAssets: ethers.utils.formatUnits(totalAssets, dec),
+					availableDepositLimit: ethers.utils.formatUnits(availableDepositLimit, dec),
+					pricePerShare: ethers.utils.formatUnits(pricePerShare, dec),
+					decimals: dec,
+					activation: Number(activation)
+				},
+				APY: {
+					week: grossData.week,
+					month: grossData.month,
+					inception: grossData.inception,
+				},
+				want: {
+					address: v.WANT_ADDR,
+					symbol: v.WANT_SYMBOL,
+					cgID: v.COINGECKO_SYMBOL,
+				}
+			});
+		} else {
+			_vaults.push({
+				title: v.TITLE,
+				logo: v.LOGO,
+				displayName: `${v.LOGO} ${v.TITLE}`,
+				src: `https://ape.tax/${k}`,
+				status: v.VAULT_STATUS,
+				type: v.VAULT_TYPE,
+				address: v.VAULT_ADDR,
+				network: v.CHAIN_ID,
+				data: {
+					apiVersion: apiVersion,
+					depositLimit: ethers.utils.formatUnits(depositLimit, dec),
+					totalAssets: ethers.utils.formatUnits(totalAssets, dec),
+					availableDepositLimit: ethers.utils.formatUnits(availableDepositLimit, dec),
+					pricePerShare: ethers.utils.formatUnits(pricePerShare, dec),
+					decimals: dec,
+					activation: Number(activation)
+				},
+				want: {
+					address: v.WANT_ADDR,
+					symbol: v.WANT_SYMBOL,
+					cgID: v.COINGECKO_SYMBOL,
+				}
+			});
+		}
 	});
 	return _vaults;
 }, {maxAge: 10 * 60}); //10 mn
