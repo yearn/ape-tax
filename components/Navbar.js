@@ -89,14 +89,15 @@ function	Navbar({router}) {
 					</Link> : null}
 				</div>
 				<div className={'items-center justify-end flex-row flex'}>
-					<select
-						value={chainID}
-						className={'m-0 mr-2 px-3 py-2 items-center leading-4 cursor-pointer whitespace-nowrap border border-solid border-ygray-200 text-xs font-mono font-semibold text-ygray-700 pr-7 hidden md:flex'}
-						onChange={e => onSwitchChain(e.target.value)}>
-						{Object.values(chains).map((chain, index) => (
-							<option key={index} value={chain.chainID}>{chain.name}</option>
-						))}
-					</select>
+					{router.route === '/' ? 
+						<select
+							value={chainID}
+							className={'m-0 mr-2 px-3 py-2 items-center leading-4 cursor-pointer whitespace-nowrap border border-solid border-ygray-200 text-xs font-mono font-semibold text-ygray-700 pr-7 hidden md:flex'}
+							onChange={e => onSwitchChain(e.target.value)}>
+							{Object.values(chains).map((chain, index) => (
+								<option key={index} value={chain.chainID}>{chain.name}</option>
+							))}
+						</select> : null}
 					{renderWalletButton()}
 				</div>
 			</div>
