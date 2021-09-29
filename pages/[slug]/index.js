@@ -12,6 +12,7 @@ import	{Provider, Contract}													from	'ethcall';
 import	useSWR																	from	'swr';
 import	useWeb3																	from	'contexts/useWeb3';
 import	ModalLogin																from	'components/ModalLogin';
+import	useWindowInFocus														from	'hook/useWindowInFocus';
 import	vaults																	from	'utils/vaults.json';
 import	chains																	from	'utils/chains.json';
 import	{performGet}															from	'utils/API';
@@ -687,8 +688,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 function	Wrapper({vault, prices}) {
 	const	{provider, getProvider, active, address, ens, chainID} = useWeb3();
 	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
+	const	windowInFocus = useWindowInFocus();
 
-	function	onSwitchChain(newChainID) {
+	const onSwitchChain = useCallback((newChainID) => {
 		if (newChainID === chainID) {
 			return;
 		}
@@ -701,7 +703,14 @@ function	Wrapper({vault, prices}) {
 		} else {
 			provider.send('wallet_addEthereumChain', [chains[newChainID].chain_swap, address]).catch((error) => console.error(error));
 		}
-	}
+	}, [active, address, chainID, provider]);
+
+	useEffect(() => {
+		if (windowInFocus && chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
+			onSwitchChain(vault.CHAIN_ID);
+		}
+	}, [chainID, onSwitchChain, vault.CHAIN_ID, windowInFocus]);
+
 
 	if (!active) {
 		return (
