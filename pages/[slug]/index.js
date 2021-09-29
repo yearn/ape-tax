@@ -378,7 +378,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}));
 	}, [prices, vault.COINGECKO_SYMBOL]);
 
-	console.log(vaultAPY?.data);
 	return (
 		<div className={'mt-8 text-ygray-700'}>
 			<div>
@@ -528,7 +527,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 							}
 							<button
 								onClick={() => {
-									console.log(vaultData.allowanceZapOut);
 									if (isZapOutApproving)
 										return;
 									set_isZapOutApproving(true);
