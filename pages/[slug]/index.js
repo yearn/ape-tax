@@ -20,6 +20,26 @@ import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
 
+
+function AnimatedWait() {
+	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
+	const [index, setIndex] = useState(0);
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setIndex((index) => (index + 1) % frames.length);
+		}, 100);
+		return () => clearTimeout(timer);
+	}, [frames.length]);
+
+	return <span>{frames[index]}</span>;
+}
+function Suspense({wait, children}) {
+	if (wait) {
+		return <AnimatedWait />;
+	}
+	return <span>{children}</span>;
+}
+
 function	InfoMessage({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
@@ -154,6 +174,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	const	[amount, set_amount] = useState(0);
 	const	[zapAmount, set_zapAmount] = useState(0);
 	const	[vaultData, set_vaultData] = useState({
+		loaded: false,
 		depositLimit: -1,
 		totalAssets: 0,
 		availableDepositLimit: 0,
@@ -247,6 +268,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 
 		set_vaultData({
+			loaded: true,
 			apiVersion: apiVersion,
 			depositLimit: Number(ethers.utils.formatUnits(depositLimit, decimals)).toFixed(2),
 			totalAssets: Number(ethers.utils.formatUnits(totalAssets, decimals)).toFixed(2),
@@ -378,7 +400,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}));
 	}, [prices, vault.COINGECKO_SYMBOL]);
 
-	console.log(vaultAPY?.data);
 	return (
 		<div className={'mt-8 text-ygray-700'}>
 			<div>
@@ -398,47 +419,85 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 					<div>
 						<p className={'inline'}>{'Version: '}</p>
-						<p className={'inline'}>{vaultData.apiVersion}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>{vaultData.apiVersion}</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
-						<p className={'inline'}>{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Deposit Limit: '}</p>
-						<p className={'inline'}>{`${vaultData.depositLimit === -1 ? '-' : formatAmount(vaultData?.depositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultData.depositLimit === -1 ? '-' : formatAmount(vaultData?.depositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total Assets: '}</p>
-						<p className={'inline'}>{`${formatAmount(vaultData?.totalAssets || 0, 2)} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${formatAmount(vaultData?.totalAssets || 0, 2)} ${vault.WANT_SYMBOL}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Total AUM: '}</p>
-						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData.totalAUM, 2)}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
+							</Suspense>
+						</p>
 					</div>
 				</div>
 				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 					<div>
 						<p className={'inline'}>{'Gross APR (last week): '}</p>
-						<p className={'inline'}>{`${vaultAPY?.data?.inception || '-'}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultAPY?.data?.inception || '-'}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (last month): '}</p>
-						<p className={'inline'}>{`${vaultAPY?.data?.month || '-'}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultAPY?.data?.month || '-'}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Gross APR (inception): '}</p>
-						<p className={'inline'}>{`${vaultAPY?.data?.week || '-'}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultAPY?.data?.week || '-'}`}
+							</Suspense>
+						</p>
 					</div>
 				</div>
 				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
-						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultData.pricePerShare}`}
+							</Suspense>
+						</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Available limit: '}</p>
-						<p className={'inline'}>{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}</p>
+						<p className={'inline'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}
+							</Suspense>
+						</p>
 					</div>
 					<div className={'progress-bar'}>
 						<span className={'progress-body mr-2 hidden md:inline'}>
