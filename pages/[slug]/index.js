@@ -586,7 +586,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 							}
 							<button
 								onClick={() => {
-									console.log(vaultData.allowanceZapOut);
 									if (isZapOutApproving)
 										return;
 									set_isZapOutApproving(true);
