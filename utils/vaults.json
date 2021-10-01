@@ -644,7 +644,7 @@
     "WANT_ADDR": "0x92D5ebF3593a92888C25C0AbEF126583d4b5312E",
     "WANT_SYMBOL": "fUSDT+2CRV",
     "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "daihard2": {
@@ -680,7 +680,7 @@
     "WANT_ADDR": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
     "WANT_SYMBOL": "btcCRV",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "wether": {
