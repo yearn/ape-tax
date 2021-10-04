@@ -460,7 +460,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 						<p className={'inline'}>{'Gross APR (last week): '}</p>
 						<p className={'inline'}>
 							<Suspense wait={!vaultData.loaded}>
-								{`${vaultAPY?.data?.inception || '-'}`}
+								{`${vaultAPY?.data?.week || '-'}`}
 							</Suspense>
 						</p>
 					</div>
@@ -476,7 +476,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 						<p className={'inline'}>{'Gross APR (inception): '}</p>
 						<p className={'inline'}>
 							<Suspense wait={!vaultData.loaded}>
-								{`${vaultAPY?.data?.week || '-'}`}
+								{`${vaultAPY?.data?.inception || '-'}`}
 							</Suspense>
 						</p>
 					</div>
