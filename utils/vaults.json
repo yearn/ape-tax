@@ -923,5 +923,17 @@
     "COINGECKO_SYMBOL": "magic-internet-money",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 250
+  },
+  "ftm_usdc": {
+    "TITLE": "Ghosty Eagle",
+    "LOGO": "👻🦅",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xEF0210eB96c7EB36AF8ed1c20306462764935607",
+    "WANT_ADDR": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 250
   }
 }
