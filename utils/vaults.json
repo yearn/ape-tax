@@ -912,7 +912,7 @@
     "VAULT_STATUS": "active",
     "CHAIN_ID": 42161
   },
-  "mr-mime": {
+  "ftm_mr_mime": {
     "TITLE": "Mr. MIMe",
     "LOGO": "🤡🪄",
     "VAULT_ABI": "yVaultV2",
