@@ -945,7 +945,7 @@
     "WANT_ADDR": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
     "WANT_SYMBOL": "MIM",
     "COINGECKO_SYMBOL": "magic-internet-money",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "gemini-saga": {
@@ -957,7 +957,19 @@
     "WANT_ADDR": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
     "WANT_SYMBOL": "GUSD",
     "COINGECKO_SYMBOL": "gemini-dollar",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
+  },
+  "satoshis-ghost": {
+    "TITLE": "Satoshi's Ghost",
+    "LOGO": "👻₿",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x42c379Ab711621aC3A0890916e8b4a4f9B2013b9",
+    "WANT_ADDR": "0x321162Cd933E2Be498Cd2267a90534A804051b11",
+    "WANT_SYMBOL": "BTC",
+    "VAULT_STATUS": "new",
+    "COINGECKO_SYMBOL": "wrapped-bitcoin",
+    "CHAIN_ID": 250
   }
 }
