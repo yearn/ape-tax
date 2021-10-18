@@ -945,7 +945,7 @@
     "WANT_ADDR": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
     "WANT_SYMBOL": "MIM",
     "COINGECKO_SYMBOL": "magic-internet-money",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "gemini-saga": {
@@ -957,7 +957,7 @@
     "WANT_ADDR": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
     "WANT_SYMBOL": "GUSD",
     "COINGECKO_SYMBOL": "gemini-dollar",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "satoshis-ghost": {
