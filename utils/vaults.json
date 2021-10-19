@@ -837,7 +837,7 @@
     "ZAP_ADDR": "0xfCE6CbeF3867102da383465cc237B49fF4B9d48F",
     "WANT_SYMBOL": "WFTM",
     "COINGECKO_SYMBOL": "fantom",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   },
   "get-bridged-or-dai-farmin": {
@@ -861,7 +861,7 @@
     "WANT_ADDR": "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   },
   "fantom-2crv": {
@@ -885,7 +885,7 @@
     "WANT_ADDR": "0x29b0Da86e484E1C0029B56e817912d778aC0EC69",
     "WANT_SYMBOL": "YFI",
     "COINGECKO_SYMBOL": "yearn-finance",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   },
   "ghost-woofy": {
@@ -921,7 +921,7 @@
     "WANT_ADDR": "0x82f0B8B456c1A451378467398982d4834b6829c1",
     "WANT_SYMBOL": "MIM",
     "COINGECKO_SYMBOL": "magic-internet-money",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   },
   "ftm_usdc": {
@@ -933,7 +933,7 @@
     "WANT_ADDR": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   }
 }
