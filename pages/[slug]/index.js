@@ -120,9 +120,9 @@ function	Strategies({vault, chainID}) {
 				shouldBreak = true;
 				return;
 			}
-			const	details = await performGet(`https://meta.yearn.network/strategies/${strategyAddress}`);
 			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
 			const	name = await strategyContract.name();
+			const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
 			
 			set_strategiesData((s) => {
 				s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
