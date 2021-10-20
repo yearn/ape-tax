@@ -1,10 +1,3 @@
-/*
- * @Author:				The Ape Community
- * @Twitter:				@ape_tax
- * @Date:					Wednesday October 20th 2021
- * @Filename:				vaults.json
- */
-
 {
   "yusdcidle": {
     "TITLE": "USDc Idle",
@@ -483,7 +476,7 @@
     "WANT_ADDR": "0x841fad6eae12c286d1fd18d1d525dffa75c7effe",
     "WANT_SYMBOL": "BOO",
     "COINGECKO_SYMBOL": "spookyswap",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "rai": {
