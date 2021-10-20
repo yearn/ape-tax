@@ -12,6 +12,20 @@ import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	{prepareGrossData}		from	'pages/api/specificApy';
 
+async function newEthCallProvider(provider, chainID) {
+	const	ethcallProvider = new Provider();
+	if (chainID === 1337) {
+		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		return ethcallProvider;
+	}
+	await	ethcallProvider.init(provider);
+	if (chainID === 42161) {
+		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
+	return	ethcallProvider;
+}
+
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
 async function asyncForEach(array, callback) {
@@ -39,26 +53,13 @@ function getProvider(chain = 1) {
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
-async function newEthCallProvider(provider) {
-	const	ethcallProvider = new Provider();
-	await ethcallProvider.init(provider);
-	return ethcallProvider;
-}
-
 export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 	network = Number(network);
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	let		ethcallProvider = await newEthCallProvider(provider);
-	if (network === 1337) {
-		ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
-	} else if (network === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-
+	const	ethcallProvider = await newEthCallProvider(provider, network);
 	const	_vaults = [];
 	const	_calls = [];
 

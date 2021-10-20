@@ -13,6 +13,7 @@ import	{DefaultSeo}					from	'next-seo';
 import	{Web3ReactProvider}				from	'@web3-react-fork/core';
 import	{ethers}						from	'ethers';
 import	{Web3ContextApp}				from	'contexts/useWeb3';
+import	useUI, {UIContextApp}			from	'contexts/useUI';
 import	Navbar							from	'components/Navbar';
 import	useSecret						from	'hook/useSecret';
 import	vaults							from	'utils/vaults.json';
@@ -29,6 +30,7 @@ const useSecretCode = () => {
 
 function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
+	const	{switchTheme} = useUI();
 	const	hasSecretCode = useSecretCode();
 	const	WEBSITE_URI = process.env.WEBSITE_URI;
 	const	vaultsCGIds = [...new Set(Object.values(vaults).map(vault => vault.COINGECKO_SYMBOL.toLowerCase()))];
@@ -78,7 +80,7 @@ function	AppWrapper(props) {
 					site: '@ape_tax',
 					cardType: 'summary_large_image',
 				}} />
-			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
+			<main id={'app'} className={'p-4 relative bg-white dark:bg-dark-600'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
 					<Navbar router={router} />
 				</div>
@@ -90,13 +92,19 @@ function	AppWrapper(props) {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600'}>
-					<a href={'https://twitter.com/ape_tax'} target={'_blank'} rel={'noreferrer'} className={'dashed-underline-gray'}>
+				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600 dark:text-white'}>
+					<a href={'https://twitter.com/ape_tax'} target={'_blank'} rel={'noreferrer'} className={'dashed-underline-gray cursor-pointer'}>
 						{'Made with 💙 by the 🦍 community'}
 					</a>
+					<p className={'mx-2'}>
+						{' - '}
+					</p>
+					<p onClick={switchTheme} className={'dashed-underline-gray cursor-pointer'}>
+						{'Switch theme'}
+					</p>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
-				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-ygray-700 font-semibold border border-solid border-ygray-200 font-mono bg-white noBr noShadow toaster'}} />
+				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-ygray-700 dark:text-dark-50 font-semibold border border-solid border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 noBr noShadow toaster'}} />
 			</main>
 		</>
 	);
@@ -110,15 +118,17 @@ function	MyApp(props) {
 	const	{Component, router, pageProps} = props;
 	
 	return (
-		<Web3ReactProvider getLibrary={getLibrary}>
-			<Web3ContextApp router={router}>
-				<AppWrapper
-					Component={Component}
-					pageProps={pageProps}
-					element={props.element}
-					router={props.router} />
-			</Web3ContextApp>
-		</Web3ReactProvider>
+		<UIContextApp>
+			<Web3ReactProvider getLibrary={getLibrary}>
+				<Web3ContextApp router={router}>
+					<AppWrapper
+						Component={Component}
+						pageProps={pageProps}
+						element={props.element}
+						router={props.router} />
+				</Web3ContextApp>
+			</Web3ReactProvider>
+		</UIContextApp>
 	);
 }
 

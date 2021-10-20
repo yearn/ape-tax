@@ -13,6 +13,20 @@ import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	Web3Contract			from	'web3-eth-contract';
 
+async function newEthCallProvider(provider, chainID) {
+	const	ethcallProvider = new Provider();
+	if (chainID === 1337) {
+		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		return ethcallProvider;
+	}
+	await	ethcallProvider.init(provider);
+	if (chainID === 42161) {
+		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
+	return	ethcallProvider;
+}
+
 async function	fetchBlockTimestamp(timestamp, network = 1) {
 	if (network === 250) {
 		const	result = await performGet(`https://api.ftmscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.FTMSCAN_API}`);
@@ -108,12 +122,6 @@ function getWeb3Provider(chain = 1) {
 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
 }
 
-async function newEthCallProvider(provider) {
-	const	ethcallProvider = new Provider();
-	await ethcallProvider.init(provider);
-	return ethcallProvider;
-}
-
 async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 	let		_grossAPRWeek = '-';
 	let		_grossAPRMonth = '-';
@@ -172,15 +180,7 @@ export default fn(async ({address, network = 1, rpc}) => {
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	let		ethcallProvider = await newEthCallProvider(provider);
-
-	if (network === 1337) {
-		ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
-	} else if (network === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-
+	const	ethcallProvider = await newEthCallProvider(provider, network);
 	const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 	const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
 	const	callResult = await ethcallProvider.all([

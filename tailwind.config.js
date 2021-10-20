@@ -5,7 +5,7 @@ module.exports = {
 		'./pages/**/*.js',
 		'./components/**/*.js'
 	],
-	darkMode: false,
+	darkMode: 'class',
 	corePlugins: {
 		ringColor: false,
 	},
@@ -23,6 +23,7 @@ module.exports = {
 			},
 			red: colors.red,
 			white: colors.white,
+			black: colors.black,
 			sky: colors.sky,
 			error: '#FF005E',
 			pending: '#FFB800',
@@ -35,7 +36,16 @@ module.exports = {
 				600: '#767676',
 				700: '#2c3e50',
 				900: '#363636',
-			}
+			},
+			dark: {
+				900: '#09162E',
+				600: 'rgb(19,38,75)',
+				400: 'rgb(24,48,95)',
+				300: '#2f446f',
+				200: '#46597e',
+				100: '#5d6e8f',
+				50: '#ced3dd',
+			},
 		},
 		extend: {
 			lineHeight: {
