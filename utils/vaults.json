@@ -945,7 +945,7 @@
     "WANT_ADDR": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
     "WANT_SYMBOL": "MIM",
     "COINGECKO_SYMBOL": "magic-internet-money",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "gemini-saga": {
@@ -957,7 +957,19 @@
     "WANT_ADDR": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
     "WANT_SYMBOL": "GUSD",
     "COINGECKO_SYMBOL": "gemini-dollar",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
+  },
+  "magic-box": {
+    "TITLE": "Magic Box",
+    "LOGO": "🔮📦",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x209667B173fE4E9559bdA7818e53Bd5F5E0f9acD",
+    "WANT_ADDR": "0x82f0B8B456c1A451378467398982d4834b6829c1",
+    "WANT_SYMBOL": "MIM",
+    "COINGECKO_SYMBOL": "magic-internet-money",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 250
   }
 }
