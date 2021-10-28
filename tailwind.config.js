@@ -1,13 +1,24 @@
 const colors = require('tailwindcss/colors');
 
 module.exports = {
-	purge: [
-		'./pages/**/*.js',
-		'./components/**/*.js'
-	],
 	darkMode: 'class',
 	corePlugins: {
 		ringColor: false,
+	},
+	purge: {
+		content: [
+			'./pages/**/*.js',
+			'./components/**/*.js'
+		],
+		safelist: [
+			'dark',
+			'dark:',
+			'dark:text-dark-50',
+			'dark:border-dark-200',
+			'dark:bg-dark-600',
+			'dark:bg-dark-400',
+			'dark:bg-dark-300',
+		]
 	},
 	theme: {
 		fontFamily: {
