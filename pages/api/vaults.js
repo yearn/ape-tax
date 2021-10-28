@@ -16,12 +16,15 @@ async function newEthCallProvider(provider, chainID) {
 	const	ethcallProvider = new Provider();
 	if (chainID === 1337) {
 		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
 		return ethcallProvider;
 	}
 	await	ethcallProvider.init(provider);
+	if (chainID === 250) {
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
+	}
 	if (chainID === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
 	}
 	return	ethcallProvider;
 }

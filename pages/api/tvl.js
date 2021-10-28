@@ -18,12 +18,15 @@ async function newEthCallProvider(provider, chainID) {
 	const	ethcallProvider = new Provider();
 	if (chainID === 1337) {
 		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
 		return ethcallProvider;
 	}
 	await	ethcallProvider.init(provider);
+	if (chainID === 250) {
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
+	}
 	if (chainID === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
 	}
 	return	ethcallProvider;
 }
@@ -75,7 +78,9 @@ export default fn(async ({network = 1, rpc}) => {
 	const	ethcallProvider = await newEthCallProvider(provider, network);
 	const	_calls = [];
 	const	_cgIDS = [];
-	let		_tvl = 0;
+	let		_tvlEndorsed = 0;
+	let		_tvlExperimental = 0;
+	let		_tvlDeprecated = 0;
 
 	Object.values(vaults).forEach((v) => {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
@@ -102,7 +107,18 @@ export default fn(async ({network = 1, rpc}) => {
 		const	dec = Number(decimals);
 		index++;
 
-		_tvl += Number(ethers.utils.formatUnits(totalAssets, dec)) * price;
+		if (v.VAULT_STATUS === 'endorsed') {
+			_tvlEndorsed += Number(ethers.utils.formatUnits(totalAssets, dec)) * price;
+		} else if (v.VAULT_STATUS === 'withdraw') {
+			_tvlDeprecated += Number(ethers.utils.formatUnits(totalAssets, dec)) * price;
+		} else {
+			_tvlExperimental += Number(ethers.utils.formatUnits(totalAssets, dec)) * price;
+		}
 	});
-	return _tvl;
-}, {maxAge: 1 * 60}); //1 mn
+	return {
+		tvlEndorsed: _tvlEndorsed,
+		tvlExperimental: _tvlExperimental,
+		tvlDeprecated: _tvlDeprecated,
+		tvl: _tvlEndorsed + _tvlExperimental + _tvlDeprecated
+	};
+}, {maxAge: 5 * 60}); //5 mn
