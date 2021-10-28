@@ -21,6 +21,20 @@ import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
 
+async function newEthCallProvider(provider, chainID) {
+	const	ethcallProvider = new Provider();
+	if (chainID === 1337) {
+		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		return ethcallProvider;
+	}
+	await	ethcallProvider.init(provider);
+	if (chainID === 42161) {
+		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
+	return	ethcallProvider;
+}
+
 function AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
 	const [index, setIndex] = useState(0);
@@ -141,11 +155,11 @@ function	Strategies({vault, chainID}) {
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
-			<h1 className={'text-2xl font-mono font-semibold text-ygray-900 mb-6'}>{'Strategies'}</h1>
+			<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Strategies'}</h1>
 			{
 				strategiesData.map((strategy, index) => (
 
-					<div key={index} className={'font-mono text-ygray-700 text-sm mb-4'}>
+					<div key={index} className={'font-mono text-ygray-700 dark:text-dark-50 text-sm mb-4'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>
@@ -199,12 +213,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	const	[isDepositing, set_isDepositing] = useState(false);
 	const	[isWithdrawing, set_isWithdrawing] = useState(false);
 
-	async function newEthCallProvider(provider) {
-		const	ethcallProvider = new Provider();
-		await ethcallProvider.init(provider);
-		return ethcallProvider;
-	}
-
 	const	prepareVaultData = useCallback(async () => {
 		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
 			return;
@@ -213,7 +221,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
-
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
 			providerToUse = getProvider('fantom');
@@ -221,7 +228,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
 			providerToUse = getProvider('polygon');
 		}
-		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
+		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
 			providerToUse = getProvider('arbitrum');
 		}
 
@@ -239,15 +246,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			],
 			providerToUse
 		);
-		let	ethcallProvider = await newEthCallProvider(providerToUse);
-
-		if (Number(network.chainId) === 1337) {
-			ethcallProvider = await newEthCallProvider(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-			ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		} else if (vault.CHAIN_ID === 42161) {
-			ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-		}
-
+		const	ethcallProvider = await newEthCallProvider(providerToUse, network.chainId === 1337 ? 1337 : network.chainID);
 
 		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
 		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI);
@@ -400,111 +399,111 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	}, [prices, vault.COINGECKO_SYMBOL]);
 
 	return (
-		<div className={'mt-8 text-ygray-700'}>
+		<div className={'mt-8 text-ygray-700 dark:text-dark-50'}>
 			<div>
-				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'text-3xl font-mono font-semibold text-ygray-900'}>{vault.TITLE}</h1>
+				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 dark:text-white leading-120px'}>{vault.LOGO}</h1>
+				<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage status={vault.VAULT_STATUS} />
 			<section aria-label={'DETAILS'}>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
-						<p className={'inline'}>{'Vault: '}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Vault: '}</p>
 						<a
-							className={'dashed-underline-gray'}
+							className={'dashed-underline-gray text-ygray-700 dark:text-dark-50'}
 							href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`} target={'_blank'} rel={'noreferrer'}>
 							{'📃 Contract'}
 						</a>
 					</div>
 					<div>
-						<p className={'inline'}>{'Version: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Version: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>{vaultData.apiVersion}</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Deposit Limit: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Deposit Limit: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultData.depositLimit === -1 ? '-' : formatAmount(vaultData?.depositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Total Assets: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Total Assets: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${formatAmount(vaultData?.totalAssets || 0, 2)} ${vault.WANT_SYMBOL}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Total AUM: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Total AUM: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
 							</Suspense>
 						</p>
 					</div>
 				</div>
-				<div className={`font-mono text-ygray-700 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+				<div className={`font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 					<div>
-						<p className={'inline'}>{'Gross APR (last week): '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last week): '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultAPY?.data?.week || '-'}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Gross APR (last month): '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last month): '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultAPY?.data?.month || '-'}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Gross APR (inception): '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (inception): '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultAPY?.data?.inception || '-'}`}
 							</Suspense>
 						</p>
 					</div>
 				</div>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
-						<p className={'inline'}>{'Price Per Share: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Price Per Share: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultData.pricePerShare}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Available limit: '}</p>
-						<p className={'inline'}>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Available limit: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}
 							</Suspense>
 						</p>
 					</div>
 					<div className={'progress-bar'}>
-						<span className={'progress-body mr-2 hidden md:inline'}>
+						<span className={'bg-white dark:bg-dark-600 text-black dark:text-white -ml-2 mr-2 hidden md:inline'}>
 							&nbsp;{'['}&nbsp;
 							<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={50} />
 							&nbsp;{']'}&nbsp;
 						</span>
-						<span className={'progress-body mr-2 inline md:hidden'}>
+						<span className={'bg-white dark:bg-dark-600 text-black dark:text-white -ml-2 mr-2 inline md:hidden'}>
 							&nbsp;{'['}&nbsp;
 							<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={30} />
 							&nbsp;{']'}&nbsp;
@@ -515,34 +514,34 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			</section>
 			<Strategies vault={vault} chainID={chainID} />
 			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 mb-6'}>{'Wallet'}</h1>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
-						<p className={'inline'}>{'Your Account: '}</p>
-						<p className={'inline font-bold'}>{ens || `${address.slice(0, 4)}...${address.slice(-4)}`}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Your Account: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50 font-bold'}>{ens || `${address.slice(0, 4)}...${address.slice(-4)}`}</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Your vault shares: '}</p>
-						<p className={'inline'}>{`${formatAmount(vaultData?.balanceOf || 0, 2)}`}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Your vault shares: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.balanceOf || 0, 2)}`}</p>
 					</div>
 					<div>
-						<p className={'inline'}>{'Your shares value: '}</p>
-						<p className={'inline'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : formatAmount(vaultData?.balanceOfValue || 0, 2)}`}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Your shares value: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : formatAmount(vaultData?.balanceOfValue || 0, 2)}`}</p>
 					</div>
 					<div>
-						<p className={'inline'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-						<p className={'inline'}>{`${formatAmount(vaultData?.wantBalance || 0, 2)}`}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.wantBalance || 0, 2)}`}</p>
 					</div>
 					<div>
-						<p className={'inline'}>{`Your ${chainCoin} Balance: `}</p>
-						<p className={'inline'}>{`${formatAmount(vaultData?.coinBalance || 0, 2)}`}</p>
+						<p className={'inline text-ygray-900 dark:text-white'}>{`Your ${chainCoin} Balance: `}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.coinBalance || 0, 2)}`}</p>
 					</div>
 				</div>
 			</section>
 			<section aria-label={'ACTIONS'} className={'mt-8 my-4'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 mb-6'}>{'APE-IN/OUT'}</h1>
+				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'APE-IN/OUT'}</h1>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono font-medium text-ygray-700 text-sm'}>{'Deposit closed.'}</p>
+					<p className={'font-mono font-medium text-ygray-700 dark:text-dark-50 text-sm'}>{'Deposit closed.'}</p>
 				</div>
 
 				{vault.ZAP_ADDR ?
@@ -550,13 +549,13 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 						<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
 							<div className={'flex flex-row items-center mb-2 mr-2'} style={{height: '33px'}}>
 								<input
-									className={'text-xs px-2 py-1.5 text-ygray-700 border-ygray-200 font-mono'}
-									style={{height: '33px'}}
+									className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
+									style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 									type={'number'}
 									min={'0'}
 									value={zapAmount}
 									onChange={(e) => set_zapAmount(e.target.value)} />
-								<div className={'bg-ygray-50 text-xs font-mono px-2 py-1.5 border border-ygray-200 border-solid border-l-0 text-ygray-400'} style={{height: '33px'}}>
+								<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
 									{chainCoin}&nbsp;
 								</div>
 							</div>
@@ -578,7 +577,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 												});
 											}}
 											disabled={isDepositing || Number(zapAmount) === 0}
-											className={`${isDepositing || Number(zapAmount) === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mb-2 mr-8`}>
+											className={`${isDepositing || Number(zapAmount) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mb-2 mr-8`}>
 											{'🏦 Zap in'}
 										</button>
 									</>
@@ -597,7 +596,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 									});
 								}}
 								disabled={vaultData.allowanceZapOut > 0 || isZapOutApproving}
-								className={`${vaultData.allowanceZapOut > 0 || isZapOutApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+								className={`${vaultData.allowanceZapOut > 0 || isZapOutApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 								{vaultData.allowanceZapOut > 0 ? '✅ Approved' : '🚀 Approve Zap Out'}
 							</button>
 							<button
@@ -617,7 +616,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 									});
 								}}
 								disabled={Number(vaultData.balanceOf) === 0 || vaultData?.allowanceZapOut === 0}
-								className={`${Number(vaultData.balanceOf) === 0 || vaultData?.allowanceZapOut === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+								className={`${Number(vaultData.balanceOf) === 0 || vaultData?.allowanceZapOut === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 								{'💸 Zap out'}
 							</button>
 						</div>
@@ -628,13 +627,13 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
 						<div className={'flex flex-row items-center mb-2 mr-2'} style={{height: '33px'}}>
 							<input
-								className={'text-xs px-2 py-1.5 text-ygray-700 border-ygray-200 font-mono'}
-								style={{height: '33px'}}
+								className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
+								style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 								type={'number'}
 								min={'0'}
 								value={amount}
 								onChange={(e) => set_amount(e.target.value)} />
-							<div className={'bg-ygray-50 text-xs font-mono px-2 py-1.5 border border-ygray-200 border-solid border-l-0 text-ygray-400'} style={{height: '33px'}}>
+							<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
 								{vault.WANT_SYMBOL}
 							</div>
 						</div>
@@ -655,8 +654,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 												fetchApproval();
 											});
 										}}
-										disabled={vaultData.allowance > 0 || isApproving}
-										className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+										className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 										{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
 									</button>
 									<button
@@ -672,7 +670,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 											});
 										}}
 										disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
-										className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+										className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 										{'🏦 Deposit'}
 									</button>
 									<button
@@ -688,7 +686,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 											});
 										}}
 										disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
-										className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+										className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 										{'🏦 Deposit All'}
 									</button>
 								</>
@@ -711,7 +709,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 								});
 							}}
 							disabled={Number(vaultData.balanceOf) === 0}
-							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 							{'💸 Withdraw'}
 						</button>
 						<button
@@ -731,7 +729,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 								});
 							}}
 							disabled={Number(vaultData.balanceOf) === 0}
-							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
+							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold`}>
 							{'💸 Withdraw All'}
 						</button>
 					</div>
@@ -785,10 +783,10 @@ function	Wrapper({vault, prices}) {
 					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Not connected'}</p>
+					<p className={'text-4xl font-mono font-medium text-ygray-900 dark:text-white leading-11'}>{'Not connected'}</p>
 					<button
 						onClick={() => set_modalLoginOpen(true)}
-						className={'bg-ygray-50 hover:bg-ygray-100 transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						className={'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300 transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-medium mt-8'}>
 						{'🔌 Connect wallet'}
 					</button>
 				</div>
@@ -814,10 +812,10 @@ function	Wrapper({vault, prices}) {
 					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'text-4xl font-mono font-medium text-ygray-900 leading-11'}>{'Wrong Chain'}</p>
+					<p className={'text-4xl font-mono font-medium text-ygray-900 dark:text-white leading-11'}>{'Wrong Chain'}</p>
 					<button
 						onClick={() => onSwitchChain(vault.CHAIN_ID)}
-						className={'bg-ygray-50 hover:bg-ygray-100 transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						className={'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300 transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-medium mt-8'}>
 						{'🔀 Change network'}
 					</button>
 				</div>

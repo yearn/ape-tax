@@ -163,14 +163,14 @@ function	Index() {
 	}
 
 	return (
-		<section className={'mt-8 text-ygray-700'}>
+		<section className={'mt-8 text-ygray-700 dark:text-dark-50'}>
 			<div>
-				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'text-3xl font-mono font-semibold text-ygray-900'}>{vault.TITLE}</h1>
+				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 dark:text-white leading-120px'}>{vault.LOGO}</h1>
+				<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage />
 			<section aria-label={'DETAILS'}>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Vault: '}</p>
 						<a
@@ -200,7 +200,7 @@ function	Index() {
 						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData?.totalAUM || 0, 2)}`}</p>
 					</div>
 				</div>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
 						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
@@ -213,8 +213,8 @@ function	Index() {
 			</section>
 
 			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 mb-6'}>{'Wallet'}</h1>
-				<div className={'font-mono text-ygray-700 font-medium text-sm mb-4'}>
+				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
+				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
 						<p className={'inline font-bold'}>{ens || `${address.slice(0, 4)}...${address.slice(-4)}`}</p>
@@ -239,21 +239,22 @@ function	Index() {
 			</section>
 			<section aria-label={'ACTIONS'} className={'my-4'}>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-					<label className={'font-mono font-semibold text-sm mb-1.5 text-ygray-900'}>{'Amount'}</label>
+					<label className={'font-mono font-semibold text-sm mb-1.5 text-ygray-900 dark:text-white'}>{'Amount'}</label>
 					<div className={'flex flex-row items-center'}>
 						<input
-							className={'text-xs px-2 py-1.5 text-ygray-700 border-ygray-200 font-mono'}
+							className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
+							style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 							type={'number'}
 							min={'0'}
 							value={amount}
 							onChange={(e) => set_amount(e.target.value)} />
-						<div className={'bg-ygray-50 text-xs font-mono px-2 py-1.5 border border-ygray-200 border-solid border-l-0 text-ygray-400'}>
+						<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
 							{vault.WANT_SYMBOL}
 						</div>
 					</div>
 				</div>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono font-medium text-ygray-700 text-sm'}>{'Deposit closed.'}</p>
+					<p className={'font-mono font-medium text-ygray-700 dark:text-dark-50 text-sm'}>{'Deposit closed.'}</p>
 				</div>
 				<div className={'mt-10'}>
 					<button
@@ -273,9 +274,9 @@ function	Index() {
 								fetchApproval();
 							});
 						}}
-						disabled={(vaultData.allowance >= Number(amount) && Number(amount) > 0) || isApproving}
-						className={`${(vaultData.allowance >= Number(amount) && Number(amount) > 0) || isApproving ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-						{(vaultData.allowance >= Number(amount) && Number(amount) > 0) ? '✅ Approved' : '🚀 Approve Vault'}
+						disabled={vaultData.allowance > 0 || isApproving}
+						className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
 					</button>
 					<button
 						onClick={() => {
@@ -293,8 +294,8 @@ function	Index() {
 								fetchPostDepositOrWithdraw();
 							});
 						}}
-						disabled={(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing}
-						className={`${(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
+						className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 						{'🏦 Deposit'}
 					</button>
 					<button
@@ -313,8 +314,8 @@ function	Index() {
 								fetchPostDepositOrWithdraw();
 							});
 						}}
-						disabled={(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing}
-						className={`${(vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
+						className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 						{'🏦 Deposit All'}
 					</button>
 					<button
@@ -333,8 +334,8 @@ function	Index() {
 								fetchPostDepositOrWithdraw();
 							});
 						}}
-						disabled={vaultData.balanceOf <= 0}
-						className={`${vaultData.balanceOf <= 0 ? 'bg-ygray-50 opacity-30 cursor-not-allowed' : 'bg-ygray-50 hover:bg-ygray-100'} transition-colors font-mono border border-solid border-ygray-600 text-sm px-1.5 py-1.5 font-semibold`}>
+						disabled={Number(vaultData.balanceOf) === 0}
+						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>

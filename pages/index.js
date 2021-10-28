@@ -176,7 +176,7 @@ function	Index() {
 	if (!active) {
 		return (
 			<section>
-				<h1 className={'text-sm font-mono font-semibold text-ygray-900'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'text-sm font-mono font-semibold text-ygray-900 dark:text-white'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
@@ -184,25 +184,29 @@ function	Index() {
 	return (
 		<section>
 			<div>
-				<h1 className={'hidden lg:block text-3xl font-mono font-semibold text-ygray-900 leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
-				<h1 className={'block md:hidden text-3xl font-mono font-semibold text-ygray-900 leading-9'}>{'Ex'}<sup>{'2'}</sup>{' Registry'}</h1>
+				<div className={'hidden md:block'}>
+					<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
+				</div>
+				<div className={'flex md:hidden'}>
+					<h1 className={'text-xl font-mono font-semibold text-ygray-900 dark:text-white leading-9'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+				</div>
 			</div>
 			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 			<div className={'max-w-5xl my-8'}>
-				<span className={'text-base font-semibold text-ygray-900 font-mono'}>
+				<span className={'text-base font-semibold text-ygray-900 dark:text-white font-mono'}>
 					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 				</span>
-				<span className={'text-base font-normal text-ygray-900 font-mono'}>
+				<span className={'text-base font-normal text-ygray-900 dark:text-white font-mono'}>
 					{` $${formatAmount(tvl?.data || 0, 2)}`}
 				</span>
 			</div>
 
 			<div className={'max-w-5xl grid grid-cols-2 gap-2'}>
 				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-gray-900 font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
+					<h2 className={'text-2xl text-ygray-900 dark:text-white font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -215,10 +219,9 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-gray-700 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'ml-4 text-base font-normal text-ygray-700 dark:text-dark-50 font-mono dashed-underline-gray cursor-pointer'}>
 											{vault.TITLE}
 											<Tag status={vault.VAULT_STATUS} />
-
 										</span>
 									</div>
 								</Link>
@@ -228,7 +231,7 @@ function	Index() {
 				</div>
 
 				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-gray-900 font-mono font-semibold mb-4'}>{'🧠 Weird'}</h2>
+					<h2 className={'text-2xl text-ygray-900 dark:text-white font-mono font-semibold mb-4'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -241,7 +244,7 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-gray-700 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'ml-4 text-base font-normal text-ygray-700 dark:text-dark-50 font-mono dashed-underline-gray cursor-pointer'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
