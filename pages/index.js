@@ -93,6 +93,7 @@ function	DisabledVaults({vaultsInactive}) {
 	);
 }
 
+const fetcher = (...args) => fetch(...args).then(res => res.json());
 function	Index() {
 	const	{provider, active, address, chainID} = useWeb3();
 	const	[, set_nonce] = useState(0);
@@ -100,7 +101,7 @@ function	Index() {
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
 	const	[vaultsInactive, set_vaultsInactive] = useState([]);
 	const	[vaultsInactiveForUser, set_vaultsInactiveForUser] = useState([]);
-	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`);
+	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`, fetcher);
 
 	useEffect(() => {
 		if (!active) {
@@ -194,13 +195,40 @@ function	Index() {
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
-			<div className={'max-w-5xl my-8'}>
+			<div className={'max-w-5xl mt-8'}>
 				<span className={'text-base font-semibold text-ygray-900 dark:text-white font-mono'}>
 					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 				</span>
 				<span className={'text-base font-normal text-ygray-900 dark:text-white font-mono'}>
-					{` $${formatAmount(tvl?.data || 0, 2)}`}
+					{` $${formatAmount(tvl?.data?.tvl || 0, 2)}`}
 				</span>
+			</div>
+
+			<div className={'max-w-5xl mb-8 text-xs opacity-60'}>
+				<div>
+					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
+						{'Endorsed:'}
+					</span>
+					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
+						{` $${formatAmount(tvl?.data?.tvlEndorsed || 0, 2)}`}
+					</span>
+				</div>
+				<div>
+					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
+						{'Experimental:'}
+					</span>
+					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
+						{` $${formatAmount(tvl?.data?.tvlExperimental || 0, 2)}`}
+					</span>
+				</div>
+				<div>
+					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
+						{'Deprecated:'}
+					</span>
+					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
+						{` $${formatAmount(tvl?.data?.tvlDeprecated || 0, 2)}`}
+					</span>
+				</div>
 			</div>
 
 			<div className={'max-w-5xl grid grid-cols-2 gap-2'}>

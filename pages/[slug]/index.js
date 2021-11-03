@@ -8,6 +8,7 @@
 import	React, {useState, useEffect, useCallback}								from	'react';
 import	{ethers}																from	'ethers';
 import	{NextSeo}																from	'next-seo';
+import	axios																	from	'axios'
 import	{Provider, Contract}													from	'ethcall';
 import	useSWR																	from	'swr';
 import	useWeb3																	from	'contexts/useWeb3';
@@ -20,8 +21,6 @@ import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}					from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
-
-const fetcher = (...args) => fetch(...args).then(res => res.json());
 
 async function newEthCallProvider(provider, chainID) {
 	const	ethcallProvider = new Provider();
@@ -37,7 +36,7 @@ async function newEthCallProvider(provider, chainID) {
 	return	ethcallProvider;
 }
 
-function AnimatedWait() {
+function	AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
 	const [index, setIndex] = useState(0);
 	useEffect(() => {
@@ -49,7 +48,7 @@ function AnimatedWait() {
 
 	return <span>{frames[index]}</span>;
 }
-function Suspense({wait, children}) {
+function	Suspense({wait, children}) {
 	if (wait) {
 		return <AnimatedWait />;
 	}
@@ -183,12 +182,14 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
+const fetcher = url => axios.get(url).then(res => res.data)
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
-	const	{data: vaultAPY} = useSWR(`api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher);
+	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
 	const	[zapAmount, set_zapAmount] = useState(0);
+	const	[vaultAPY, set_vaultAPY] = useState(null);
 	const	[vaultData, set_vaultData] = useState({
 		loaded: false,
 		depositLimit: -1,
@@ -298,6 +299,30 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	useEffect(() => {
 		prepareVaultData();
 	}, [prepareVaultData]);
+
+	useEffect(() => {
+		set_vaultAPY(vaultAPYSWR);
+	}, [vaultAPYSWR]);
+
+	useEffect(() => {
+		fetcher(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_vaultAPY);
+	}, []);
+
+	async function _computeAPY() {
+		const	ethcallProvider = await newEthCallProvider(provider, network);
+		const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
+		const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
+		const	callResult = await ethcallProvider.all([
+			vaultContractMultiCall.pricePerShare(),
+			vaultContractMultiCall.decimals(),
+			vaultContractMultiCall.activation(),
+		]);
+		const	[pricePerShare, decimals, activation] = callResult;
+	}
+
+	useEffect(() => {
+
+	}, []);
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
@@ -460,24 +485,24 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last week): '}</p>
 						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultAPY?.data?.week || '-'}`}
+							<Suspense wait={!vaultAPY}>
+								{`${vaultAPY?.week || '-'}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last month): '}</p>
 						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultAPY?.data?.month || '-'}`}
+							<Suspense wait={!vaultAPY}>
+								{`${vaultAPY?.month || '-'}`}
 							</Suspense>
 						</p>
 					</div>
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (inception): '}</p>
 						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultAPY?.data?.inception || '-'}`}
+							<Suspense wait={!vaultAPY}>
+								{`${vaultAPY?.inception || '-'}`}
 							</Suspense>
 						</p>
 					</div>
