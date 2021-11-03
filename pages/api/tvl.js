@@ -8,7 +8,6 @@
 import	axios					from	'axios';
 import	{ethers}				from	'ethers';
 import	{Provider, Contract}	from	'ethcall';
-import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 
@@ -69,9 +68,7 @@ function getProvider(chain = 1) {
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
-export default fn(async ({network = 1, rpc}) => {
-	console.log('HELLO');
-	network = Number(network);
+async function getTVL({network, rpc}) {
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -122,4 +119,21 @@ export default fn(async ({network = 1, rpc}) => {
 		tvlDeprecated: _tvlDeprecated,
 		tvl: _tvlEndorsed + _tvlExperimental + _tvlDeprecated
 	};
-}, {maxAge: 5 * 60}); //5 mn
+}
+
+const	tvlMapping = {};
+let		tvlMappingAccess = {};
+export default async function handler(req, res) {
+	let		{network, rpc, revalidate} = req.query;
+	network = Number(network);
+
+	const	now = new Date().getTime();
+	const	lastAccess = tvlMappingAccess[network] || 0;
+	if (lastAccess === 0 || ((now - lastAccess) > 5 * 60 * 1000) || revalidate === 'true' || !tvlMapping[network]) {
+		const	result = await getTVL({network, rpc});
+		tvlMapping[network] = result;
+		tvlMappingAccess[network] = now;
+	}
+	res.setHeader('Cache-Control', 's-maxage=300'); // 5 minutes
+	return res.status(200).json(tvlMapping[network]);
+}

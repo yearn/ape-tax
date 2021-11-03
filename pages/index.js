@@ -8,6 +8,7 @@
 import	React, {useState, useEffect}						from	'react';
 import	Link												from	'next/link';
 import	useSWR												from	'swr';
+import	axios												from	'axios'
 import	{ethers}											from	'ethers';
 import	useWeb3												from	'contexts/useWeb3';
 import	{formatAmount}										from	'utils';
@@ -93,7 +94,7 @@ function	DisabledVaults({vaultsInactive}) {
 	);
 }
 
-const fetcher = (...args) => fetch(...args).then(res => res.json());
+const		fetcher = url => axios.get(url).then(res => res.data)
 function	Index() {
 	const	{provider, active, address, chainID} = useWeb3();
 	const	[, set_nonce] = useState(0);
@@ -200,7 +201,7 @@ function	Index() {
 					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 				</span>
 				<span className={'text-base font-normal text-ygray-900 dark:text-white font-mono'}>
-					{` $${formatAmount(tvl?.data?.tvl || 0, 2)}`}
+					{` $${formatAmount(tvl?.tvl || 0, 2)}`}
 				</span>
 			</div>
 
@@ -210,7 +211,7 @@ function	Index() {
 						{'Endorsed:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlEndorsed || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
 					</span>
 				</div>
 				<div>
@@ -218,7 +219,7 @@ function	Index() {
 						{'Experimental:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlExperimental || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
 					</span>
 				</div>
 				<div>
@@ -226,7 +227,7 @@ function	Index() {
 						{'Deprecated:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlDeprecated || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
 					</span>
 				</div>
 			</div>

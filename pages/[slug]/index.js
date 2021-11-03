@@ -182,7 +182,7 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
-const fetcher = url => axios.get(url).then(res => res.data)
+const		fetcher = url => axios.get(url).then(res => res.data)
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
