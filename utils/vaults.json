@@ -969,7 +969,19 @@
     "WANT_ADDR": "0x82f0B8B456c1A451378467398982d4834b6829c1",
     "WANT_SYMBOL": "MIM",
     "COINGECKO_SYMBOL": "magic-internet-money",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 250
+  },
+  "liquid-spirit": {
+    "TITLE": "Liquid Spirit",
+    "LOGO": "🍸🧞",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x378cb52b00F9D0921cb46dFc099CFf73b42419dC",
+    "WANT_ADDR": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+    "WANT_SYMBOL": "LUSD",
+    "COINGECKO_SYMBOL": "liquity-usd",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
