@@ -17,7 +17,6 @@ import	GraphemeSplitter									from	'grapheme-splitter';
 
 const	splitter = new GraphemeSplitter();
 const	sortBy = (arr, k) => arr.concat().sort((a, b) => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
-const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
 function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -101,7 +100,7 @@ function	Index() {
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
 	const	[vaultsInactive, set_vaultsInactive] = useState([]);
 	const	[vaultsInactiveForUser, set_vaultsInactiveForUser] = useState([]);
-	const	{data: tvl} = useSWR(`/api/tvl?network=${chainID}`, fetcher);
+	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`);
 
 	useEffect(() => {
 		if (!active) {

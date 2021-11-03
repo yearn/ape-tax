@@ -21,6 +21,8 @@ import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
 
+const fetcher = (...args) => fetch(...args).then(res => res.json());
+
 async function newEthCallProvider(provider, chainID) {
 	const	ethcallProvider = new Provider();
 	if (chainID === 1337) {
@@ -183,7 +185,7 @@ function	Strategies({vault, chainID}) {
 
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
-	const	{data: vaultAPY} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`);
+	const	{data: vaultAPY} = useSWR(`api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher);
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
 	const	[zapAmount, set_zapAmount] = useState(0);

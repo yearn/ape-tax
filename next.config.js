@@ -21,22 +21,5 @@ module.exports = ({
 		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
 		BSCSCAN_API: process.env.BSCSCAN_API,
 		MORALIS_ARBITRUM_KEY: process.env.MORALIS_ARBITRUM_KEY
-	},
-	optimization: {
-		minimize: true,
-		splitChunks: {
-			chunks: 'all',
-			maxInitialRequests: 25,
-			minSize: 20000
-		}
-	},
-	webpack: (config, {webpack}) => {
-		config.plugins.push(new webpack.IgnorePlugin(/\/__tests__\//));
-		return config;
-	},
-	webpackDevMiddleware: (config) => {
-		// Perform customizations to webpack dev middleware config
-		// Important: return the modified config
-		return config;
-	},
+	}
 });
