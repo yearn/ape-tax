@@ -75,12 +75,15 @@ async function getVault({network, address, rpc}) {
 	]);
 
 	const	dec = Number(decimals);
-	const	strategies = await getVaultStrategies({
-		vaultAddress: vaultToUse.VAULT_ADDR,
-		vaultSymbol: vaultToUse.WANT_SYMBOL,
-		vaultChainID: vaultToUse.CHAIN_ID,
-		provider
-	});
+	const	[grossData, strategies] = await Promise.all([
+		prepareGrossData({vault: vaultToUse, pricePerShare, decimals, activation}),
+		getVaultStrategies({
+			vaultAddress: vaultToUse.VAULT_ADDR,
+			vaultSymbol: vaultToUse.WANT_SYMBOL,
+			vaultChainID: vaultToUse.CHAIN_ID,
+			provider
+		})
+	]);
 	return ({
 		title: vaultToUse.TITLE,
 		logo: vaultToUse.LOGO,
@@ -100,6 +103,11 @@ async function getVault({network, address, rpc}) {
 			decimals: dec,
 			activation: Number(activation)
 		},
+		APY: {
+			week: grossData.week,
+			month: grossData.month,
+			inception: grossData.inception,
+		},
 		want: {
 			address: vaultToUse.WANT_ADDR,
 			symbol: vaultToUse.WANT_SYMBOL,
@@ -112,6 +120,9 @@ const	oneVaultMapping = {};
 let		oneVaultMappingAccess = {};
 export default async function handler(req, res) {
 	let		{address, network, rpc, revalidate} = req.query;
+	if (!address || address === '') {
+		return res.status(200).json({});
+	}
 
 	network = Number(network);
 	address = address.toLowerCase();

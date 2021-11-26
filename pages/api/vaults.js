@@ -14,7 +14,7 @@ import	* as utils				from	'utils';
 
 const	{newEthCallProvider, getProvider, asyncForEach, chunk} = utils;
 
-async function getVaults({network = 1, rpc, status = 'active', apy = 0}) {
+async function getVaults({network, rpc, status, apy}) {
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -56,11 +56,8 @@ async function getVaults({network = 1, rpc, status = 'active', apy = 0}) {
 		const	dec = Number(decimals);
 		index++;
 
-		if (apy === 1) {
-			const	[grossData] = await Promise.all([
-				prepareGrossData({vault: v, pricePerShare, decimals, activation}),
-			]);
-
+		if (Number(apy) === 1) {
+			const	grossData = await prepareGrossData({vault: v, pricePerShare, decimals, activation});
 			_vaults.push({
 				title: v.TITLE,
 				logo: v.LOGO,
