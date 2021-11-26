@@ -8,6 +8,7 @@
 const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');
+const	{getProvider, toAddress} = require('../utils/index');
 const	fs = require('fs');
 const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').argv;
 
@@ -39,18 +40,6 @@ function	getSlugFromString(str) {
 	str = str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 	return str;
 }
-function	getProvider(chain = 1) {
-	if (chain === 1) {
-		return new ethers.providers.AlchemyProvider('homestead');
-	} else if (chain === 137) {
-		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools/');
-	} else if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-	}
-	return (new ethers.providers.AlchemyProvider('homestead'));
-}
 
 const	ENUM_CHAIN = {
 	'Mainnet (1)': 1,
@@ -58,20 +47,6 @@ const	ENUM_CHAIN = {
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
 	'Arbitrum One (42161)': 42161,
-};
-const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
-const	toAddress = (address) => {
-	if (!address) {
-		return ADDRESS_ZERO;
-	}
-	if (address === 'GENESIS') {
-		return ADDRESS_ZERO;
-	}
-	try {
-		return ethers.utils.getAddress(address);	
-	} catch (error) {
-		return ADDRESS_ZERO;
-	}
 };
 
 let	defaultVaultType = 'experimental';
@@ -179,7 +154,7 @@ inquirer.prompt(questions).then(async ({
 	vaultStatus = defaultVaultStatus,
 }) => {
 	const	address = toAddress(vaultAddress);
-	if (address === ADDRESS_ZERO) {
+	if (address === ethers.constants.AddressZero) {
 		throw 'Cannot be address 0';
 	}
 	const	provider = getProvider(ENUM_CHAIN[vaultChain]);

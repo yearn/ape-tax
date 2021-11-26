@@ -5,124 +5,15 @@
 **	@Filename:				vaults.js
 ******************************************************************************/
 
-import	axios					from	'axios';
 import	{ethers}				from	'ethers';
-import	{Provider, Contract}	from	'ethcall';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	Web3Contract			from	'web3-eth-contract';
+import	{Contract}				from	'ethcall';
+import	{fetchBlockTimestamp}	from	'utils/API';
+import	utils					from	'utils';
 
-async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	if (chainID === 1337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	if (chainID === 250) {
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-	}
-	if (chainID === 42161) {
-		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-	return	ethcallProvider;
-}
-
-async function	fetchBlockTimestamp(timestamp, network = 1) {
-	if (network === 250) {
-		const	result = await performGet(`https://api.ftmscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.FTMSCAN_API}`);
-
-		if (result) {
-			return result.result;
-		}
-		return null;
-	}
-	if (network === 56) {
-		const	result = await performGet(`https://api.bscscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.BSCSCAN_API}`);
-
-		if (result) {
-			return result.result;
-		}
-		return null;
-	}
-	if (network === 137) {
-		const	result = await performGet(`https://api.polygonscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.POLYGONSCAN_API}`);
-
-		if (result) {
-			return result.result;
-		}
-		return null;
-	}
-	if (network === 42161) {
-		const	result = await performGet(`https://api.arbiscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
-
-		if (result) {
-			return result.result;
-		}
-		return null;
-	}
-
-	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
-
-	if (result) {
-		return result.result;
-	}
-	return null;
-}
-
-export const	performGet = (url) => {
-	return (
-		axios.get(url)
-			.then(function (response) {
-				return response.data;
-			})
-			.catch(function (error) {
-				console.warn(error);
-				return null;
-			})
-	);
-};
-
-function getProvider(chain = 1) {
-	if (chain === 1) {
-		if (process.env.ALCHEMY_KEY) {
-			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		} else {
-			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-		}
-	} else if (chain === 'polygon' || chain === 137) {
-		if (process.env.ALCHEMY_KEY_POLYGON) {
-			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
-		}
-		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org');
-	} else if (chain === 42161) {
-		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	} else if (chain === 1337) {
-		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	}
-	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
-}
-function getWeb3Provider(chain = 1) {
-	if (chain === 1) {
-		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
-	} else if (chain === 'polygon' || chain === 137) {
-		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
-	} else if (chain === 250) {
-		return ('https://rpc.ftm.tools');
-	} else if (chain === 56) {
-		return ('https://bsc-dataseed1.defibit.io/');
-	} else if (chain === 42161) {
-		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	} else if (chain === 1337) {
-		return ('http://localhost:8545');
-	}
-	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
-}
+const	{newEthCallProvider, getProvider, getWeb3Provider} = utils;
 
 async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 	let		_grossAPRWeek = '-';

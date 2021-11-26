@@ -9,7 +9,7 @@ import	React, {useState, useEffect, useCallback}								from	'react';
 import	{ethers}																from	'ethers';
 import	{NextSeo}																from	'next-seo';
 import	axios																	from	'axios'
-import	{Provider, Contract}													from	'ethcall';
+import	{Contract}																from	'ethcall';
 import	useSWR																	from	'swr';
 import	useWeb3																	from	'contexts/useWeb3';
 import	ModalLogin																from	'components/ModalLogin';
@@ -17,24 +17,10 @@ import	useWindowInFocus														from	'hook/useWindowInFocus';
 import	vaults																	from	'utils/vaults.json';
 import	chains																	from	'utils/chains.json';
 import	{performGet}															from	'utils/API';
-import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}					from	'utils';
+import	{asyncForEach, bigNumber, formatAmount, newEthCallProvider}				from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
-
-async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	if (chainID === 1337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	if (chainID === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-	return	ethcallProvider;
-}
 
 function	AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
@@ -131,7 +117,7 @@ function	Strategies({vault, chainID}) {
 			** through the max number of strategies until we hit 0
 			**************************************************************************/
 			const	strategyAddress = await vaultContract.withdrawalQueue(index);
-			if (strategyAddress === ADDRESS_ZERO) {
+			if (strategyAddress === ethers.constants.AddressZero) {
 				shouldBreak = true;
 				return;
 			}

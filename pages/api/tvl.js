@@ -5,68 +5,14 @@
 **	@Filename:				vaults.js
 ******************************************************************************/
 
-import	axios					from	'axios';
-import	{ethers}				from	'ethers';
-import	{Provider, Contract}	from	'ethcall';
-import	vaults					from	'utils/vaults.json';
-import	yVaultABI				from	'utils/ABI/yVault.abi.json';
+import	{ethers}					from	'ethers';
+import	{Contract}					from	'ethcall';
+import	vaults						from	'utils/vaults.json';
+import	yVaultABI					from	'utils/ABI/yVault.abi.json';
+import	{performGet}				from	'utils/API';
+import	utils						from	'utils';
 
-const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
-
-async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	if (chainID === 1337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	if (chainID === 250) {
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-	}
-	if (chainID === 42161) {
-		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-	return	ethcallProvider;
-}
-
-export const	performGet = (url) => {
-	return (
-		axios.get(url)
-			.then(function (response) {
-				return response.data;
-			})
-			.catch(function (error) {
-				console.warn(error);
-				return null;
-			})
-	);
-};
-
-async function asyncForEach(array, callback) {
-	for (let index = 0; index < array.length; index++) {
-		await callback(array[index], index, array);
-	}
-}
-
-function getProvider(chain = 1) {
-	if (chain === 1) {
-		if (process.env.ALCHEMY_KEY) {
-			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		} else {
-			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-		}
-	} else if (chain === 137) {
-		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
-	} else if (chain === 1337) {
-		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	}
-	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
-}
+const	{newEthCallProvider, getProvider, chunk, asyncForEach} = utils;
 
 async function getTVL({network, rpc}) {
 	let		provider = getProvider(network);

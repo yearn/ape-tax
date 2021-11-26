@@ -5,32 +5,22 @@
 **	@Filename:				index.js
 ******************************************************************************/
 
-import	{ethers}						from	'ethers';
-
-export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+import	{ethers}	from	'ethers';
+import	{Provider}	from	'ethcall';
 
 export const toAddress = (address) => {
 	if (!address) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	if (address === 'GENESIS') {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	try {
 		return ethers.utils.getAddress(address);	
 	} catch (error) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 };
-
-export const bigNumber = ethers.BigNumber;
-
-export function truncateAddress(address) {
-	if (address !== undefined) {
-		return `${address.slice(0, 4)}...${address.slice(-4)}`;
-	}
-	return '0x000...0000';
-}
 
 export async function asyncForEach(array, callback) {
 	for (let index = 0; index < array.length; index++) {
@@ -45,6 +35,63 @@ export function	formatAmount(amount, decimals = 2) {
 	return (new Intl.NumberFormat([locale, 'en-US'], {minimumFractionDigits: 0, maximumFractionDigits: decimals}).format(amount));
 }
 
-export function	formatValue(value, decimals = 2) {
-	return (new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: decimals}).format(value));
+export const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
+
+export async function newEthCallProvider(provider, chainID) {
+	const	ethcallProvider = new Provider();
+	if (chainID === 1337) {
+		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
+		return ethcallProvider;
+	}
+	await	ethcallProvider.init(provider);
+	if (chainID === 250) {
+		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
+	}
+	if (chainID === 42161) {
+		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
+	}
+	return	ethcallProvider;
+}
+
+export function getProvider(chain = 1) {
+	if (chain === 1) {
+		if (process.env.ALCHEMY_KEY) {
+			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
+		} else {
+			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
+		}
+	} else if (chain === 137) {
+		if (process.env.ALCHEMY_KEY_POLYGON) {
+			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
+		}
+		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
+	} else if (chain === 250) {
+		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
+	} else if (chain === 56) {
+		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
+	} else if (chain === 1337) {
+		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
+	} else if (chain === 42161) {
+		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+	} 
+	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
+}
+
+
+export function getWeb3Provider(chain = 1) {
+	if (chain === 1) {
+		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
+	} else if (chain === 'polygon' || chain === 137) {
+		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
+	} else if (chain === 250) {
+		return ('https://rpc.ftm.tools');
+	} else if (chain === 56) {
+		return ('https://bsc-dataseed1.defibit.io/');
+	} else if (chain === 42161) {
+		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+	} else if (chain === 1337) {
+		return ('http://localhost:8545');
+	}
+	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
 }
