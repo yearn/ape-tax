@@ -189,7 +189,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		progress:  0,
 		allowance: 0,
 		apiVersion: '-',
-		wantBalanceRaw: bigNumber.from(0),
+		wantBalanceRaw: ethers.BigNumber.from(0),
 		allowanceZapOut: 0
 	});
 	const	[isApproving, set_isApproving] = useState(false);

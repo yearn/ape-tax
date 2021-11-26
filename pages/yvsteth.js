@@ -45,7 +45,7 @@ function	Index() {
 		totalAUM: 0,
 		allowance: 0,
 		version: '-',
-		wantBalanceRaw: bigNumber.from(0),
+		wantBalanceRaw: ethers.BigNumber.from(0),
 	});
 	const	[isApproving, set_isApproving] = useState(false);
 	const	[isDepositing, set_isDepositing] = useState(false);
