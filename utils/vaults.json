@@ -1,6 +1,7 @@
 {
   "yusdcidle": {
     "TITLE": "USDc Idle",
+    "SLUG": "yusdcidle",
     "LOGO": "🏆🚀",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -13,6 +14,7 @@
   },
   "icecreath2": {
     "TITLE": "iceCREATH2",
+    "SLUG": "icecreath2",
     "LOGO": "🍦TH2",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -25,6 +27,7 @@
   },
   "sushirocket": {
     "TITLE": "Sushi YFI-ETH",
+    "SLUG": "sushirocket",
     "LOGO": "🍣🍬",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -37,6 +40,7 @@
   },
   "daihard": {
     "TITLE": "DAI Hard",
+    "SLUG": "daihard",
     "LOGO": "🏅💪",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -49,6 +53,7 @@
   },
   "usdc": {
     "TITLE": "USd Coin",
+    "SLUG": "usdc",
     "LOGO": "🇺🇸🪙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -61,6 +66,7 @@
   },
   "yvsteth": {
     "TITLE": "Lido St. Ether",
+    "SLUG": "yvsteth",
     "LOGO": "👼🏦",
     "VAULT_ABI": "LidoVault",
     "VAULT_TYPE": "weird",
@@ -73,6 +79,7 @@
   },
   "daiironbank": {
     "TITLE": "DAI Ironbank",
+    "SLUG": "daiironbank",
     "LOGO": "🦾🏦",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -85,6 +92,7 @@
   },
   "wethmaker": {
     "TITLE": "WETH Maker",
+    "SLUG": "wethmaker",
     "LOGO": "🖲🏰",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -97,6 +105,7 @@
   },
   "stecrv": {
     "TITLE": "st. Ether-ETH Pool",
+    "SLUG": "stecrv",
     "LOGO": "💧🎱",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -109,6 +118,7 @@
   },
   "ironlender": {
     "TITLE": "WETH Iron Lender",
+    "SLUG": "ironlender",
     "LOGO": "🦾💰",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -121,6 +131,7 @@
   },
   "mmwbtc": {
     "TITLE": "Mushroom Worker",
+    "SLUG": "mmwbtc",
     "LOGO": "🍄🧑‍🌾",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "weird",
@@ -133,6 +144,7 @@
   },
   "ecrvseth": {
     "TITLE": "Egyptian God sETH/ETH",
+    "SLUG": "ecrvseth",
     "LOGO": "𓀀☀︎",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -145,6 +157,7 @@
   },
   "wethgenlender": {
     "TITLE": "WETH Gen Lender",
+    "SLUG": "wethgenlender",
     "LOGO": "🧬💰",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -157,6 +170,7 @@
   },
   "susdidle": {
     "TITLE": "sUSD Idle",
+    "SLUG": "susdidle",
     "LOGO": "🏆⚔️",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -169,6 +183,7 @@
   },
   "creamyswords": {
     "TITLE": "Creamy Swords SNX",
+    "SLUG": "creamyswords",
     "LOGO": "🍦⚔️",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -181,6 +196,7 @@
   },
   "spadavault": {
     "TITLE": "SpadaVault",
+    "SLUG": "spadavault",
     "LOGO": "s🦡",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -193,6 +209,7 @@
   },
   "fantomsfury": {
     "TITLE": "Fantom's Fury",
+    "SLUG": "fantomsfury",
     "LOGO": "👻⚡",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -205,6 +222,7 @@
   },
   "fantomsdollar": {
     "TITLE": "Fantom's Dollar",
+    "SLUG": "fantomsdollar",
     "LOGO": "👻💵",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -217,6 +235,7 @@
   },
   "hotcoins": {
     "TITLE": "HotCoins",
+    "SLUG": "hotcoins",
     "LOGO": "🔥🪙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -229,6 +248,7 @@
   },
   "fullmetalfarmer": {
     "TITLE": "Full Metal Farmer",
+    "SLUG": "fullmetalfarmer",
     "LOGO": "🧙‍♂️🧪",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -241,6 +261,7 @@
   },
   "badgergoat": {
     "TITLE": "Badger's GOAT",
+    "SLUG": "badgergoat",
     "LOGO": "🦡🐐",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -253,6 +274,7 @@
   },
   "oceanofdata": {
     "TITLE": "Ocean of Data",
+    "SLUG": "oceanofdata",
     "LOGO": "🌊💿",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -265,6 +287,7 @@
   },
   "dataaave": {
     "TITLE": "Data AAVE",
+    "SLUG": "dataaave",
     "LOGO": "💿🕊",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -277,6 +300,7 @@
   },
   "idletether": {
     "TITLE": "Idle Tether",
+    "SLUG": "idletether",
     "LOGO": "🛌T",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -289,6 +313,7 @@
   },
   "trueidle": {
     "TITLE": "True Idle",
+    "SLUG": "trueidle",
     "LOGO": "T🛌",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -301,6 +326,7 @@
   },
   "poolwithus": {
     "TITLE": "Pool with Us",
+    "SLUG": "poolwithus",
     "LOGO": "🏊‍♂️👩‍👩‍👧‍👧",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -313,6 +339,7 @@
   },
   "vesperusdc": {
     "TITLE": "Vesper-bell USDC",
+    "SLUG": "vesperusdc",
     "LOGO": "🛐🪙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -325,6 +352,7 @@
   },
   "sushibank": {
     "TITLE": "Bank Sushi",
+    "SLUG": "sushibank",
     "LOGO": "🏦🍣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -337,6 +365,7 @@
   },
   "fantombaby": {
     "TITLE": "Fantom's Ape Ape Baby",
+    "SLUG": "fantombaby",
     "LOGO": "🧊👶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -349,6 +378,7 @@
   },
   "bscbaby": {
     "TITLE": "BSC's Ape Ape Baby",
+    "SLUG": "bscbaby",
     "LOGO": "🧊👶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -361,6 +391,7 @@
   },
   "ellipsoidal": {
     "TITLE": "Ellipsoidal Farmer",
+    "SLUG": "ellipsoidal",
     "LOGO": "🍩3️⃣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -373,6 +404,7 @@
   },
   "ethbaby": {
     "TITLE": "ETH's Ape Ape Baby",
+    "SLUG": "ethbaby",
     "LOGO": "🧊👶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -385,6 +417,7 @@
   },
   "bscfrappedape": {
     "TITLE": "BSC's Frapped Ape",
+    "SLUG": "bscfrappedape",
     "LOGO": "☕️🦧",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -397,6 +430,7 @@
   },
   "bscfusdtproxyeth": {
     "TITLE": "BSC's fUSDT proxy to ETH",
+    "SLUG": "bscfusdtproxyeth",
     "LOGO": "😷🐙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -409,6 +443,7 @@
   },
   "bsceth": {
     "TITLE": "BSC ETH",
+    "SLUG": "bsceth",
     "LOGO": "🕳️🐨",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -421,6 +456,7 @@
   },
   "ftmfusdtproxyeth": {
     "TITLE": "FTM's fUSDT proxy to ETH",
+    "SLUG": "ftmfusdtproxyeth",
     "LOGO": "😷🐙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -433,6 +469,7 @@
   },
   "ftmfrappedape": {
     "TITLE": "FTM's Frapped Ape",
+    "SLUG": "ftmfrappedape",
     "LOGO": "☕️🦧",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -445,6 +482,7 @@
   },
   "grandmastersdai": {
     "TITLE": "Old Grandmaster's DAI",
+    "SLUG": "grandmastersdai",
     "LOGO": "♟👴",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -457,6 +495,7 @@
   },
   "bnbfarmer": {
     "TITLE": "BNB Farmer",
+    "SLUG": "bnbfarmer",
     "LOGO": "🔶👨‍🌾",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -469,6 +508,7 @@
   },
   "spooky": {
     "TITLE": "Spooky Skeletons",
+    "SLUG": "spooky",
     "LOGO": "🙀👻",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -481,6 +521,7 @@
   },
   "rai": {
     "TITLE": "Reflex me",
+    "SLUG": "rai",
     "LOGO": "📷💚",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -493,6 +534,7 @@
   },
   "nrv": {
     "TITLE": "Nervy Mastermind",
+    "SLUG": "nrv",
     "LOGO": "☸️🤔",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -505,6 +547,7 @@
   },
   "ftm_woofy": {
     "TITLE": "FTM's Wandering Woofy",
+    "SLUG": "ftm_woofy",
     "LOGO": "🧭🐶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -517,6 +560,7 @@
   },
   "complifiusdc": {
     "TITLE": "Comfi Carousel",
+    "SLUG": "complifiusdc",
     "LOGO": "🛋🎠",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -529,6 +573,7 @@
   },
   "frogprince": {
     "TITLE": "The Frog Prince",
+    "SLUG": "frogprince",
     "LOGO": "🐸💋",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -541,6 +586,7 @@
   },
   "frogprince2": {
     "TITLE": "The Frog Prince 2",
+    "SLUG": "frogprince2",
     "LOGO": "🐸💋",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -553,6 +599,7 @@
   },
   "matic_woofy": {
     "TITLE": "Matic's Wandering Woofy",
+    "SLUG": "matic_woofy",
     "LOGO": "🧭🐶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -565,6 +612,7 @@
   },
   "matic-idle-dai": {
     "TITLE": "Matic's Magic Idle DAI",
+    "SLUG": "matic-idle-dai",
     "LOGO": "🏆🚀",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -577,6 +625,7 @@
   },
   "purpletwister": {
     "TITLE": "Purple Twister",
+    "SLUG": "purpletwister",
     "LOGO": "🟣🧬",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -589,6 +638,7 @@
   },
   "ultrasoundmoney": {
     "TITLE": "Wrapped Ultra Sound Money",
+    "SLUG": "ultrasoundmoney",
     "LOGO": "🦇🔊",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -601,6 +651,7 @@
   },
   "coinsonfire": {
     "TITLE": "Coins On Fire",
+    "SLUG": "coinsonfire",
     "LOGO": "🪙🔥",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -613,6 +664,7 @@
   },
   "dollarstorebento": {
     "TITLE": "Dollar Store Bento",
+    "SLUG": "dollarstorebento",
     "LOGO": "💵🍱",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -625,6 +677,7 @@
   },
   "splitcameron": {
     "TITLE": "Split Cameron",
+    "SLUG": "splitcameron",
     "LOGO": "🕴🖖",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -637,6 +690,7 @@
   },
   "tiedtyler": {
     "TITLE": "Tied Tyler",
+    "SLUG": "tiedtyler",
     "LOGO": "🕴🪢",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -649,6 +703,7 @@
   },
   "daihard2": {
     "TITLE": "DAI Hard 2",
+    "SLUG": "daihard2",
     "LOGO": "💪💪",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -661,6 +716,7 @@
   },
   "intergalacticsushi": {
     "TITLE": "Intergalactic Sushi",
+    "SLUG": "intergalacticsushi",
     "LOGO": "✨🍣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -673,6 +729,7 @@
   },
   "ftmbtccrv": {
     "TITLE": "Fantom Bitcoin",
+    "SLUG": "ftmbtccrv",
     "LOGO": "👻🪙",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -685,6 +742,7 @@
   },
   "wether": {
     "TITLE": "Wether",
+    "SLUG": "wether",
     "LOGO": "🧬🐑",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -697,6 +755,7 @@
   },
   "curvedaave": {
     "TITLE": "Curved aave",
+    "SLUG": "curvedaave",
     "LOGO": "🧬🐑",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -709,6 +768,7 @@
   },
   "daihard3": {
     "TITLE": "DAI Hard with a Vengeance",
+    "SLUG": "daihard3",
     "LOGO": "💪3️⃣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -721,6 +781,7 @@
   },
   "bitcoinwave": {
     "TITLE": "Bitcoin wAAVE",
+    "SLUG": "bitcoinwave",
     "LOGO": "₿👋",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -733,6 +794,7 @@
   },
   "interstellarsushi": {
     "TITLE": "Interstellar Sushi",
+    "SLUG": "interstellarsushi",
     "LOGO": "✨🍣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -745,6 +807,7 @@
   },
   "compoundingcosmos": {
     "TITLE": "Compounding Cosmos",
+    "SLUG": "compoundingcosmos",
     "LOGO": "📈✨",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -757,6 +820,7 @@
   },
   "spookystars": {
     "TITLE": "Spooky Stars",
+    "SLUG": "spookystars",
     "LOGO": "👻✨",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -769,6 +833,7 @@
   },
   "truecereal": {
     "TITLE": "True Cereal",
+    "SLUG": "truecereal",
     "LOGO": "🔵🥣",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -781,6 +846,7 @@
   },
   "synthetic-btc": {
     "TITLE": "Synthetic BTC",
+    "SLUG": "synthetic-btc",
     "LOGO": "⚔🟡",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -793,6 +859,7 @@
   },
   "yfi-wifey": {
     "TITLE": "YFI Wifey",
+    "SLUG": "yfi-wifey",
     "LOGO": "⚖️🤰",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -805,6 +872,7 @@
   },
   "wether-aether": {
     "TITLE": "wEther Aether",
+    "SLUG": "wether-aether",
     "LOGO": "⚖️💫",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -817,6 +885,7 @@
   },
   "hedged-dollar": {
     "TITLE": "Hedged Dollar",
+    "SLUG": "hedged-dollar",
     "LOGO": "🦔🦅",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -829,6 +898,7 @@
   },
   "the-fantom": {
     "TITLE": "The Fantom",
+    "SLUG": "the-fantom",
     "LOGO": "👻👻",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -842,6 +912,7 @@
   },
   "get-bridged-or-dai-farmin": {
     "TITLE": "Get bridge'd or DAI farmin'",
+    "SLUG": "get-bridged-or-dai-farmin",
     "LOGO": "🌁 ⚰️",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -854,6 +925,7 @@
   },
   "fantom-dai": {
     "TITLE": "Fantom's Dai Hard",
+    "SLUG": "fantom-dai",
     "LOGO": "👻⚰️",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -866,6 +938,7 @@
   },
   "fantom-2crv": {
     "TITLE": "Split Cameron V2",
+    "SLUG": "fantom-2crv",
     "LOGO": "🕴🖖",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -878,6 +951,7 @@
   },
   "ghost-yfi": {
     "TITLE": "Ghost YFI",
+    "SLUG": "ghost-yfi",
     "LOGO": "👻🤰",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -890,6 +964,7 @@
   },
   "ghost-woofy": {
     "TITLE": "Ghost Woofy",
+    "SLUG": "ghost-woofy",
     "LOGO": "👻🐶",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -902,6 +977,7 @@
   },
   "arbi-one": {
     "TITLE": "Arbi One",
+    "SLUG": "arbi-one",
     "LOGO": "🥇🥇",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -914,6 +990,7 @@
   },
   "ftm_mr_mime": {
     "TITLE": "Mr. MIMe",
+    "SLUG": "ftm_mr_mime",
     "LOGO": "🤡🔮",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -926,6 +1003,7 @@
   },
   "ftm_usdc": {
     "TITLE": "Ghosty Eagle",
+    "SLUG": "ftm_usdc",
     "LOGO": "👻🦅",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -938,6 +1016,7 @@
   },
   "mimosa": {
     "TITLE": "MIMosa",
+    "SLUG": "mimosa",
     "LOGO": "🤡🔮",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -950,6 +1029,7 @@
   },
   "gemini-saga": {
     "TITLE": "Gemini Saga",
+    "SLUG": "gemini-saga",
     "LOGO": "♊👼",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -962,6 +1042,7 @@
   },
   "magic-box": {
     "TITLE": "Magic Box",
+    "SLUG": "magic-box",
     "LOGO": "🔮📦",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
@@ -974,6 +1055,7 @@
   },
   "liquid-spirit": {
     "TITLE": "Liquid Spirit",
+    "SLUG": "liquid-spirit",
     "LOGO": "🍸🧞",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",

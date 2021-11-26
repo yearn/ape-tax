@@ -5,22 +5,24 @@
 **	@Filename:				index.js
 ******************************************************************************/
 
-import	React, {useState, useEffect, useCallback}								from	'react';
-import	{ethers}																from	'ethers';
-import	{NextSeo}																from	'next-seo';
-import	axios																	from	'axios'
-import	{Contract}																from	'ethcall';
-import	useSWR																	from	'swr';
-import	useWeb3																	from	'contexts/useWeb3';
-import	ModalLogin																from	'components/ModalLogin';
-import	useWindowInFocus														from	'hook/useWindowInFocus';
-import	vaults																	from	'utils/vaults.json';
-import	chains																	from	'utils/chains.json';
-import	{performGet}															from	'utils/API';
-import	{asyncForEach, bigNumber, formatAmount, newEthCallProvider}				from	'utils';
-import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
-import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
-import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
+import	React, {useState, useEffect, useCallback}		from	'react';
+import	{ethers}										from	'ethers';
+import	{NextSeo}										from	'next-seo';
+import	axios											from	'axios'
+import	{Contract}										from	'ethcall';
+import	useSWR											from	'swr';
+import	useWeb3											from	'contexts/useWeb3';
+import	ModalLogin										from	'components/ModalLogin';
+import	useWindowInFocus								from	'hook/useWindowInFocus';
+import	vaults											from	'utils/vaults.json';
+import	chains											from	'utils/chains.json';
+import	{performGet}									from	'utils/API';
+import	{asyncForEach, bigNumber, formatAmount,
+	newEthCallProvider, parseMarkdown}					from	'utils';
+import	{approveToken, depositToken, withdrawToken,
+	apeInVault, apeOutVault}							from	'utils/actions';
+import	ERC20ABI										from	'utils/ABI/erc20.abi.json';
+import	YVAULTABI										from	'utils/ABI/yVault.abi.json';
 
 function	AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
@@ -75,13 +77,6 @@ function	ProgressChart({progress, width}) {
 		white_width = 0;
 	
 	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
-}
-
-function	parseMarkdown(markdownText) {
-	const htmlText = markdownText
-		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
-
-	return htmlText.trim();
 }
 
 function	Strategies({vault, chainID}) {

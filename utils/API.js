@@ -13,8 +13,7 @@ export const	performGet = (url) => {
 			.then(function (response) {
 				return response.data;
 			})
-			.catch(function (error) {
-				console.warn(error);
+			.catch(function () {
 				return null;
 			})
 	);

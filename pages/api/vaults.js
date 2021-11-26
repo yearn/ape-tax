@@ -6,17 +6,15 @@
 ******************************************************************************/
 
 import	{ethers}				from	'ethers';
-import	{fn}					from	'utils/fn';
 import	{Contract}				from	'ethcall';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	{prepareGrossData}		from	'pages/api/specificApy';
-import	utils					from	'utils';
+import	* as utils				from	'utils';
 
 const	{newEthCallProvider, getProvider, asyncForEach, chunk} = utils;
 
-export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
-	network = Number(network);
+async function getVaults({network = 1, rpc, status = 'active', apy = 0}) {
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -59,12 +57,10 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 		index++;
 
 		if (apy === 1) {
-			const	grossData = await prepareGrossData({
-				vault: v,
-				pricePerShare,
-				decimals,
-				activation,
-			});
+			const	[grossData] = await Promise.all([
+				prepareGrossData({vault: v, pricePerShare, decimals, activation}),
+			]);
+
 			_vaults.push({
 				title: v.TITLE,
 				logo: v.LOGO,
@@ -122,4 +118,23 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 		}
 	});
 	return _vaults;
-}, {maxAge: 10 * 60}); //10 mn
+}
+
+const	vaultMapping = {};
+let		vaultMappingAccess = {};
+export default async function handler(req, res) {
+	let		{apy = 0, network = 1, rpc, status = 'active', revalidate} = req.query;
+
+	network = Number(network);
+	const	now = new Date().getTime();
+	const	lastAccess = vaultMappingAccess[network] || 0;
+	if (lastAccess === 0 || ((now - lastAccess) > 10 * 60 * 1000) || revalidate === 'true' || !vaultMapping[network]) {
+		const	result = await getVaults({network, rpc, status, apy});
+		vaultMapping[network] = result;
+		vaultMappingAccess[network] = now;
+	}
+	res.setHeader('Cache-Control', 's-maxage=600'); // 10 minutes
+	return res.status(200).json(vaultMapping[network]);
+}
+
+export {prepareGrossData};

@@ -10,7 +10,7 @@ import	{Contract}					from	'ethcall';
 import	vaults						from	'utils/vaults.json';
 import	yVaultABI					from	'utils/ABI/yVault.abi.json';
 import	{performGet}				from	'utils/API';
-import	utils						from	'utils';
+import	* as utils					from	'utils';
 
 const	{newEthCallProvider, getProvider, chunk, asyncForEach} = utils;
 
@@ -70,7 +70,7 @@ async function getTVL({network, rpc}) {
 const	tvlMapping = {};
 let		tvlMappingAccess = {};
 export default async function handler(req, res) {
-	let		{network, rpc, revalidate} = req.query;
+	let		{network = 1, rpc, revalidate} = req.query;
 	network = Number(network);
 
 	const	now = new Date().getTime();

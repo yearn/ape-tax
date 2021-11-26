@@ -196,6 +196,7 @@ inquirer.prompt(questions).then(async ({
 	});
 	updatedVaults[vaultSlug] = {
 		TITLE: vaultName,
+		SLUG: vaultSlug,
 		LOGO: vaultLogo,
 		VAULT_ABI: 'yVaultV2',
 		VAULT_TYPE: vaultType,

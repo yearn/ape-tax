@@ -11,7 +11,7 @@ import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	Web3Contract			from	'web3-eth-contract';
 import	{Contract}				from	'ethcall';
 import	{fetchBlockTimestamp}	from	'utils/API';
-import	utils					from	'utils';
+import	* as utils				from	'utils';
 
 const	{newEthCallProvider, getProvider, getWeb3Provider} = utils;
 

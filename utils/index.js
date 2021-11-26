@@ -37,6 +37,13 @@ export function	formatAmount(amount, decimals = 2) {
 
 export const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
+export function	parseMarkdown(markdownText) {
+	const htmlText = markdownText
+		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
+
+	return htmlText.trim();
+}
+
 export async function newEthCallProvider(provider, chainID) {
 	const	ethcallProvider = new Provider();
 	if (chainID === 1337) {
@@ -77,7 +84,6 @@ export function getProvider(chain = 1) {
 	} 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
-
 
 export function getWeb3Provider(chain = 1) {
 	if (chain === 1) {
