@@ -69,7 +69,7 @@ This route is accessible to this URI and gives the details of a specific vault, 
 https://ape.tax/api/vault
 ```
 
-The following options is **mandatory**:
+The following option is **mandatory**:
 - *address*
   - `?address=0x671a912c10bba0cfa74cfc2d6fba9ba1ed9530b2`
 
@@ -174,7 +174,7 @@ This route is accessible to this URI and gives the APY of a specific Vault, per 
 https://ape.tax/api/specificApy
 ```
 
-The following options is **mandatory**:
+The following option is **mandatory**:
 - *address*
   - `?address=0x671a912c10bba0cfa74cfc2d6fba9ba1ed9530b2`
 
