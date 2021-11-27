@@ -84,11 +84,11 @@ export default async function handler(req, res) {
 	const	lastAccess = oneVaultStrategiesMappingAccess[address] || 0;
 	if (lastAccess === 0 || ((now - lastAccess) > 60 * 60 * 1000) || revalidate === 'true' || !oneVaultStrategiesMapping[address]) {
 		const	result = await getStrategies({network, rpc, address});
-		oneVaultStrategiesMapping[network] = result;
-		oneVaultStrategiesMappingAccess[network] = now;
+		oneVaultStrategiesMapping[address] = result;
+		oneVaultStrategiesMappingAccess[address] = now;
 	}
 	res.setHeader('Cache-Control', 's-maxage=3600'); // 60 minutes
-	return res.status(200).json(oneVaultStrategiesMapping[network]);
+	return res.status(200).json(oneVaultStrategiesMapping[address]);
 }
 
 export {prepareGrossData};

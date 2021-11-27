@@ -131,11 +131,11 @@ export default async function handler(req, res) {
 	const	lastAccess = oneVaultMappingAccess[address] || 0;
 	if (lastAccess === 0 || ((now - lastAccess) > 10 * 60 * 1000) || revalidate === 'true' || !oneVaultMapping[address]) {
 		const	result = await getVault({network, rpc, address});
-		oneVaultMapping[network] = result;
-		oneVaultMappingAccess[network] = now;
+		oneVaultMapping[address] = result;
+		oneVaultMappingAccess[address] = now;
 	}
 	res.setHeader('Cache-Control', 's-maxage=600'); // 10 minutes
-	return res.status(200).json(oneVaultMapping[network]);
+	return res.status(200).json(oneVaultMapping[address]);
 }
 
 export {prepareGrossData};

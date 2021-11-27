@@ -79,75 +79,20 @@ function	ProgressChart({progress, width}) {
 	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
 }
 
-function	Strategies({vault, chainID}) {
-	const	{provider, active, address} = useWeb3();
-	const	[strategiesData, set_strategiesData] = useState([]);
-	const	[, set_nonce] = useState(0);
+function	Strategies({vault, strategiesData}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
-
-	/**************************************************************************
-	** Retrieve the details of the attached strategies and compute some of the
-	** elements for the UI.
-	**************************************************************************/
-	const prepreStrategiesData = useCallback(async () => {
-		if (chainID !== vault?.CHAIN_ID && !(chainID === 1337)) {
-			return;
-		}
-		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
-			return;
-		}
-
-		const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, ['function withdrawalQueue(uint256 arg0) view returns (address)'], provider);
-		const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
-		let		shouldBreak = false;
-		asyncForEach(strategiesIndex, async (index) => {
-			if (shouldBreak) {
-				return;
-			}
-
-			/**************************************************************************
-			** The fun part to get all the strategies addresses is that we need to
-			** retrieve the address of the strategy from withdrawQueue, looping
-			** through the max number of strategies until we hit 0
-			**************************************************************************/
-			const	strategyAddress = await vaultContract.withdrawalQueue(index);
-			if (strategyAddress === ethers.constants.AddressZero) {
-				shouldBreak = true;
-				return;
-			}
-			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
-			const	name = await strategyContract.name();
-			const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
-			
-			set_strategiesData((s) => {
-				s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
-				return (s);
-			});
-			set_nonce(n => n + 1);
-		});
-	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
-
-	useEffect(() => {
-		if (!vault || !active || !provider || !address) {
-			return;
-		}
-		prepreStrategiesData();
-	}, [vault, active, provider, address, prepreStrategiesData]);
-
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
 			<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Strategies'}</h1>
 			{
 				strategiesData.map((strategy, index) => (
-
 					<div key={index} className={'font-mono text-ygray-700 dark:text-dark-50 text-sm mb-4'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>
 						</div>
 						<div className={'max-w-xl w-full text-justify'}>
-							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
+							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: parseMarkdown(strategy?.description || '')}} />
 						</div>
 						<div>
 							<a
@@ -196,6 +141,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	const	[isZapOutApproving, set_isZapOutApproving] = useState(false);
 	const	[isDepositing, set_isDepositing] = useState(false);
 	const	[isWithdrawing, set_isWithdrawing] = useState(false);
+	const	[strategiesData, set_strategiesData] = useState([]);
 
 	const	prepareVaultData = useCallback(async () => {
 		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
@@ -278,16 +224,17 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	}, [vault, active, provider, address, chainID]);
 
 	useEffect(() => {
+		fetcher(`/api/strategies?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_strategiesData);
+		fetcher(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_vaultAPY);
+	}, []);
+
+	useEffect(() => {
 		prepareVaultData();
 	}, [prepareVaultData]);
 
 	useEffect(() => {
 		set_vaultAPY(vaultAPYSWR);
 	}, [vaultAPYSWR]);
-
-	useEffect(() => {
-		fetcher(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_vaultAPY);
-	}, []);
 
 	async function _computeAPY() {
 		const	ethcallProvider = await newEthCallProvider(provider, network);
@@ -520,7 +467,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 				</div>
 			</section>
-			<Strategies vault={vault} chainID={chainID} />
+			<Strategies strategiesData={strategiesData} vault={vault} />
 			<section aria-label={'WALLET'} className={'mt-8'}>
 				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
