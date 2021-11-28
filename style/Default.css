@@ -117,10 +117,14 @@ html.dark {
 .dashed-underline-gray {
 	border-bottom: 1px dashed transparent;
 }
+
+.group:hover .dashed-underline-gray,
 .dashed-underline-gray:hover {
 	border-bottom: 1px dashed #2c3e50;
 }
+.dark .group:hover .dashed-underline-gray,
 .dark .dashed-underline-gray:hover {
+	padding-bottom: 0.1rem;
 	border-bottom: 1px dashed #ced3dd;
 }
 .progress-bar { 

@@ -5,24 +5,22 @@
 **	@Filename:				index.js
 ******************************************************************************/
 
-import	React, {useState, useEffect, useCallback}		from	'react';
-import	{ethers}										from	'ethers';
-import	{NextSeo}										from	'next-seo';
-import	axios											from	'axios'
-import	{Contract}										from	'ethcall';
-import	useSWR											from	'swr';
-import	useWeb3											from	'contexts/useWeb3';
-import	ModalLogin										from	'components/ModalLogin';
-import	useWindowInFocus								from	'hook/useWindowInFocus';
-import	vaults											from	'utils/vaults.json';
-import	chains											from	'utils/chains.json';
-import	{performGet}									from	'utils/API';
-import	{asyncForEach, bigNumber, formatAmount,
-	newEthCallProvider, parseMarkdown}					from	'utils';
+import	React, {useState, useEffect, useCallback}			from	'react';
+import	{ethers}											from	'ethers';
+import	{NextSeo}											from	'next-seo';
+import	axios												from	'axios';
+import	{Contract}											from	'ethcall';
+import	useSWR												from	'swr';
+import	useWeb3												from	'contexts/useWeb3';
+import	ModalLogin											from	'components/ModalLogin';
+import	useWindowInFocus									from	'hook/useWindowInFocus';
+import	vaults												from	'utils/vaults.json';
+import	chains												from	'utils/chains.json';
+import	{formatAmount, newEthCallProvider, parseMarkdown}	from	'utils';
 import	{approveToken, depositToken, withdrawToken,
-	apeInVault, apeOutVault}							from	'utils/actions';
-import	ERC20ABI										from	'utils/ABI/erc20.abi.json';
-import	YVAULTABI										from	'utils/ABI/yVault.abi.json';
+	apeInVault, apeOutVault}								from	'utils/actions';
+import	ERC20ABI											from	'utils/ABI/erc20.abi.json';
+import	YVAULTABI											from	'utils/ABI/yVault.abi.json';
 
 function	AnimatedWait() {
 	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
@@ -84,31 +82,69 @@ function	Strategies({vault, strategiesData}) {
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
 			<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Strategies'}</h1>
-			{
-				strategiesData.map((strategy, index) => (
-					<div key={index} className={'font-mono text-ygray-700 dark:text-dark-50 text-sm mb-4'}>
-						<div>
-							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
-							<p className={'inline font-bold'}>{strategy.name}</p>
+			<div className={'grid grid-cols-4 gap-6 max-w-5xl'}>
+				{
+					strategiesData.map((strategy, index) => (
+						<div key={index} className={'bg-ygray-50 dark:bg-dark-400 border-ygray-200 dark:border-dark-200 border p-4 group cursor-pointer h-full flex flex-col justify-between'}>
+							<div className={'font-mono text-ygray-700 dark:text-dark-50 text-sm mb-4'}>
+								<div className={'mb-2'}>
+									<p className={'inline font-bold whitespace-pre-wrap break-all'}>{strategy.name}</p>
+								</div>
+								<div className={'max-w-xl w-full'}>
+									{strategy?.description ? 
+										<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: parseMarkdown(strategy?.description || '')}} />
+										:
+										<i className={'inline text-xs'} dangerouslySetInnerHTML={{__html: parseMarkdown('No description provided for this strategy.')}} />
+									}
+								</div>
+							</div>
+							<div>
+								<a
+									className={'dashed-underline-gray text-xs'}
+									href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
+									{'📃 Contract'}
+								</a>
+							</div>
 						</div>
-						<div className={'max-w-xl w-full text-justify'}>
-							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: parseMarkdown(strategy?.description || '')}} />
-						</div>
-						<div>
-							<a
-								className={'dashed-underline-gray text-xs'}
-								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
-								{'📃 Contract'}
-							</a>
-						</div>
-					</div>
-				))
-			}
+					))
+				}
+			</div>
 		</section>
 	);
 }
 
-const		fetcher = url => axios.get(url).then(res => res.data)
+function	Growth({vault, vaultAPY}) {
+	return (
+		<div className={`font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+			<div>
+				<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last week): '}</p>
+				<p className={'inline text-ygray-700 dark:text-dark-50'}>
+					<Suspense wait={!vaultAPY}>
+						{`${vaultAPY?.week || '-'}`}
+					</Suspense>
+				</p>
+			</div>
+			<div>
+				<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last month): '}</p>
+				<p className={'inline text-ygray-700 dark:text-dark-50'}>
+					<Suspense wait={!vaultAPY}>
+						{`${vaultAPY?.month || '-'}`}
+					</Suspense>
+				</p>
+			</div>
+			<div>
+				<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (inception): '}</p>
+				<p className={'inline text-ygray-700 dark:text-dark-50'}>
+					<Suspense wait={!vaultAPY}>
+						{`${vaultAPY?.inception || '-'}`}
+					</Suspense>
+				</p>
+			</div>
+		</div>
+	);
+}
+
+const		fetcher = url => axios.get(url).then(res => res.data);
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
@@ -173,6 +209,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)',
 				'function activation() public view returns(uint256)',
+				'function lastReport() public view returns (uint256)',
 			],
 			providerToUse
 		);
@@ -190,10 +227,21 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			vaultContractMultiCall.balanceOf(address),
 			wantContractMultiCall.balanceOf(address),
 			wantContractMultiCall.allowance(address, vault.VAULT_ADDR),
+			vaultContractMultiCall.lastReport(),
 		]);
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult;
+		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance, lastReport] = callResult;
 		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+
+		const	date = new Date(lastReport * 1000);
+		const	datevalues = [
+			date.getFullYear(),
+			date.getMonth()+1 < 10 ? '0' + (date.getMonth()+1) : date.getMonth()+1,
+			date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
+			date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
+			date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
+			date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds(),
+		];
 
 		set_vaultData({
 			loaded: true,
@@ -203,6 +251,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, decimals)).toFixed(2),
 			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, decimals)).toFixed(4),
 			decimals,
+			lastHarvest: `${datevalues[2]}/${datevalues[1]}/${datevalues[0]} ${datevalues[3]}:${datevalues[4]}:${datevalues[5]}`,
 			coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
 			balanceOf: Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(2),
 			balanceOfRaw: balanceOf,
@@ -235,22 +284,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 	useEffect(() => {
 		set_vaultAPY(vaultAPYSWR);
 	}, [vaultAPYSWR]);
-
-	async function _computeAPY() {
-		const	ethcallProvider = await newEthCallProvider(provider, network);
-		const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
-		const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
-		const	callResult = await ethcallProvider.all([
-			vaultContractMultiCall.pricePerShare(),
-			vaultContractMultiCall.decimals(),
-			vaultContractMultiCall.activation(),
-		]);
-		const	[pricePerShare, decimals, activation] = callResult;
-	}
-
-	useEffect(() => {
-
-	}, []);
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
@@ -316,6 +349,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			vaultContract.availableDepositLimit(),
 			vaultContract.pricePerShare(),
 		]);
+
 		set_vaultData(v => ({
 			...v,
 			allowance: Number(ethers.utils.formatUnits(wantAllowance, v.decimals)),
@@ -360,6 +394,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage status={vault.VAULT_STATUS} />
+
 			<section aria-label={'DETAILS'}>
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
@@ -409,38 +444,23 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 						</p>
 					</div>
 				</div>
-				<div className={`font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last week): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.week || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last month): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.month || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (inception): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.inception || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-				</div>
+
+				<Growth vault={vault} vaultAPY={vaultAPY}/>
+
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Price Per Share: '}</p>
 						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultData.pricePerShare}`}
+							</Suspense>
+						</p>
+					</div>
+					<div>
+						<p className={'inline text-ygray-900 dark:text-white'}>{'Last Harvest: '}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50'}>
+							<Suspense wait={!vaultData.loaded}>
+								{`${vaultData.lastHarvest}`}
 							</Suspense>
 						</p>
 					</div>
@@ -467,7 +487,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 				</div>
 			</section>
+
 			<Strategies strategiesData={strategiesData} vault={vault} />
+
 			<section aria-label={'WALLET'} className={'mt-8'}>
 				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
@@ -493,6 +515,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 					</div>
 				</div>
 			</section>
+
 			<section aria-label={'ACTIONS'} className={'mt-8 my-4'}>
 				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'APE-IN/OUT'}</h1>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
