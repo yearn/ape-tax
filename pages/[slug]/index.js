@@ -208,8 +208,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				'function decimals() public view returns (uint256)',
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)',
-				'function activation() public view returns(uint256)',
-				'function lastReport() public view returns (uint256)',
+				'function activation() public view returns(uint256)'
 			],
 			providerToUse
 		);
@@ -226,22 +225,11 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			vaultContractMultiCall.decimals(),
 			vaultContractMultiCall.balanceOf(address),
 			wantContractMultiCall.balanceOf(address),
-			wantContractMultiCall.allowance(address, vault.VAULT_ADDR),
-			vaultContractMultiCall.lastReport(),
+			wantContractMultiCall.allowance(address, vault.VAULT_ADDR)
 		]);
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance, lastReport] = callResult;
+		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult;
 		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-
-		const	date = new Date(lastReport * 1000);
-		const	datevalues = [
-			date.getFullYear(),
-			date.getMonth()+1 < 10 ? '0' + (date.getMonth()+1) : date.getMonth()+1,
-			date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
-			date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
-			date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
-			date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds(),
-		];
 
 		set_vaultData({
 			loaded: true,
@@ -251,7 +239,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, decimals)).toFixed(2),
 			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, decimals)).toFixed(4),
 			decimals,
-			lastHarvest: `${datevalues[2]}/${datevalues[1]}/${datevalues[0]} ${datevalues[3]}:${datevalues[4]}:${datevalues[5]}`,
 			coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
 			balanceOf: Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(2),
 			balanceOfRaw: balanceOf,
@@ -453,14 +440,6 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 						<p className={'inline text-ygray-700 dark:text-dark-50'}>
 							<Suspense wait={!vaultData.loaded}>
 								{`${vaultData.pricePerShare}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Last Harvest: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultData.lastHarvest}`}
 							</Suspense>
 						</p>
 					</div>
