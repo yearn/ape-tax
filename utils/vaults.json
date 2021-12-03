@@ -852,18 +852,6 @@
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
-  "sushi-steroids": {
-    "TITLE": "Sushi Steroids",
-    "LOGO": "🍣💉",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xD1a075C806e40D79e32eA09553E7080d5d9d4b29",
-    "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
-    "WANT_SYMBOL": "SUSHI",
-    "COINGECKO_SYMBOL": "sushi",
-    "VAULT_STATUS": "new",
-    "CHAIN_ID": 1
-  },
   "fantom-dai": {
     "TITLE": "Fantom's Dai Hard",
     "LOGO": "👻⚰️",
@@ -993,6 +981,18 @@
     "WANT_ADDR": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
     "WANT_SYMBOL": "LUSD",
     "COINGECKO_SYMBOL": "liquity-usd",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "sushi-steroids": {
+    "TITLE": "Sushi Steroids",
+    "LOGO": "🍣💉",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xD1a075C806e40D79e32eA09553E7080d5d9d4b29",
+    "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+    "WANT_SYMBOL": "SUSHI",
+    "COINGECKO_SYMBOL": "sushi",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
