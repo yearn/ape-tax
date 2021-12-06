@@ -995,5 +995,17 @@
     "COINGECKO_SYMBOL": "sushi",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "enter-the-reactor": {
+    "TITLE": "Enter the reactor",
+    "LOGO": "☢️☢️",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xFF8f8A38c80b9899a928152D58F219fDCcD4306C",
+    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
