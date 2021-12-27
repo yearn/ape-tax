@@ -135,7 +135,7 @@ export const Web3ContextApp = ({children, router}) => {
 					137: 'https://rpc-mainnet.matic.network',
 					250: 'https://rpc.ftm.tools',
 					1337: 'http://localhost:8545',
-					42161: `https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`,
+					42161: 'https://arb1.arbitrum.io/rpc',
 				},
 				chainId: 1,
 				bridge: 'https://bridge.walletconnect.org',

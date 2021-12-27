@@ -80,7 +80,7 @@ export function getProvider(chain = 1) {
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	} else if (chain === 42161) {
-		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+		return new ethers.providers.JsonRpcProvider(`https://arb1.arbitrum.io/rpc`);
 	} 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
@@ -95,7 +95,7 @@ export function getWeb3Provider(chain = 1) {
 	} else if (chain === 56) {
 		return ('https://bsc-dataseed1.defibit.io/');
 	} else if (chain === 42161) {
-		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+		return (`https://arb1.arbitrum.io/rpc`);
 	} else if (chain === 1337) {
 		return ('http://localhost:8545');
 	}

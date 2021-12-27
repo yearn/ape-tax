@@ -11,8 +11,49 @@ import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	{prepareGrossData}		from	'pages/api/specificApy';
 import	* as utils				from	'utils';
+import	{performGet}			from	'utils/API';
 
 const	{newEthCallProvider, getProvider, asyncForEach, chunk} = utils;
+
+async function getVaultStrategies({vaultAddress, vaultSymbol, vaultChainID, provider}) {
+	const	vaultContract = new ethers.Contract(
+		vaultAddress,
+		['function withdrawalQueue(uint256 arg0) view returns (address)'],
+		provider
+	);
+	const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+	const 	strategies = [];
+	let		shouldBreak = false;
+	for (let i = 0; i < strategiesIndex.length; i++) {
+		const index = strategiesIndex[i];
+		if (shouldBreak) {
+			return;
+		}
+
+		/**************************************************************************
+		** The fun part to get all the strategies addresses is that we need to
+		** retrieve the address of the strategy from withdrawQueue, looping
+		** through the max number of strategies until we hit 0
+		**************************************************************************/
+		const	strategyAddress = await vaultContract.withdrawalQueue(index);
+		if (strategyAddress === ethers.constants.AddressZero) {
+			shouldBreak = true;
+			return strategies;
+		}
+		const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
+		const	[name, details] = await Promise.all([
+			strategyContract.name(),
+			performGet(`https://meta.yearn.network/strategies/${vaultChainID}/${strategyAddress}`),
+		]);
+
+		strategies.push({
+			address: strategyAddress,
+			name,
+			description: details?.description ? details?.description.replaceAll('{{token}}', vaultSymbol) : null
+		});	
+	}
+	return strategies;
+}
 
 async function getVaults({network, rpc, status, apy}) {
 	let		provider = getProvider(network);
