@@ -8,6 +8,7 @@
 import	React, {useState, useEffect}						from	'react';
 import	Link												from	'next/link';
 import	useSWR												from	'swr';
+import	axios												from	'axios'
 import	{ethers}											from	'ethers';
 import	useWeb3												from	'contexts/useWeb3';
 import	{formatAmount}										from	'utils';
@@ -17,7 +18,6 @@ import	GraphemeSplitter									from	'grapheme-splitter';
 
 const	splitter = new GraphemeSplitter();
 const	sortBy = (arr, k) => arr.concat().sort((a, b) => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
-const	fetcher = (...args) => fetch(...args).then(res => res.json());
 
 function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
@@ -94,6 +94,7 @@ function	DisabledVaults({vaultsInactive}) {
 	);
 }
 
+const		fetcher = url => axios.get(url).then(res => res.data)
 function	Index() {
 	const	{provider, active, address, chainID} = useWeb3();
 	const	[, set_nonce] = useState(0);
@@ -101,7 +102,7 @@ function	Index() {
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
 	const	[vaultsInactive, set_vaultsInactive] = useState([]);
 	const	[vaultsInactiveForUser, set_vaultsInactiveForUser] = useState([]);
-	const	{data: tvl} = useSWR(`/api/tvl?network=${chainID}`, fetcher);
+	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`, fetcher);
 
 	useEffect(() => {
 		if (!active) {
@@ -181,8 +182,6 @@ function	Index() {
 		);
 	}
 
-	console.log(tvl);
-
 	return (
 		<section>
 			<div>
@@ -202,7 +201,7 @@ function	Index() {
 					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 				</span>
 				<span className={'text-base font-normal text-ygray-900 dark:text-white font-mono'}>
-					{` $${formatAmount(tvl?.data?.tvl || 0, 2)}`}
+					{` $${formatAmount(tvl?.tvl || 0, 2)}`}
 				</span>
 			</div>
 
@@ -212,7 +211,7 @@ function	Index() {
 						{'Endorsed:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlEndorsed || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
 					</span>
 				</div>
 				<div>
@@ -220,7 +219,7 @@ function	Index() {
 						{'Experimental:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlExperimental || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
 					</span>
 				</div>
 				<div>
@@ -228,7 +227,7 @@ function	Index() {
 						{'Deprecated:'}
 					</span>
 					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.data?.tvlDeprecated || 0, 2)}`}
+						{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
 					</span>
 				</div>
 			</div>

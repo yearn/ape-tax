@@ -8,7 +8,6 @@
 import	axios					from	'axios';
 import	{ethers}				from	'ethers';
 import	{Provider, Contract}	from	'ethcall';
-import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	Web3Contract			from	'web3-eth-contract';
@@ -177,8 +176,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 	};
 }
 
-export default fn(async ({address, network = 1, rpc}) => {
-	network = Number(network);
+async function getSpecificAPY({network, address, rpc}) {
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -198,6 +196,26 @@ export default fn(async ({address, network = 1, rpc}) => {
 		decimals,
 		activation,
 	});
-}, {maxAge: 10 * 60}); //10 mn
+}
+
+
+const	specificApyMapping = {};
+let		specificApyMappingAccess = {};
+export default async function handler(req, res) {
+	let		{address, network, rpc, revalidate} = req.query;
+
+	network = Number(network);
+	address = address.toLowerCase();
+
+	const	now = new Date().getTime();
+	const	lastAccess = specificApyMappingAccess[address] || 0;
+	if (lastAccess === 0 || ((now - lastAccess) > 10 * 60 * 1000) || revalidate === 'true' || !specificApyMapping[address]) {
+		const	result = await getSpecificAPY({network, address, rpc});
+		specificApyMapping[address] = result;
+		specificApyMappingAccess[address] = now;
+	}
+	res.setHeader('Cache-Control', 's-maxage=600'); // 10 minutes
+	return res.status(200).json(specificApyMapping[address]);
+}
 
 export {prepareGrossData};

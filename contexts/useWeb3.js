@@ -14,6 +14,7 @@ import	{ConnectorEvent}					from	'@web3-react-fork/types';
 import	{WalletConnectConnector}			from	'@web3-react-fork/walletconnect-connector';
 import	useLocalStorage						from	'hook/useLocalStorage';
 import	useWindowInFocus					from	'hook/useWindowInFocus';
+import	useDebounce							from	'hook/useDebounce';
 import	{toAddress}							from	'utils';
 
 const walletType = {NONE: -1, METAMASK: 0, WALLET_CONNECT: 1};
@@ -54,6 +55,8 @@ export const Web3ContextApp = ({children, router}) => {
 	const	[chainID, set_chainID] = useLocalStorage('chainID', -1);
 	const	[lastWallet, set_lastWallet] = useLocalStorage('lastWallet', walletType.NONE);
 	const	[, set_nonce] = useState(0);
+	const	debouncedChainID = useDebounce(chainID, 500);
+
 	const	{activate, active, library, connector, account, chainId, deactivate} = web3;
 
 	const onUpdate = useCallback(async (update) => {
@@ -118,7 +121,7 @@ export const Web3ContextApp = ({children, router}) => {
 			return;
 		}
 		provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
-	}, [active, chainID, provider]);
+	}, [active, debouncedChainID, provider]);
 
 	useEffect(() => {
 		if (router.pathname !== '/[slug]')
