@@ -77,5 +77,12 @@
         "decimals": 18
       }
     }
+  },
+    "100": {
+    "chainID": "100",
+    "name": "Gnosis Chain",
+    "displayName": "Gnosis Chain",
+    "coin": "xDai",
+    "block_explorer": "https://blockscout.com/"
   }
 }
