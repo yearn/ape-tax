@@ -83,6 +83,16 @@
     "name": "Gnosis Chain",
     "displayName": "Gnosis Chain",
     "coin": "xDai",
-    "block_explorer": "https://blockscout.com/"
+    "block_explorer": "https://blockscout.com/",
+    "chain_swap": {
+      "chainId": "0x64",
+      "blockExplorerUrls": ["https://blockscout.com/"],
+      "chainName": "Gnosis Chain",
+      "rpcUrls": ["https://rpc.gnosischain.com/"],
+      "nativeCurrency": {
+        "name": "xDai",
+        "symbol": "XDAI",
+        "decimals": 18
+      }
   }
 }
