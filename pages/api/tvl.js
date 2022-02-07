@@ -64,6 +64,8 @@ function getProvider(chain = 1) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
+	} else if (chain === 100) {
+		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
