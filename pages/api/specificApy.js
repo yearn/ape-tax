@@ -132,7 +132,7 @@ function getWeb3Provider(chain = 1) {
 	} else if (chain === 1337) {
 		return ('http://localhost:8545');
 	} else if (chain === 100) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
+		return ('https://rpc.gnosischain.com/');
 	}
 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
 }
