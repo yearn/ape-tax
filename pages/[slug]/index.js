@@ -234,6 +234,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
 			providerToUse = getProvider('arbitrum');
 		}
+		if (vault.CHAIN_ID === 100 && network.chainId !== 100) {
+			providerToUse = getProvider('xdai')
+		}
 
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
@@ -360,6 +363,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		}
 		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
 			providerToUse = getProvider('arbitrum');
+		}
+		if (vault.CHAIN_ID === 100 && chainID !== 100) {
+			providerToUse = getProvider('xdai');
 		}
 
 		const	wantContract = new ethers.Contract(
