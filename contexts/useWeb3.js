@@ -113,7 +113,8 @@ export const Web3ContextApp = ({children, router}) => {
 			Number(chainID) === 137 ||
 			Number(chainID) === 250 ||
 			Number(chainID) === 1337 ||
-			Number(chainID) === 42161
+			Number(chainID) === 42161 ||
+			Number(chainID) === 100
 		);
 		if (isCompatibleChain) {
 			return;
