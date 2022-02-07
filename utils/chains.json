@@ -34,7 +34,21 @@
       "chainId": "0x38",
       "blockExplorerUrls": ["https://bscscan.com"],
       "chainName": "Binance Smart Chain Mainnet",
-      "rpcUrls": ["https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://bsc-dataseed3.binance.org", "https://bsc-dataseed4.binance.org", "https://bsc-dataseed1.defibit.io", "https://bsc-dataseed2.defibit.io", "https://bsc-dataseed3.defibit.io", "https://bsc-dataseed4.defibit.io", "https://bsc-dataseed1.ninicoin.io", "https://bsc-dataseed2.ninicoin.io", "https://bsc-dataseed3.ninicoin.io", "https://bsc-dataseed4.ninicoin.io", "wss://bsc-ws-node.nariox.org"],
+      "rpcUrls": [
+        "https://bsc-dataseed1.binance.org",
+        "https://bsc-dataseed2.binance.org",
+        "https://bsc-dataseed3.binance.org",
+        "https://bsc-dataseed4.binance.org",
+        "https://bsc-dataseed1.defibit.io",
+        "https://bsc-dataseed2.defibit.io",
+        "https://bsc-dataseed3.defibit.io",
+        "https://bsc-dataseed4.defibit.io",
+        "https://bsc-dataseed1.ninicoin.io",
+        "https://bsc-dataseed2.ninicoin.io",
+        "https://bsc-dataseed3.ninicoin.io",
+        "https://bsc-dataseed4.ninicoin.io",
+        "wss://bsc-ws-node.nariox.org"
+      ],
       "nativeCurrency": {
         "name": "Binance Chain Native Token",
         "symbol": "BNB",
@@ -52,7 +66,12 @@
       "chainId": "0x89",
       "blockExplorerUrls": ["https://polygonscan.com"],
       "chainName": "Matic(Polygon) Mainnet",
-      "rpcUrls": ["https://rpc-mainnet.matic.network", "wss://ws-mainnet.matic.network", "https://rpc-mainnet.matic.quiknode.pro", "https://matic-mainnet.chainstacklabs.com"],
+      "rpcUrls": [
+        "https://rpc-mainnet.matic.network",
+        "wss://ws-mainnet.matic.network",
+        "https://rpc-mainnet.matic.quiknode.pro",
+        "https://matic-mainnet.chainstacklabs.com"
+      ],
       "nativeCurrency": {
         "name": "Matic",
         "symbol": "MATIC",
@@ -78,7 +97,7 @@
       }
     }
   },
-    "100": {
+  "100": {
     "chainID": "100",
     "name": "Gnosis Chain",
     "displayName": "Gnosis Chain",
@@ -94,5 +113,6 @@
         "symbol": "XDAI",
         "decimals": 18
       }
+    }
   }
 }
