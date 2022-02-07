@@ -108,7 +108,7 @@ if (!args.logo) {
 /******************************************************************************
 **	If the chain is not in the arguments, let's prompt it.
 **	The chain will be associated with the `CHAINID` key. Numbers are expected.
-**	Possible value : 1, 56, 137, 250
+**	Possible value : 1, 56, 137, 250, 42161, 100
 ******************************************************************************/
 if (!args.chain || !([1, 56, 137, 250, 42161, 100]).includes(args.chain)) {
 	questions.push(		{
