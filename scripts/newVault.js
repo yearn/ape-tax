@@ -14,7 +14,7 @@ const	args = require('yargs/yargs')(process.argv.slice(2)).string('address').arg
 async function checkTokenCGID(tokenID) {
 	try {
 		const	data = await axios.get(`https://api.coingecko.com/api/v3/coins/${tokenID}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`).then(e => e.data);
-		return	data;		
+		return	data;
 	} catch (error) {
 		return	{};
 	}
@@ -22,7 +22,7 @@ async function checkTokenCGID(tokenID) {
 async function getTokenInfo(tokenAddress) {
 	try {
 		const	data = await axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${tokenAddress}`).then(e => e.data);
-		return	data;		
+		return	data;
 	} catch (error) {
 		return	{};
 	}
@@ -48,6 +48,8 @@ function	getProvider(chain = 1) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools/');
 	} else if (chain === 56) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+	} else if (chain === 100) {
+		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead'));
 }
@@ -58,6 +60,7 @@ const	ENUM_CHAIN = {
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
 	'Arbitrum One (42161)': 42161,
+	'Gnosis Chain (100)' : 100,
 };
 const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
@@ -68,7 +71,7 @@ const	toAddress = (address) => {
 		return ADDRESS_ZERO;
 	}
 	try {
-		return ethers.utils.getAddress(address);	
+		return ethers.utils.getAddress(address);
 	} catch (error) {
 		return ADDRESS_ZERO;
 	}
@@ -105,14 +108,14 @@ if (!args.logo) {
 /******************************************************************************
 **	If the chain is not in the arguments, let's prompt it.
 **	The chain will be associated with the `CHAINID` key. Numbers are expected.
-**	Possible value : 1, 56, 137, 250
+**	Possible value : 1, 56, 137, 250, 42161, 100
 ******************************************************************************/
-if (!args.chain || !([1, 56, 137, 250]).includes(args.chain)) {
+if (!args.chain || !([1, 56, 137, 250, 42161, 100]).includes(args.chain)) {
 	questions.push(		{
 		type: 'list',
 		name: 'vaultChain',
 		message: 'Which chain ?',
-		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)'],
+		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)' ],
 	},);
 } else {
 	if (args.chain === 1)
@@ -125,6 +128,8 @@ if (!args.chain || !([1, 56, 137, 250]).includes(args.chain)) {
 		defaultVaultChain = 'Fantom Opera (250)';
 	if (args.chain === 42161)
 		defaultVaultChain = 'Arbitrum One (42161)';
+	if (args.chain === 100)
+		defaultVaultChain = 'Gnosis Chain (100)';
 }
 
 /******************************************************************************
@@ -205,7 +210,7 @@ inquirer.prompt(questions).then(async ({
 	}
 	const	vaultSlug = getSlugFromString(vaultName);
 	const	vaults = require('../utils/vaults.json');
-	
+
 	if (vaults[vaultSlug] !== undefined) {
 		throw 'Vault already used. Please use another name !';
 	}

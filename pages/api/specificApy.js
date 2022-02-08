@@ -62,6 +62,15 @@ async function	fetchBlockTimestamp(timestamp, network = 1) {
 		}
 		return null;
 	}
+	if (network === 100) {
+		const	result = await performGet(`https://blockscout.com/xdai/mainnet/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before
+`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
 
 	const	result = await performGet(`https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.ETHERSCAN_API}`);
 
@@ -104,6 +113,8 @@ function getProvider(chain = 1) {
 		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
+	} else if (chain === 100) {
+		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
@@ -120,6 +131,8 @@ function getWeb3Provider(chain = 1) {
 		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	} else if (chain === 1337) {
 		return ('http://localhost:8545');
+	} else if (chain === 100) {
+		return ('https://rpc.gnosischain.com/');
 	}
 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
 }

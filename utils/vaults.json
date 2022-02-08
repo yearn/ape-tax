@@ -1019,5 +1019,29 @@
     "COINGECKO_SYMBOL": "weth",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "ywxdai": {
+    "TITLE": "Basic Wrapped xDai Farmer",
+    "LOGO": "🏆🚀",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xE35f0516D330395a3878eB60114349b6325ec02E",
+    "WANT_ADDR": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+    "WANT_SYMBOL": "wxDai",
+    "COINGECKO_SYMBOL": "wrapped-xdai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 100
+  },
+  "ygnoweth": {
+    "TITLE": "yGnoWETH",
+    "LOGO": "🦉🌯",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x7d86C052b20bA21b2E29a7D6cc1D2915F138c53a",
+    "WANT_ADDR": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 100
   }
 }
