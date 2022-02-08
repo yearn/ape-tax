@@ -72,6 +72,9 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
 		}
+		if (status === 'ape-active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+			return;	
+		}
 		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new' && v.VAULT_STATUS !== 'endorsed')) {
 			return;	
 		}
@@ -93,6 +96,9 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 	await asyncForEach(Object.entries(vaults), async ([k, v]) => {
 		if (v.CHAIN_ID !== network || v.VAULT_TYPE === 'weird') {
 			return;
+		}
+		if (status === 'ape-active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new')) {
+			return;	
 		}
 		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new' && v.VAULT_STATUS !== 'endorsed')) {
 			return;	
