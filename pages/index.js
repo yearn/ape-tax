@@ -193,7 +193,7 @@ function	Index() {
 				</div>
 			</div>
 			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
-				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
+				{'⚠️ '}<strong>{'WARNING'}</strong> {"these vaults are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 			<div className={'max-w-5xl mt-8'}>
