@@ -1045,7 +1045,7 @@
     "CHAIN_ID": 100
   },
   "curved-owl": {
-    "TITLE": "yGnoWETH",
+    "TITLE": "Curved Owl",
     "LOGO": "🦉🥌",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
