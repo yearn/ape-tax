@@ -17,7 +17,7 @@ import	useWindowInFocus														from	'hook/useWindowInFocus';
 import	vaults																	from	'utils/vaults.json';
 import	chains																	from	'utils/chains.json';
 import	{performGet}															from	'utils/API';
-import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount}					from	'utils';
+import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount, truncateAddress}	from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
@@ -551,7 +551,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Your Account: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50 font-bold'}>{ens || `${address.slice(0, 4)}...${address.slice(-4)}`}</p>
+						<p className={'inline text-ygray-700 dark:text-dark-50 font-bold'}>{ens || `${truncateAddress(address)}`}</p>
 					</div>
 					<div>
 						<p className={'inline text-ygray-900 dark:text-white'}>{'Your vault shares: '}</p>
