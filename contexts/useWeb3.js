@@ -5,17 +5,18 @@
 **	@Filename:				useWeb3.js
 ******************************************************************************/
 
-import	React, {useState, useEffect, useContext, createContext, useCallback}	from	'react';
+import	React, {useContext, createContext}	from	'react';
 import	{ethers}							from	'ethers';
 import	QRCodeModal							from	'@walletconnect/qrcode-modal';
 import	{useWeb3React}						from	'@web3-react-fork/core';
 import	{InjectedConnector}					from	'@web3-react-fork/injected-connector';
-import	{ConnectorEvent}					from	'@web3-react-fork/types';
 import	{WalletConnectConnector}			from	'@web3-react-fork/walletconnect-connector';
 import	useLocalStorage						from	'hook/useLocalStorage';
 import	useWindowInFocus					from	'hook/useWindowInFocus';
 import	useDebounce							from	'hook/useDebounce';
+import	useClientEffect						from	'hook/useClientEffect';
 import	{toAddress}							from	'utils';
+import	performBatchedUpdates				from	'utils/performBatchedUpdates';
 
 const walletType = {NONE: -1, METAMASK: 0, WALLET_CONNECT: 1};
 const Web3Context = createContext();
@@ -49,84 +50,32 @@ function getProvider(chain = 'ethereum') {
 
 export const Web3ContextApp = ({children, router}) => {
 	const	web3 = useWeb3React();
+	const   {activate, active, library, account, chainId, deactivate} = web3;
 	const	windowInFocus = useWindowInFocus();
-	const	[initialized, set_initialized] = useState(false);
-	const	[provider, set_provider] = useState(undefined);
-	const	[address, set_address] = useLocalStorage('address', '');
 	const	[ens, set_ens] = useLocalStorage('ens', '');
-	const	[chainID, set_chainID] = useLocalStorage('chainID', -1);
 	const	[lastWallet, set_lastWallet] = useLocalStorage('lastWallet', walletType.NONE);
-	const	[, set_nonce] = useState(0);
-	const	debouncedChainID = useDebounce(chainID, 500);
+	const   [disconnected, set_disconnected] = React.useState(false);
+	const	[disableAutoChainChange, set_disableAutoChainChange] = React.useState(false);
+	const	debouncedChainID = useDebounce(chainId, 500);
 
-	const	{activate, active, library, connector, account, chainId, deactivate} = web3;
-
-	const onUpdate = useCallback(async (update) => {
-		if (update.provider) {
-			set_provider(library);
+	const onSwitchChain = React.useCallback((force) => {
+		if (!force && (!active || disableAutoChainChange)) {
+			return;
 		}
-		if (update.chainId) {
-			if (update.chainId.startsWith('0x')) {
-				set_chainID(parseInt(update.chainId, 16));
-			} else {
-				set_chainID(Number(update.chainId));
-			}
-		}
-		if (update.account) {
-			getProvider().lookupAddress(toAddress(update.account)).then(_ens => set_ens(_ens || ''));
-			set_address(toAddress(update.account));
-		}
-		set_nonce(n => n + 1);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [library]);
-
-	const onDesactivate = useCallback(() => {
-		set_chainID(-1);
-		set_provider(undefined);
-		set_lastWallet(walletType.NONE);
-		set_address('');
-		set_ens('');
-		if (connector !== undefined) {
-			connector
-				.off(ConnectorEvent.Update, onUpdate)
-				.off(ConnectorEvent.Deactivate, onDesactivate);
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [connector]);
-
-	const onActivate = useCallback(async () => {
-		set_provider(library);
-		set_address(toAddress(account));
-		library.getNetwork().then(e => set_chainID(e.chainId));
-		getProvider().lookupAddress(toAddress(account)).then(_ens => set_ens(_ens || ''));
-
-		connector
-			.on(ConnectorEvent.Update, onUpdate)
-			.on(ConnectorEvent.Deactivate, onDesactivate);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [account, chainId, connector, library, onDesactivate, onUpdate]);
-
-	const onSwitchChain = useCallback(() => {
-		const	isCompatibleChain = (
-			Number(chainID) === 1 ||
-			Number(chainID) === 56 ||
-			Number(chainID) === 137 ||
-			Number(chainID) === 250 ||
-			Number(chainID) === 1337 ||
-			Number(chainID) === 42161 ||
-			Number(chainID) === 100
-		);
+		const	isCompatibleChain = [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0))
 		if (isCompatibleChain) {
 			return;
 		}
-		if (!provider || !active) {
+		if (!library || !active) {
 			console.error('Not initialized');
 			return;
 		}
-		provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
-	}, [active, debouncedChainID, provider]);
+		library
+			.send('wallet_switchEthereumChain', [{chainId: '0x1'}])
+			.catch(() => set_disableAutoChainChange(true));
+	}, [active, disableAutoChainChange, debouncedChainID, library]);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (router.pathname !== '/[slug]')
 			onSwitchChain();
 	}, [windowInFocus, onSwitchChain, router]);
@@ -144,7 +93,7 @@ export const Web3ContextApp = ({children, router}) => {
 	**	Moreover, we are starting to listen to events (disconnect, changeAccount
 	**	or changeChain).
 	**************************************************************************/
-	const connect = useCallback(async (_providerType) => {
+	const connect = React.useCallback(async (_providerType) => {
 		if (_providerType === walletType.METAMASK) {
 			if (active) {
 				deactivate();
@@ -180,42 +129,43 @@ export const Web3ContextApp = ({children, router}) => {
 				set_lastWallet(walletType.NONE);
 			}
 		}
-	}, [activate, active, deactivate, set_lastWallet]);
+	}, [activate, active, deactivate]);
 
-	useEffect(() => {
-		if (active) {
-			set_initialized(true);
-			onActivate();
-		}
-	}, [active, onActivate]);
-
-	useEffect(() => {
+	useClientEffect(() => {
 		if (!active && lastWallet !== walletType.NONE) {
 			connect(lastWallet);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [active]);
 
-	useEffect(() => {
-		setTimeout(() => set_initialized(true), 1500);
-	}, []);
+	useClientEffect(() => {
+		if (account) {
+			getProvider()
+				.lookupAddress(toAddress(account))
+				.then((_ens) => set_ens(_ens || ''));
+		}
+	}, [account]);
 
 	return (
 		<Web3Context.Provider
 			value={{
-				address,
+				address: account,
 				ens,
 				connect,
 				deactivate,
-				onDesactivate,
 				walletType,
-				chainID,
+				chainID: Number(chainId || 0),
 				active,
-				initialized,
-
-				provider,
+				active: active && [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0)),
+				provider: library,
 				getProvider,
-				currentRPCProvider: provider
+				disconnected,
+				onDesactivate: () => {
+					performBatchedUpdates(() => {
+						set_lastWallet(walletType.NONE);
+						set_disconnected(true);
+					});
+					setTimeout(() => set_disconnected(false), 100);
+				}
 			}}>
 			{children}
 		</Web3Context.Provider>
