@@ -11,7 +11,7 @@ import	useWeb3											from	'contexts/useWeb3';
 import	vaults											from	'utils/vaults.json';
 import	chains											from	'utils/chains.json';
 import	{fetchCryptoPrice}								from	'utils/API';
-import	{bigNumber, formatAmount}						from	'utils';
+import	{bigNumber, formatAmount, truncateAddress}		from	'utils';
 import	{approveToken, depositToken, withdrawToken}		from	'utils/actions';
 
 function	InfoMessage() {
@@ -217,7 +217,7 @@ function	Index() {
 				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
-						<p className={'inline font-bold'}>{ens || `${address.slice(0, 4)}...${address.slice(-4)}`}</p>
+						<p className={'inline font-bold'}>{ens || `${truncateAddress(address)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Your vault shares: '}</p>
