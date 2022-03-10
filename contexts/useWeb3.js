@@ -40,6 +40,8 @@ function getProvider(chain = 'ethereum') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	} else if (chain === 'arbitrum') {
 		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+	} else if (chain === 'xdai') {
+		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
@@ -111,7 +113,8 @@ export const Web3ContextApp = ({children, router}) => {
 			Number(chainID) === 137 ||
 			Number(chainID) === 250 ||
 			Number(chainID) === 1337 ||
-			Number(chainID) === 42161
+			Number(chainID) === 42161 ||
+			Number(chainID) === 100
 		);
 		if (isCompatibleChain) {
 			return;
@@ -161,6 +164,7 @@ export const Web3ContextApp = ({children, router}) => {
 					250: 'https://rpc.ftm.tools',
 					1337: 'http://localhost:8545',
 					42161: `https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`,
+					100: 'https://rpc.gnosischain.com/',
 				},
 				chainId: 1,
 				bridge: 'https://bridge.walletconnect.org',
