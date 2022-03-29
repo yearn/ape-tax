@@ -40,7 +40,7 @@ function getProvider(chain = 'ethereum') {
 	} else if (chain === 'major') {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	} else if (chain === 'arbitrum') {
-		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+		return new ethers.providers.JsonRpcProvider('https://arbitrum.public-rpc.com);
 	} else if (chain === 'xdai') {
 		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
