@@ -1061,11 +1061,11 @@
       "LOGO": "⭐️🕺",
       "VAULT_ABI": "yVaultV2",
       "VAULT_TYPE": "experimental",
-      "VAULT_ADDR": "0x902cf5373317bb3e42660e9f4e85aa21532c0e44",
+      "VAULT_ADDR": "0x902cF5373317BB3E42660e9F4e85AA21532c0e44",
       "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "WANT_SYMBOL": "USDC",
       "COINGECKO_SYMBOL": "usd-coin",
       "VAULT_STATUS": "new",
       "CHAIN_ID": 1
-  },
+  }
 }
