@@ -44,17 +44,19 @@ function getProvider(chain = 1) {
 		} else {
 			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
 		}
+	} else if (chain === 56) {
+		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
+	} else if (chain === 100) {
+		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	} else if (chain === 137) {
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
 	} else if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	} else if (chain === 100) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
-	}
+	} else if (chain === 42161) {
+		return new ethers.providers.JsonRpcProvider('https://arbitrum.public-rpc.com');
+	} 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
