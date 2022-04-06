@@ -5,33 +5,31 @@ module.exports = {
 	corePlugins: {
 		ringColor: false,
 	},
-	purge: {
-		content: [
-			'./pages/**/*.js',
-			'./components/**/*.js'
-		],
-		safelist: [
-			'dark',
-			'dark:',
-			'dark:text-dark-50',
-			'dark:border-dark-200',
-			'dark:bg-dark-600',
-			'dark:bg-dark-400',
-			'dark:bg-dark-300',
-		]
-	},
+	content: [
+		'./pages/**/*.js',
+		'./components/**/*.js'
+	],
+	safelist: [
+		'dark',
+		'dark:',
+		'dark:text-dark-50',
+		'dark:border-dark-200',
+		'dark:bg-dark-600',
+		'dark:bg-dark-400',
+		'dark:bg-dark-300',
+	],
 	theme: {
 		fontFamily: {
 			mono: ['IBM Plex Mono', 'monospace']
 		},
 		colors: {
-			gray: colors.coolGray,
 			tag: {
 				new: '#10B981',
 				info: '#167df0',
 				warning: '#fff257',
 				withdraw: '#EF4444'
 			},
+			gray: colors.gray,
 			red: colors.red,
 			white: colors.white,
 			black: colors.black,
