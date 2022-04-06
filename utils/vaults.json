@@ -1079,5 +1079,17 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "lazy-synapses": {
+    "TITLE": "Lazy Synapses",
+    "LOGO": "💤🧠",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x9e3922FCBb28F40026dA2E58926f0f249d8A138d",
+    "WANT_ADDR": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 250
   }
 }
