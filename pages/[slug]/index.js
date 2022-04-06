@@ -17,7 +17,7 @@ import	useWindowInFocus														from	'hook/useWindowInFocus';
 import	vaults																	from	'utils/vaults.json';
 import	chains																	from	'utils/chains.json';
 import	{performGet}															from	'utils/API';
-import	{ADDRESS_ZERO, asyncForEach, bigNumber, formatAmount, truncateAddress}	from	'utils';
+import	{ADDRESS_ZERO, bigNumber, formatAmount, truncateAddress}	from	'utils';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
 import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
 import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
@@ -118,11 +118,10 @@ function	Strategies({vault, chainID}) {
 		}
 
 		const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, ['function withdrawalQueue(uint256 arg0) view returns (address)'], provider);
-		const	strategiesIndex = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 		let		shouldBreak = false;
-		asyncForEach(strategiesIndex, async (index) => {
+		for (let index = 0; index < 20; index++) {
 			if (shouldBreak) {
-				return;
+				continue;
 			}
 
 			/**************************************************************************
@@ -133,18 +132,26 @@ function	Strategies({vault, chainID}) {
 			const	strategyAddress = await vaultContract.withdrawalQueue(index);
 			if (strategyAddress === ADDRESS_ZERO) {
 				shouldBreak = true;
-				return;
+				continue;
 			}
 			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
 			const	name = await strategyContract.name();
-			const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
+			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
+				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
+				set_strategiesData((s) => {
+					s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
+					return (s);
+				});
+			} else {
+				set_strategiesData((s) => {
+					s[index] = {address: strategyAddress, name, description: 'Description not provided for this strategy.'};
+					return (s);
+				});
+			}
 			
-			set_strategiesData((s) => {
-				s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
-				return (s);
-			});
 			set_nonce(n => n + 1);
-		});
+		}
+
 	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
 
 	useEffect(() => {
