@@ -62,7 +62,7 @@ export const Web3ContextApp = ({children, router}) => {
 		if (!force && (!active || disableAutoChainChange)) {
 			return;
 		}
-		const	isCompatibleChain = [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0))
+		const	isCompatibleChain = [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0));
 		if (isCompatibleChain) {
 			return;
 		}
@@ -154,7 +154,6 @@ export const Web3ContextApp = ({children, router}) => {
 				deactivate,
 				walletType,
 				chainID: Number(chainId || 0),
-				active,
 				active: active && [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0)),
 				provider: library,
 				getProvider,

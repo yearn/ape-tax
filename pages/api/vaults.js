@@ -20,12 +20,6 @@ async function newEthCallProvider(provider, chainID) {
 		return ethcallProvider;
 	}
 	await	ethcallProvider.init(provider);
-	if (chainID === 250) {
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-	}
-	if (chainID === 42161) {
-		ethcallProvider.multicall.address = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
 	return	ethcallProvider;
 }
 
@@ -55,7 +49,7 @@ function getProvider(chain = 1) {
 	} else if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
 	} else if (chain === 42161) {
-		return new ethers.providers.JsonRpcProvider('https://arbitrum.public-rpc.com');
+		return new ethers.providers.JsonRpcProvider('https://arbitrumrpc.com');
 	} 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
@@ -81,6 +75,7 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 			return;	
 		}
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
+		provider.getCode(v.VAULT_ADDR).then(e => console.log(e));
 		_calls.push(...[
 			vaultContract.apiVersion(),
 			vaultContract.depositLimit(),
@@ -91,8 +86,15 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 			vaultContract.activation(),
 		]);
 	});
-	const	callResult = await ethcallProvider.all(_calls);
-	const	chunkedCallResult = chunk(callResult, 7);
+	let		isCallASuccess = true;
+	let		chunkedCallResult = [];
+	try {
+		const	callResult = await ethcallProvider.tryAll(_calls);
+		chunkedCallResult = chunk(callResult, 7);
+	} catch (error) {
+		isCallASuccess = false;
+		console.error(error);
+	}
 	let		index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([k, v]) => {
@@ -105,7 +107,16 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 		if (status === 'active' && (v.VAULT_STATUS !== 'active' && v.VAULT_STATUS !== 'new' && v.VAULT_STATUS !== 'endorsed')) {
 			return;	
 		}
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, activation] = chunkedCallResult[index];
+		let	apiVersion = '0';
+		let	depositLimit = ethers.BigNumber.from('0');
+		let	totalAssets = ethers.BigNumber.from('0');
+		let	availableDepositLimit = ethers.BigNumber.from('0');
+		let	pricePerShare = ethers.BigNumber.from('0');
+		let	decimals = 18;
+		let	activation = '0';
+
+		if (isCallASuccess)
+			[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, activation] = chunkedCallResult[index];
 		const	dec = Number(decimals);
 		index++;
 

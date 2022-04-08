@@ -8,7 +8,7 @@
 import	React, {useState, useEffect}						from	'react';
 import	Link												from	'next/link';
 import	useSWR												from	'swr';
-import	axios												from	'axios'
+import	axios												from	'axios';
 import	{ethers}											from	'ethers';
 import	useWeb3												from	'contexts/useWeb3';
 import	{formatAmount}										from	'utils';
@@ -94,7 +94,7 @@ function	DisabledVaults({vaultsInactive}) {
 	);
 }
 
-const		fetcher = url => axios.get(url).then(res => res.data)
+const		fetcher = url => axios.get(url).then(res => res.data);
 function	Index() {
 	const	{provider, active, address, chainID} = useWeb3();
 	const	[, set_nonce] = useState(0);

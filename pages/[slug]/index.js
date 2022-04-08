@@ -8,7 +8,7 @@
 import	React, {useState, useEffect, useCallback}								from	'react';
 import	{ethers}																from	'ethers';
 import	{NextSeo}																from	'next-seo';
-import	axios																	from	'axios'
+import	axios																	from	'axios';
 import	{Provider, Contract}													from	'ethcall';
 import	useSWR																	from	'swr';
 import	useWeb3																	from	'contexts/useWeb3';
@@ -189,7 +189,7 @@ function	Strategies({vault, chainID}) {
 	);
 }
 
-const		fetcher = url => axios.get(url).then(res => res.data)
+const		fetcher = url => axios.get(url).then(res => res.data);
 function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
@@ -242,7 +242,7 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 			providerToUse = getProvider('arbitrum');
 		}
 		if (vault.CHAIN_ID === 100 && network.chainId !== 100) {
-			providerToUse = getProvider('xdai')
+			providerToUse = getProvider('xdai');
 		}
 
 		const	vaultContract = new ethers.Contract(
@@ -318,17 +318,17 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		fetcher(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_vaultAPY);
 	}, []);
 
-	async function _computeAPY() {
-		const	ethcallProvider = await newEthCallProvider(provider, network);
-		const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
-		const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
-		const	callResult = await ethcallProvider.all([
-			vaultContractMultiCall.pricePerShare(),
-			vaultContractMultiCall.decimals(),
-			vaultContractMultiCall.activation(),
-		]);
-		const	[pricePerShare, decimals, activation] = callResult;
-	}
+	// async function _computeAPY() {
+	// 	const	ethcallProvider = await newEthCallProvider(provider, network);
+	// 	const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
+	// 	const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
+	// 	const	callResult = await ethcallProvider.all([
+	// 		vaultContractMultiCall.pricePerShare(),
+	// 		vaultContractMultiCall.decimals(),
+	// 		vaultContractMultiCall.activation(),
+	// 	]);
+	// 	const	[pricePerShare, decimals, activation] = callResult;
+	// }
 
 	useEffect(() => {
 
