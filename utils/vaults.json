@@ -1041,7 +1041,7 @@
     "WANT_ADDR": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
     "WANT_SYMBOL": "LINK",
     "COINGECKO_SYMBOL": "chainlink",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "curved-owl": {
@@ -1053,7 +1053,7 @@
     "WANT_ADDR": "0x1337bedc9d22ecbe766df105c9623922a27963ec",
     "WANT_SYMBOL": "x3CRV",
     "COINGECKO_SYMBOL": "wrapped-xdai",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 100
   },
   "stargate-samba": {
@@ -1065,7 +1065,7 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "radioactive-dai": {
@@ -1077,7 +1077,7 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "lazy-synapses": {
@@ -1089,7 +1089,19 @@
     "WANT_ADDR": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 250
+  },
+  "frax-fifth-avenue": {
+    "TITLE": "Frax Fifth Avenue",
+    "LOGO": "🛍👗",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xB364D19c3FF37e0fa4B94bf4cf626729533C1c26",
+    "WANT_ADDR": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+    "WANT_SYMBOL": "FRAX",
+    "COINGECKO_SYMBOL": "frax",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
