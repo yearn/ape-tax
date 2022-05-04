@@ -115,7 +115,7 @@ if (!args.chain || !([1, 56, 137, 250, 42161, 100]).includes(args.chain)) {
 		type: 'list',
 		name: 'vaultChain',
 		message: 'Which chain ?',
-		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)' ],
+		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)'],
 	},);
 } else {
 	if (args.chain === 1)
