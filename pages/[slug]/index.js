@@ -235,13 +235,16 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
 			providerToUse = getProvider('fantom');
 		}
+		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
+			providerToUse = getProvider('rinkeby');
+		}
 		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
 			providerToUse = getProvider('polygon');
 		}
 		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
 			providerToUse = getProvider('arbitrum');
 		}
-		if (vault.CHAIN_ID === 100 && network.chainId !== 100) {
+		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
 			providerToUse = getProvider('xdai');
 		}
 
@@ -364,6 +367,9 @@ function	Index({vault, provider, getProvider, active, address, ens, chainID, pri
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
 			providerToUse = getProvider('fantom');
+		}
+		if (vault.CHAIN_ID === 4 && chainID !== 1337) {
+			providerToUse = getProvider('rinkeby');
 		}
 		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
 			providerToUse = getProvider('polygon');

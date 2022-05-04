@@ -28,6 +28,8 @@ function getProvider(chain = 'ethereum') {
 		} else {
 			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
 		}
+	} else if (chain === 'rinkeby') {
+		return new ethers.providers.JsonRpcProvider(`https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`);
 	} else if (chain === 'polygon') {
 		if (process.env.ALCHEMY_KEY_POLYGON) {
 			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
@@ -62,7 +64,7 @@ export const Web3ContextApp = ({children, router}) => {
 		if (!force && (!active || disableAutoChainChange)) {
 			return;
 		}
-		const	isCompatibleChain = [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0));
+		const	isCompatibleChain = [1, 4, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0));
 		if (isCompatibleChain) {
 			return;
 		}
@@ -108,6 +110,7 @@ export const Web3ContextApp = ({children, router}) => {
 			const walletconnect = new WalletConnectConnector({
 				rpc: {
 					1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+					4: `https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`,
 					56: 'https://bsc-dataseed.binance.org/',
 					137: 'https://rpc-mainnet.matic.network',
 					250: 'https://rpc.ftm.tools',
@@ -154,7 +157,7 @@ export const Web3ContextApp = ({children, router}) => {
 				deactivate,
 				walletType,
 				chainID: Number(chainId || 0),
-				active: active && [1, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0)),
+				active: active && [1, 4, 56, 100, 137, 250, 1337, 31337, 42161].includes(Number(chainId || 0)),
 				provider: library,
 				getProvider,
 				disconnected,

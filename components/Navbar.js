@@ -51,6 +51,8 @@ function	Navbar({router}) {
 		}
 		if (Number(newChainID) === 1) {
 			provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error) => console.error(error));
+		} else if (Number(newChainID) === 4) {
+			provider.send('wallet_switchEthereumChain', [{chainId: '0x4'}]).catch((error) => console.error(error));
 		} else {
 			provider.send('wallet_addEthereumChain', [chains[newChainID].chain_swap, address]).catch((error) => console.error(error));
 		}
