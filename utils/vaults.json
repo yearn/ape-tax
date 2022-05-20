@@ -1103,5 +1103,17 @@
     "COINGECKO_SYMBOL": "frax",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "xtreme-sushi": {
+    "TITLE": "Xtreme Sushi",
+    "LOGO": "🍣🍣",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xD1a075C806e40D79e32eA09553E7080d5d9d4b29",
+    "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+    "WANT_SYMBOL": "SUSHI",
+    "COINGECKO_SYMBOL": "sushi",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
