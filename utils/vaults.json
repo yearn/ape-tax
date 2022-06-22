@@ -1104,6 +1104,30 @@
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
+  "bird-feeder": {
+    "TITLE": "Bird Feeder",
+    "LOGO": "🦜🌎",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xcaE0347E9fafC1e08880C79c8331F15c786083E0",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "santa-bills": {
+    "TITLE": "Santa Bills",
+    "LOGO": "🎅💵",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb0D6d7C0ed4b9C2B8186a3Ac3Acad88683586e35",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
   "xtreme-sushi": {
     "TITLE": "Xtreme Sushi",
     "LOGO": "🍣🍣",
