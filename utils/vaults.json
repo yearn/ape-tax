@@ -1113,7 +1113,7 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
   "santa-bills": {
