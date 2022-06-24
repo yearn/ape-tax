@@ -1005,7 +1005,7 @@
     "WANT_ADDR": "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
     "WANT_SYMBOL": "WFTM",
     "COINGECKO_SYMBOL": "fantom",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
   "fresh-beets": {
@@ -1101,7 +1101,55 @@
     "WANT_ADDR": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
     "WANT_SYMBOL": "FRAX",
     "COINGECKO_SYMBOL": "frax",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "bird-feeder": {
+    "TITLE": "Bird Feeder",
+    "LOGO": "🦜🌎",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xcaE0347E9fafC1e08880C79c8331F15c786083E0",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "santa-bills": {
+    "TITLE": "Santa Bills",
+    "LOGO": "🎅💵",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb0D6d7C0ed4b9C2B8186a3Ac3Acad88683586e35",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "xtreme-sushi": {
+    "TITLE": "Xtreme Sushi",
+    "LOGO": "🍣🍣",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xD1a075C806e40D79e32eA09553E7080d5d9d4b29",
+    "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+    "WANT_SYMBOL": "SUSHI",
+    "COINGECKO_SYMBOL": "sushi",
+    "VAULT_STATUS": "active",
+    "CHAIN_ID": 1
+  },
+  "arbi-2crv": {
+    "TITLE": "Arbi 2crv",
+    "LOGO": "🐬👗",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x49448d2B94fb9C4e41a30aD8315D32f46004A34b",
+    "WANT_ADDR": "0x7f90122BF0700F9E7e1F688fe926940E8839F353",
+    "WANT_SYMBOL": "2crv",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
   }
 }
