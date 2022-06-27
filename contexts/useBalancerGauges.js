@@ -25,6 +25,14 @@ export const BalancerGaugeContextApp = ({children}) => {
 	**	of each of theses gauges.
 	***************************************************************************/
 	const getBalanceGauges = React.useCallback(async () => {
+		if (chainID !== 1 && chainID !== 1337) {
+			performBatchedUpdates(() => {
+				set_balancerGauges(undefined);
+				set_nonce((n) => n + 1);
+			});
+			return;
+		}
+
 		const	listOfGauges = await request(
 			'https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-gauges',
 			`{gauges(first: 1000) {

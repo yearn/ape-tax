@@ -48,19 +48,19 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 		}
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
-			providerToUse = getProvider('fantom');
+			providerToUse = getProvider(250);
 		}
 		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
-			providerToUse = getProvider('rinkeby');
+			providerToUse = getProvider(4);
 		}
 		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
-			providerToUse = getProvider('polygon');
+			providerToUse = getProvider(137);
 		}
 		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
-			providerToUse = getProvider('arbitrum');
+			providerToUse = getProvider(42161);
 		}
 		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
-			providerToUse = getProvider('xdai');
+			providerToUse = getProvider(100);
 		}
 
 		const	vaultContract = new ethers.Contract(
@@ -132,7 +132,7 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 	** If we had some issues getting the prices ... Let's try again
 	**************************************************************************/
 	useEffect(() => {
-		if (vault.PRICE_SOURCE.startsWith('Lens')) {
+		if (vault?.PRICE_SOURCE?.startsWith('Lens')) {
 			const	currentProvider = provider || providers.getProvider(vault.CHAIN_ID || 1337);
 			providers.newEthCallProvider(currentProvider).then((ethcallProvider) => {
 				const	lensPriceContract = new Contract(networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1].lensAddress, LENS_ABI);
@@ -168,7 +168,7 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 			</div>
 			<InfoMessage status={vault.VAULT_STATUS} />
 			<VaultDetails vault={vault} vaultData={vaultData} />
-			<VaultStrategies vault={vault} chainID={chainID} />
+			<VaultStrategies vault={vault} decimals={vaultData.decimals} chainID={chainID} />
 			<VaultWallet vault={vault} vaultData={vaultData} />
 			<VaultActions vault={vault} vaultData={vaultData} onUpdateVaultData={set_vaultData} />
 		</div>

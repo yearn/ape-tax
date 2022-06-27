@@ -2,7 +2,7 @@ import	React, {useCallback}				from	'react';
 import	{NextSeo}							from	'next-seo';
 import	{useWeb3}							from	'@yearn-finance/web-lib/contexts';
 import	{useClientEffect}					from	'@yearn-finance/web-lib/hooks';
-import	{toAddress}							from	'@yearn-finance/web-lib/utils';
+import	{toAddress, providers}				from	'@yearn-finance/web-lib/utils';
 import	VaultDetails						from	'components/VaultWrapper';
 import	useFactory							from	'contexts/useFactory';
 import	useWindowInFocus					from	'hook/useWindowInFocus';
@@ -10,7 +10,7 @@ import	vaults								from	'utils/vaults.json';
 import	chains								from	'utils/chains.json';
 
 function	Wrapper({vault, slug, prices}) {
-	const	{provider, getProvider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
+	const	{provider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = React.useState(vault);
 	const	windowInFocus = useWindowInFocus();
@@ -134,7 +134,7 @@ function	Wrapper({vault, slug, prices}) {
 			<VaultDetails
 				vault={currentVault}
 				provider={provider}
-				getProvider={getProvider}
+				getProvider={providers.getProvider}
 				address={address}
 				ens={ens}
 				chainID={chainID}

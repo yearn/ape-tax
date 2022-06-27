@@ -218,7 +218,7 @@ function	Index() {
 				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
-						<p className={'inline font-bold'}>{ens || `${truncateHex(address)}`}</p>
+						<p className={'inline font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Your vault shares: '}</p>

@@ -36,7 +36,7 @@ function	VaultDetails({vault, vaultData}) {
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-700'}>{`${vault.WANT_SYMBOL} price (${vault.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
+					<p className={'inline text-neutral-700'}>{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
 					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}

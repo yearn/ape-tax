@@ -14,7 +14,7 @@ function	VaultWallet({vault, vaultData}) {
 			<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your Account: '}</p>
-					<p className={'inline text-neutral-500 font-bold'}>{ens || `${truncateHex(address)}`}</p>
+					<p className={'inline text-neutral-500 font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your vault shares: '}</p>

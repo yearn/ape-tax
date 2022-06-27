@@ -1,13 +1,15 @@
 
 import	React, {useState, useEffect, useCallback}		from	'react';
 import	{ethers}										from	'ethers';
+import	{Contract}										from	'ethcall';
 import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
-import	{toAddress}										from	'@yearn-finance/web-lib/utils';
+import	{providers, toAddress}							from	'@yearn-finance/web-lib/utils';
 import	chains											from	'utils/chains.json';
 import	{performGet}									from	'utils/API';
 import	{parseMarkdown}									from	'utils';
+import	YVAULT_ABI										from	'utils/ABI/yVault.abi';
 
-function	Strategies({vault, chainID}) {
+function	Strategies({vault, decimals, chainID}) {
 	const	{provider, isActive, address} = useWeb3();
 	const	[strategiesData, set_strategiesData] = useState({});
 	const	[, set_nonce] = useState(0);
@@ -26,7 +28,9 @@ function	Strategies({vault, chainID}) {
 			return;
 		}
 
-		const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, ['function withdrawalQueue(uint256 arg0) view returns (address)'], provider);
+		const	currentProvider = provider || providers.getProvider(chainID || 1337);
+		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+		const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI);
 		let		shouldBreak = false;
 		for (let index = 0; index < 20; index++) {
 			if (shouldBreak) {
@@ -38,19 +42,25 @@ function	Strategies({vault, chainID}) {
 			** retrieve the address of the strategy from withdrawQueue, looping
 			** through the max number of strategies until we hit 0
 			**************************************************************************/
-			const	strategyAddress = await vaultContract.withdrawalQueue(index);
+			const	[strategyAddress] = await ethcallProvider.tryAll([contract.withdrawalQueue(index)]);
 			if (strategyAddress === ethers.constants.AddressZero) {
 				shouldBreak = true;
 				continue;
 			}
-			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
-			const	name = await strategyContract.name();
+			const	strategyContract = new Contract(strategyAddress, YVAULT_ABI);
+			const	[creditAvailable, name] = await ethcallProvider.tryAll([
+				contract.creditAvailable(strategyAddress),
+				strategyContract.name()
+			]);
+
 			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
 				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
 				set_strategiesData((s) => {
 					s[toAddress(strategyAddress)] = {
 						address: strategyAddress,
-						name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null
+						name: name,
+						description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
+						creditAvailable: creditAvailable
 					};
 					return (s);
 				});
@@ -58,15 +68,15 @@ function	Strategies({vault, chainID}) {
 				set_strategiesData((s) => {
 					s[toAddress(strategyAddress)] = {
 						address: strategyAddress,
-						name, description: 'Description not provided for this strategy.'
+						name: name,
+						description: 'Description not provided for this strategy.',
+						creditAvailable: creditAvailable
 					};
 					return (s);
 				});
 			}
-			
 			set_nonce(n => n + 1);
 		}
-
 	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
 
 	useEffect(() => {
@@ -95,6 +105,13 @@ function	Strategies({vault, chainID}) {
 								className={'dashed-underline-gray text-xs'}
 								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
 								{'📃 Contract'}
+							</a>
+						</div>
+						<div>
+							<a
+								className={'dashed-underline-gray text-xs'}
+								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
+								{`🚜 Harvest ${strategy.creditAvailable.toString()} ${ethers.utils.formatUnits(strategy.creditAvailable, decimals)} ${vault.WANT_SYMBOL}`}
 							</a>
 						</div>
 					</div>

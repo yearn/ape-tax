@@ -1,11 +1,12 @@
 import	React, {useState}														from	'react';
 import	{ethers}																from	'ethers';
 import	{useWeb3}																from	'@yearn-finance/web-lib/contexts';
+import	{providers}																from	'@yearn-finance/web-lib/utils';
 import	chains																	from	'utils/chains.json';
 import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
 
 function	VaultAction({vault, vaultData, onUpdateVaultData}) {
-	const	{provider, getProvider, address, chainID} = useWeb3();
+	const	{provider, address, chainID} = useWeb3();
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
 	const	[zapAmount, set_zapAmount] = useState(0);
@@ -43,19 +44,19 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}) {
 		}
 		let		providerToUse = provider;
 		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
-			providerToUse = getProvider('fantom');
+			providerToUse = providers.getProvider(250);
 		}
 		if (vault.CHAIN_ID === 4 && chainID !== 1337) {
-			providerToUse = getProvider('rinkeby');
+			providerToUse = providers.getProvider(4);
 		}
 		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
-			providerToUse = getProvider('polygon');
+			providerToUse = providers.getProvider(137);
 		}
 		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
-			providerToUse = getProvider('arbitrum');
+			providerToUse = providers.getProvider(42161);
 		}
 		if (vault.CHAIN_ID === 100 && chainID !== 100) {
-			providerToUse = getProvider('xdai');
+			providerToUse = providers.getProvider(100);
 		}
 
 		const	wantContract = new ethers.Contract(
@@ -242,7 +243,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}) {
 										onClick={onZapIn}
 										disabled={isDepositing || Number(zapAmount) === 0}
 										className={`${isDepositing || Number(zapAmount) === 0 ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mb-2 mr-8`}>
-										{'🏦 Zap in'}
+										{'💰 Zap in'}
 									</button>
 								</>
 								: null
@@ -294,13 +295,13 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}) {
 									onClick={onDeposit}
 									disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
 									className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-									{'🏦 Deposit'}
+									{'💰 Deposit'}
 								</button>
 								<button
 									onClick={onDepositAll}
 									disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
 									className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-									{'🏦 Deposit All'}
+									{'💰 Deposit All'}
 								</button>
 							</>
 							: null
