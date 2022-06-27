@@ -6,7 +6,8 @@ import	FACTORY_ABI										from	'utils/ABI/factory.abi';
 import	YVAULT_ABI										from	'utils/ABI/yVault.abi';
 
 /* 🔵 - Yearn Finance **********************************************************
-
+** The Factory Context is used to retrieve the list of community vaults
+** deployed via the Balancer Factory contract.
 ******************************************************************************/
 const	FactoryContext = createContext();
 export const FactoryContextApp = ({children}) => {
@@ -15,9 +16,9 @@ export const FactoryContextApp = ({children}) => {
 	const	[nonce, set_nonce] = React.useState(0);
 
 	/* 🔵 - Yearn Finance ******************************************************
-	**	
+	**	getCommunityVaults will fetch the currently deployed community vaults
 	***************************************************************************/
-	const getWalletStatus = React.useCallback(async () => {
+	const getCommunityVaults = React.useCallback(async () => {
 		const	currentProvider = provider || providers.getProvider(chainID || 1337);
 		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
 
@@ -68,8 +69,8 @@ export const FactoryContextApp = ({children}) => {
 	}, [provider, chainID]);
 
 	React.useEffect(() => {
-		getWalletStatus();
-	}, [getWalletStatus]);
+		getCommunityVaults();
+	}, [getCommunityVaults]);
 
 
 	/* 🔵 - Yearn Finance ******************************************************
@@ -79,6 +80,7 @@ export const FactoryContextApp = ({children}) => {
 		<FactoryContext.Provider
 			value={{
 				communityVaults,
+				getCommunityVaults,
 				useFactoryNonce: nonce
 			}}>
 			{children}

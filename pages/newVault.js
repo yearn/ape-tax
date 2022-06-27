@@ -6,6 +6,7 @@ import	{useWeb3}											from	'@yearn-finance/web-lib/contexts';
 import	{toAddress, performBatchedUpdates, providers,
 	isZeroAddress, defaultTxStatus}							from	'@yearn-finance/web-lib/utils';
 import	{AddressWithActions}								from	'@yearn-finance/web-lib';
+import	useFactory											from	'contexts/useFactory';
 import	useBalancerGauge									from	'contexts/useBalancerGauges';
 import	{createNewVaultsAndStrategies}						from	'utils/actions';
 
@@ -76,6 +77,7 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 
 
 function	Index() {
+	const	{getCommunityVaults} = useFactory();
 	const	{provider, isActive} = useWeb3();
 	const	[selectedGauge, set_selectedGauge] = React.useState();
 	const	[gaugeInfo, set_gaugeInfo] = React.useState({exists: false, name: '', symbol: '', deployed: false, vaultAddress: ''});
@@ -138,7 +140,8 @@ function	Index() {
 				return;
 			}
 			console.log(`YOU VAULT IS READY HERE: ${data}`);
-			performBatchedUpdates(() => {
+			performBatchedUpdates(async () => {
+				await getCommunityVaults();
 				set_gaugeInfo({...gaugeInfo, vaultAddress: data, deployed: true});
 				set_txStatusCreateVault({...txStatusCreateVault, success: true});
 			});
