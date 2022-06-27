@@ -21,7 +21,7 @@ export const FactoryContextApp = ({children}) => {
 		const	currentProvider = provider || providers.getProvider(chainID || 1337);
 		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
 
-		const	contract = new Contract(process.env.BALANCER_GLOBAL_ADDRESS, FACTORY_ABI);
+		const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
 		const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]);
 
 		const	vaultListCalls = [];

@@ -176,7 +176,7 @@ export async function	createNewVaultsAndStrategies({provider, gauge}, callback) 
 	const	_toast = toast.loading('Creating new Vault...');
 	const	signer = provider.getSigner();
 	const	contract = new ethers.Contract(
-		process.env.BALANCER_GLOBAL_ADDRESS,
+		process.env.YEARN_BALANCER_FACTORY_ADDRESS,
 		[
 			'function createNewVaultsAndStrategies(address _gauge) external returns (address vault, address auraStrategy)',
 			'function alreadyExistsFromGauge(address) public view returns (address)'

@@ -90,7 +90,7 @@ function	Index() {
 	**************************************************************************/
 	const	checkGauge = React.useCallback(async () => {
 		const	ethcallProvider = await providers.newEthCallProvider(provider);
-		const	balancerGlobalContract = new Contract(process.env.BALANCER_GLOBAL_ADDRESS, [{'stateMutability':'view','type':'function','name':'alreadyExistsFromGauge','inputs':[{'name':'address','type':'address'}],'outputs':[{'name':'','type':'address'}]}]);
+		const	balancerGlobalContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, [{'stateMutability':'view','type':'function','name':'alreadyExistsFromGauge','inputs':[{'name':'address','type':'address'}],'outputs':[{'name':'','type':'address'}]}]);
 		const	gaugeContract = new Contract(selectedGauge?.address, [{'stateMutability':'view','type':'function','name':'name','inputs':[],'outputs':[{'name':'','type':'string'}]},{'stateMutability':'view','type':'function','name':'symbol','inputs':[],'outputs':[{'name':'','type':'string'}]}]);
 
 		const	callResult = await ethcallProvider.tryAll([

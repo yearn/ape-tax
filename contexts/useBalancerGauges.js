@@ -41,7 +41,7 @@ export const BalancerGaugeContextApp = ({children}) => {
 		const	gaugeList = listOfGauges.gauges.filter(e => e.type.name === 'Ethereum');
 		const	currentProvider = provider || providers.getProvider(chainID || 1337);
 		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
-		const	balancerFactoryContract = new Contract(process.env.BALANCER_GLOBAL_ADDRESS, FACTORY_ABI);
+		const	balancerFactoryContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
 		const	auraBoosterContract = new Contract(process.env.AURA_BOOSTER_ADDRESS, AURA_BOOSTER_ABI);
 
 		const	[numPools] = await ethcallProvider.tryAll([auraBoosterContract.poolLength()]);
