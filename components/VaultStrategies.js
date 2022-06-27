@@ -2,13 +2,14 @@
 import	React, {useState, useEffect, useCallback}		from	'react';
 import	{ethers}										from	'ethers';
 import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
+import	{toAddress}										from	'@yearn-finance/web-lib/utils';
 import	chains											from	'utils/chains.json';
 import	{performGet}									from	'utils/API';
 import	{parseMarkdown}									from	'utils';
 
 function	Strategies({vault, chainID}) {
 	const	{provider, isActive, address} = useWeb3();
-	const	[strategiesData, set_strategiesData] = useState([]);
+	const	[strategiesData, set_strategiesData] = useState({});
 	const	[, set_nonce] = useState(0);
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 
@@ -47,12 +48,18 @@ function	Strategies({vault, chainID}) {
 			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
 				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
 				set_strategiesData((s) => {
-					s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
+					s[toAddress(strategyAddress)] = {
+						address: strategyAddress,
+						name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null
+					};
 					return (s);
 				});
 			} else {
 				set_strategiesData((s) => {
-					s[index] = {address: strategyAddress, name, description: 'Description not provided for this strategy.'};
+					s[toAddress(strategyAddress)] = {
+						address: strategyAddress,
+						name, description: 'Description not provided for this strategy.'
+					};
 					return (s);
 				});
 			}
@@ -73,7 +80,7 @@ function	Strategies({vault, chainID}) {
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
 			<h1 className={'text-2xl font-mono font-semibold text-neutral-700 mb-6'}>{'Strategies'}</h1>
 			{
-				strategiesData.map((strategy, index) => (
+				Object.values(strategiesData).map((strategy, index) => (
 
 					<div key={index} className={'font-mono text-neutral-500 text-sm mb-4'}>
 						<div>

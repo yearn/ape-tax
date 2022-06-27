@@ -19,6 +19,13 @@ export const FactoryContextApp = ({children}) => {
 	**	getCommunityVaults will fetch the currently deployed community vaults
 	***************************************************************************/
 	const getCommunityVaults = React.useCallback(async () => {
+		if (chainID !== 1 && chainID !== 1337) {
+			performBatchedUpdates(() => {
+				set_communityVaults(undefined);
+				set_nonce((n) => n + 1);
+			});
+			return;
+		}
 		const	currentProvider = provider || providers.getProvider(chainID || 1337);
 		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
 
