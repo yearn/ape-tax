@@ -178,7 +178,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 								onClick={() => onHarvestStrategy(strategy.address)}
 								className={'dashed-underline-gray text-xs'}
 								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
-								{strategy.creditAvailable.isZero() ? '🌱 Nothing to harvest (yet)' : `🚜 Harvest ${ethers.utils.formatUnits(strategy.creditAvailable, decimals)} ${vault.WANT_SYMBOL}`}
+								{strategy.creditAvailable.isZero() ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${ethers.utils.formatUnits(strategy.creditAvailable, decimals)} ${vault.WANT_SYMBOL}`}
 							</button>
 						</div> : null}
 					</div>

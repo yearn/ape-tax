@@ -183,9 +183,9 @@ function	Index() {
 					</div>
 
 					<div className={'text-xs my-6'}>
-						<div className={'text-neutral-700 font-mono text-base'}>
-							<p>{'Because now you can. You really want this vault. You want to ape so much. You want the bananas. Just ape.'}</p>
-							<p>{'We are adding a smol warning here for you. Here is how it should and will work, here is what you should do, here is what Facu will do: todo'}</p>
+						<div className={'text-neutral-700 font-mono text-base space-y-4'}>
+							<p>{'Deploy a new vault and start autocompounding the yield from your Balancer deposits'}</p>
+							<p>{'Remember, this is an experimental experiment'}</p>
 						</div>
 					</div>
 
