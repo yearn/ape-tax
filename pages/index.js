@@ -239,7 +239,7 @@ function	Index() {
 				</div>
 				<div className={'items-center flex'}>
 					<Link href={'/newVault'}>
-						<span className={'text-neutral-700 font-mono border px-4 py-2 border-dashed border-neutral-500 text-sm transition-colors hover:bg-neutral-900 hover:text-white cursor-pointer'}>
+						<span className={'text-neutral-700 font-mono border px-4 py-2 border-dashed border-neutral-500 text-sm transition-colors bg-neutral-200 hover:bg-neutral-0 cursor-pointer'}>
 							{'Deploy your own vault'}
 						</span>
 					</Link>
