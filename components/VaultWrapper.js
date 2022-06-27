@@ -168,7 +168,7 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 			</div>
 			<InfoMessage status={vault.VAULT_STATUS} />
 			<VaultDetails vault={vault} vaultData={vaultData} />
-			<VaultStrategies vault={vault} decimals={vaultData.decimals} chainID={chainID} />
+			<VaultStrategies vault={vault} decimals={vaultData.decimals} chainID={chainID} onUpdateVaultData={set_vaultData} />
 			<VaultWallet vault={vault} vaultData={vaultData} />
 			<VaultActions vault={vault} vaultData={vaultData} onUpdateVaultData={set_vaultData} />
 		</div>

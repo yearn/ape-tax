@@ -207,3 +207,34 @@ export async function	createNewVaultsAndStrategies({provider, gauge}, callback) 
 		callback({error, data: undefined});
 	}
 }
+
+export async function	harvestStrategy({provider, strategyAddress}, callback) {
+	const	_toast = toast.loading('Harvesting strategy...');
+	const	signer = provider.getSigner();
+	const	contract = new ethers.Contract(
+		process.env.YEARN_FACTORY_KEEPER_WRAPPER,
+		['function harvestStrategy(address) public'],
+		signer
+	);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		const	transaction = await contract.harvestStrategy(strategyAddress);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			toast.dismiss(_toast);
+			toast.success('Transaction successful');
+			callback({error: false, data: undefined});
+		} else {
+			toast.dismiss(_toast);
+			toast.error('Transaction failed');
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		toast.dismiss(_toast);
+		toast.error('Transaction failed');
+		callback({error, data: undefined});
+	}
+}

@@ -606,15 +606,6 @@
 		"type": "uint256",
 		"name": ""
 	}],
-	"inputs": [],
-	"stateMutability": "view",
-	"type": "function"
-}, {
-	"name": "creditAvailable",
-	"outputs": [{
-		"type": "uint256",
-		"name": ""
-	}],
 	"inputs": [{
 		"type": "address",
 		"name": "_strategy"
