@@ -1,21 +1,24 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				Default.css
-******************************************************************************/
+@import '@yearn-finance/web-lib/style.css';
 
-* {
-	scroll-behavior: smooth;
+* {@apply font-mono;}
+:root,
+:root body[data-theme="light"] {
+	--default-rounded: 0rem;
+	--color-yellow-900: 55 100% 67%;
+	--color-yellow-300: 55 100% 95%;
+	--color-yellow-200: 55 100% 90%;
 }
 
-html.dark {
-	background: rgb(19,38,75);
+:root,
+:root body[data-theme="dark"] {
+	--default-rounded: 0rem;
+	--color-yellow-900: 55 100% 67%;
+	--color-yellow-300: 55 100% 95%;
+	--color-yellow-200: 55 100% 90%;
 }
 
-#__next {
-	width: 100%;
-	height: 100%
+.yearn--modal {
+	@apply sm:max-w-2xl;
 }
 
 ::placeholder {
@@ -66,12 +69,6 @@ html.dark {
 /******************************************************************************
 **	TAILWIND CSS ++
 ******************************************************************************/
-.transition-all {
-	transition-duration: 150ms;
-}
-.animation-delay-500 {
-	animation-delay: 1000ms !important;
-}
 .text-xxs {
 	font-size: 10px;
 	line-height: 12px;
@@ -83,7 +80,6 @@ html.dark {
 	line-height: 16px;
 	letter-spacing: 0em;
 }
-
 .text-ylarge {
 	font-family: Roboto;
 	font-size: 24px;
@@ -92,8 +88,6 @@ html.dark {
 	letter-spacing: 0em;
 	text-align: center;
 }
-
-
 .text-yerror {
 	font-family: SF Pro Display;
 	font-size: 14px;
@@ -101,12 +95,6 @@ html.dark {
 	line-height: 17px;
 	letter-spacing: 0em;
 }
-
-
-*, ::before, ::after {
-    --tw-ring-color: transparent !important;
-}
-
 .dashed-underline-white {
 	border-bottom: 1px dashed transparent;
 }

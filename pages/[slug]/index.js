@@ -1,800 +1,28 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Saturday August 21st 2021
-**	@Filename:				index.js
-******************************************************************************/
+import	React, {useCallback}				from	'react';
+import	{NextSeo}							from	'next-seo';
+import	{useWeb3}							from	'@yearn-finance/web-lib/contexts';
+import	{useClientEffect}					from	'@yearn-finance/web-lib/hooks';
+import	{toAddress}							from	'@yearn-finance/web-lib/utils';
+import	VaultDetails						from	'components/VaultWrapper';
+import	useFactory							from	'contexts/useFactory';
+import	useWindowInFocus					from	'hook/useWindowInFocus';
+import	vaults								from	'utils/vaults.json';
+import	chains								from	'utils/chains.json';
 
-import	React, {useState, useEffect, useCallback}								from	'react';
-import	{ethers}																from	'ethers';
-import	{NextSeo}																from	'next-seo';
-import	axios																	from	'axios';
-import	{Provider, Contract}													from	'ethcall';
-import	useSWR																	from	'swr';
-import	useWeb3																	from	'contexts/useWeb3';
-import	ModalLogin																from	'components/ModalLogin';
-import	useWindowInFocus														from	'hook/useWindowInFocus';
-import	vaults																	from	'utils/vaults.json';
-import	chains																	from	'utils/chains.json';
-import	{performGet}															from	'utils/API';
-import	{ADDRESS_ZERO, bigNumber, formatAmount, truncateAddress}	from	'utils';
-import	{approveToken, depositToken, withdrawToken, apeInVault, apeOutVault}	from	'utils/actions';
-import	ERC20ABI																from	'utils/ABI/erc20.abi.json';
-import	YVAULTABI																from	'utils/ABI/yVault.abi.json';
-
-async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	if (chainID === 1337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicallAddress = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	if (chainID === 42161) {
-		ethcallProvider.multicallAddress = '0x10126Ceb60954BC35049f24e819A380c505f8a0F';
-	}
-	return	ethcallProvider;
-}
-
-function	AnimatedWait() {
-	const frames = ['[-----]', '[=----]', '[-=---]', '[--=--]', '[---=-]', '[----=]'];
-	const [index, setIndex] = useState(0);
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setIndex((index) => (index + 1) % frames.length);
-		}, 100);
-		return () => clearTimeout(timer);
-	}, [frames.length]);
-
-	return <span>{frames[index]}</span>;
-}
-function	Suspense({wait, children}) {
-	if (wait) {
-		return <AnimatedWait />;
-	}
-	return <span>{children}</span>;
-}
-
-function	InfoMessage({status}) {
-	if (status === 'use_production' || status === 'endorsed') {
-		return (
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-white bg-tag-info'}>
-				{'🚀 '}<strong>{'YEARN WEBSITE'}</strong> {"this vault is in Yearn Finance website. You don't need to move your funds."}
-			</div>
-		);
-	}
-	if (status === 'withdraw') {
-		return (
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-white bg-tag-withdraw'}>
-				{'🛑 '}<strong>{'WITHDRAW YOUR FUNDS'}</strong> {'this experiment is disabled and it will not generate more yield. Please remove your funds.'}
-			</div>
-		);
-	}
-	return (
-		<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
-			{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. It's extremely risky and will probably be discarded when the test is over. Proceed with extreme caution."}
-		</div>
-	);
-}
-
-function	ProgressChart({progress, width}) {
-	const	part_char = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
-	const	whole_char = '█';
-	const	whole_width = Math.floor(progress * width);
-	const	remainder_width = (progress * width) % 1;
-	const	part_width = Math.floor(remainder_width * 9);
-	let		white_width = width - whole_width - 1;
-
-	if (progress == 1)
-		white_width = 0;
-	
-	return '' + whole_char.repeat(whole_width) + part_char[part_width] + ' '.repeat(white_width) + '';
-}
-
-function	parseMarkdown(markdownText) {
-	const htmlText = markdownText
-		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
-
-	return htmlText.trim();
-}
-
-function	Strategies({vault, chainID}) {
-	const	{provider, active, address} = useWeb3();
-	const	[strategiesData, set_strategiesData] = useState([]);
-	const	[, set_nonce] = useState(0);
-	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
-
-	/**************************************************************************
-	** Retrieve the details of the attached strategies and compute some of the
-	** elements for the UI.
-	**************************************************************************/
-	const prepreStrategiesData = useCallback(async () => {
-		if (chainID !== vault?.CHAIN_ID && !(chainID === 1337)) {
-			return;
-		}
-		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
-			return;
-		}
-
-		const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, ['function withdrawalQueue(uint256 arg0) view returns (address)'], provider);
-		let		shouldBreak = false;
-		for (let index = 0; index < 20; index++) {
-			if (shouldBreak) {
-				continue;
-			}
-
-			/**************************************************************************
-			** The fun part to get all the strategies addresses is that we need to
-			** retrieve the address of the strategy from withdrawQueue, looping
-			** through the max number of strategies until we hit 0
-			**************************************************************************/
-			const	strategyAddress = await vaultContract.withdrawalQueue(index);
-			if (strategyAddress === ADDRESS_ZERO) {
-				shouldBreak = true;
-				continue;
-			}
-			const	strategyContract = new ethers.Contract(strategyAddress, ['function name() view returns (string)'], provider);
-			const	name = await strategyContract.name();
-			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
-				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
-				set_strategiesData((s) => {
-					s[index] = {address: strategyAddress, name, description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : null};
-					return (s);
-				});
-			} else {
-				set_strategiesData((s) => {
-					s[index] = {address: strategyAddress, name, description: 'Description not provided for this strategy.'};
-					return (s);
-				});
-			}
-			
-			set_nonce(n => n + 1);
-		}
-
-	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
-
-	useEffect(() => {
-		if (!vault || !active || !provider || !address) {
-			return;
-		}
-		prepreStrategiesData();
-	}, [vault, active, provider, address, prepreStrategiesData]);
-
-	return (
-		<section aria-label={'STRATEGIES'} className={'mt-8'}>
-			<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Strategies'}</h1>
-			{
-				strategiesData.map((strategy, index) => (
-
-					<div key={index} className={'font-mono text-ygray-700 dark:text-dark-50 text-sm mb-4'}>
-						<div>
-							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
-							<p className={'inline font-bold'}>{strategy.name}</p>
-						</div>
-						<div className={'max-w-xl w-full text-justify'}>
-							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
-						</div>
-						<div>
-							<a
-								className={'dashed-underline-gray text-xs'}
-								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
-								{'📃 Contract'}
-							</a>
-						</div>
-					</div>
-				))
-			}
-		</section>
-	);
-}
-
-const		fetcher = url => axios.get(url).then(res => res.data);
-function	Index({vault, provider, getProvider, active, address, ens, chainID, prices}) {
-	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
-	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
-	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
-	const	[amount, set_amount] = useState(0);
-	const	[zapAmount, set_zapAmount] = useState(0);
-	const	[vaultAPY, set_vaultAPY] = useState(null);
-	const	[vaultData, set_vaultData] = useState({
-		loaded: false,
-		depositLimit: -1,
-		totalAssets: 0,
-		availableDepositLimit: 0,
-		pricePerShare: 1,
-		decimals: 18,
-		coinBalance: 0,
-		balanceOf: 0,
-		balanceOfRaw: 0,
-		balanceOfValue: 0,
-		wantBalance: 0,
-		wantPrice: 0,
-		wantPriceError: false,
-		totalAUM: 0,
-		progress:  0,
-		allowance: 0,
-		apiVersion: '-',
-		wantBalanceRaw: bigNumber.from(0),
-		allowanceZapOut: 0
-	});
-	const	[isApproving, set_isApproving] = useState(false);
-	const	[isZapOutApproving, set_isZapOutApproving] = useState(false);
-	const	[isDepositing, set_isDepositing] = useState(false);
-	const	[isWithdrawing, set_isWithdrawing] = useState(false);
-
-	const	prepareVaultData = useCallback(async () => {
-		if (!vault || !active || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
-			return;
-		}
-		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
-			return;
-		}
-		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
-			providerToUse = getProvider('fantom');
-		}
-		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
-			providerToUse = getProvider('rinkeby');
-		}
-		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
-			providerToUse = getProvider('polygon');
-		}
-		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
-			providerToUse = getProvider('arbitrum');
-		}
-		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
-			providerToUse = getProvider('xdai');
-		}
-
-		const	vaultContract = new ethers.Contract(
-			vault.VAULT_ADDR, [
-				'function apiVersion() public view returns (string)',
-				'function depositLimit() public view returns (uint256)',
-				'function totalAssets() public view returns (uint256)',
-				'function availableDepositLimit() public view returns (uint256)',
-				'function pricePerShare() public view returns (uint256)',
-				'function decimals() public view returns (uint256)',
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)',
-				'function activation() public view returns(uint256)',
-			],
-			providerToUse
-		);
-		const	ethcallProvider = await newEthCallProvider(providerToUse, network.chainId === 1337 ? 1337 : network.chainID);
-
-		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
-		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI);
-		const	callResult = await ethcallProvider.all([
-			vaultContractMultiCall.apiVersion(),
-			vaultContractMultiCall.depositLimit(),
-			vaultContractMultiCall.totalAssets(),
-			vaultContractMultiCall.availableDepositLimit(),
-			vaultContractMultiCall.pricePerShare(),
-			vaultContractMultiCall.decimals(),
-			vaultContractMultiCall.balanceOf(address),
-			wantContractMultiCall.balanceOf(address),
-			wantContractMultiCall.allowance(address, vault.VAULT_ADDR),
-		]);
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult;
-		const	coinBalance = await providerToUse.getBalance(address);
-		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-
-		set_vaultData({
-			loaded: true,
-			apiVersion: apiVersion,
-			depositLimit: Number(ethers.utils.formatUnits(depositLimit, decimals)).toFixed(2),
-			totalAssets: Number(ethers.utils.formatUnits(totalAssets, decimals)).toFixed(2),
-			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, decimals)).toFixed(2),
-			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, decimals)).toFixed(4),
-			decimals,
-			coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
-			balanceOf: Number(ethers.utils.formatUnits(balanceOf, decimals)).toFixed(2),
-			balanceOfRaw: balanceOf,
-			balanceOfValue: (Number(ethers.utils.formatUnits(balanceOf, decimals)) * Number(ethers.utils.formatUnits(pricePerShare, decimals)) * price).toFixed(2),
-			wantBalance: Number(ethers.utils.formatUnits(wantBalance, decimals)).toFixed(2),
-			wantBalanceRaw: wantBalance,
-			wantPrice: price,
-			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, decimals)) * price).toFixed(2),
-			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, decimals))) / Number(ethers.utils.formatUnits(depositLimit, decimals)),
-			allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
-		});
-
-		if (vault.ZAP_ADDR) {
-			const	allowantZapOut = await vaultContract.allowance(address, vault.ZAP_ADDR);
-			set_vaultData((v) => ({...v, allowanceZapOut: Number(ethers.utils.formatUnits(allowantZapOut, decimals))}));
-		}
-
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vault, active, provider, address, chainID]);
-
-	useEffect(() => {
-		prepareVaultData();
-	}, [prepareVaultData]);
-
-	useEffect(() => {
-		set_vaultAPY(vaultAPYSWR);
-	}, [vaultAPYSWR]);
-
-	useEffect(() => {
-		fetcher(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`).then(set_vaultAPY);
-	}, []);
-
-	// async function _computeAPY() {
-	// 	const	ethcallProvider = await newEthCallProvider(provider, network);
-	// 	const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
-	// 	const	vaultContractMultiCall = new Contract(vaultToUse.VAULT_ADDR, yVaultABI);
-	// 	const	callResult = await ethcallProvider.all([
-	// 		vaultContractMultiCall.pricePerShare(),
-	// 		vaultContractMultiCall.decimals(),
-	// 		vaultContractMultiCall.activation(),
-	// 	]);
-	// 	const	[pricePerShare, decimals, activation] = callResult;
-	// }
-
-	useEffect(() => {
-
-	}, []);
-
-	/**************************************************************************
-	** We need to update the status when some events occurs
-	**************************************************************************/
-	async function	fetchApproval() {
-		if (!vault || !active || !provider || !address) {
-			return;
-		}
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, ['function allowance(address, address) public view returns (uint256)'], provider
-		);
-		const	allowance = await wantContract.allowance(address, vault.VAULT_ADDR);
-		set_vaultData(v => ({...v, allowance: Number(ethers.utils.formatUnits(allowance, v.decimals))}));
-	}
-	async function	fetchZapOutApproval() {
-		if (!vault || !active || !provider || !address) {
-			return;
-		}
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, ['function allowance(address, address) public view returns (uint256)'], provider
-		);
-		const	allowance = await wantContract.allowance(address, vault.ZAP_ADDR);
-		set_vaultData(v => ({...v, allowanceZapOut: Number(ethers.utils.formatUnits(allowance, v.decimals))}));
-	}
-	async function	fetchPostDepositOrWithdraw() {
-		if (!vault || !active || !provider || !address) {
-			return;
-		}
-		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
-			providerToUse = getProvider('fantom');
-		}
-		if (vault.CHAIN_ID === 4 && chainID !== 1337) {
-			providerToUse = getProvider('rinkeby');
-		}
-		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
-			providerToUse = getProvider('polygon');
-		}
-		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
-			providerToUse = getProvider('arbitrum');
-		}
-		if (vault.CHAIN_ID === 100 && chainID !== 100) {
-			providerToUse = getProvider('xdai');
-		}
-
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)'
-			], providerToUse
-		);
-		const	vaultContract = new ethers.Contract(
-			vault.VAULT_ADDR, [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)',
-				'function depositLimit() public view returns (uint256)',
-				'function totalAssets() public view returns (uint256)',
-				'function availableDepositLimit() public view returns (uint256)',
-				'function pricePerShare() public view returns (uint256)',
-			], providerToUse);
-		
-		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, depositLimit, totalAssets, availableDepositLimit, pricePerShare] = await Promise.all([
-			wantContract.allowance(address, vault.VAULT_ADDR),
-			wantContract.balanceOf(address),
-			vaultContract.balanceOf(address),
-			providerToUse.getBalance(address),
-			vaultContract.depositLimit(),
-			vaultContract.totalAssets(),
-			vaultContract.availableDepositLimit(),
-			vaultContract.pricePerShare(),
-		]);
-		set_vaultData(v => ({
-			...v,
-			allowance: Number(ethers.utils.formatUnits(wantAllowance, v.decimals)),
-			wantBalance: Number(ethers.utils.formatUnits(wantBalance, v.decimals)).toFixed(2),
-			wantBalanceRaw: wantBalance,
-			balanceOf: Number(ethers.utils.formatUnits(vaultBalance, v.decimals)).toFixed(2),
-			balanceOfRaw: vaultBalance,
-			balanceOfValue: (Number(ethers.utils.formatUnits(vaultBalance, v.decimals)) * v.pricePerShare * v.wantPrice).toFixed(2),
-			coinBalance: Number(ethers.utils.formatEther(coinBalance)).toFixed(2),
-			depositLimit: Number(ethers.utils.formatUnits(depositLimit, v.decimals)).toFixed(2),
-			totalAssets: Number(ethers.utils.formatUnits(totalAssets, v.decimals)).toFixed(2),
-			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals)).toFixed(2),
-			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, v.decimals)).toFixed(4),
-			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice).toFixed(2),
-			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals)),
-		}));
-
-		if (vault.ZAP_ADDR) {
-			const	allowantZapOut = await vaultContract.allowance(address, vault.ZAP_ADDR);
-			set_vaultData((v) => ({...v, allowanceZapOut: Number(ethers.utils.formatUnits(allowantZapOut, v.decimals))}));
-		}
-	}
-
-	/**************************************************************************
-	** If we had some issues getting the prices ... Let's try again
-	**************************************************************************/
-	useEffect(() => {
-		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-		set_vaultData(v => ({
-			...v,
-			wantPrice: price,
-			wantPriceError: false,
-			balanceOfValue: (v.balanceOf * v.pricePerShare * price).toFixed(2),
-			totalAUM: (v.totalAssets * price).toFixed(2),
-		}));
-	}, [prices, vault.COINGECKO_SYMBOL]);
-
-	return (
-		<div className={'mt-8 text-ygray-700 dark:text-dark-50'}>
-			<div>
-				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 dark:text-white leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white'}>{vault.TITLE}</h1>
-			</div>
-			<InfoMessage status={vault.VAULT_STATUS} />
-			<section aria-label={'DETAILS'}>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Vault: '}</p>
-						<a
-							className={'dashed-underline-gray text-ygray-700 dark:text-dark-50'}
-							href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`} target={'_blank'} rel={'noreferrer'}>
-							{'📃 Contract'}
-						</a>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Version: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>{vaultData.apiVersion}</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{`${vault.WANT_SYMBOL} price (CoinGecko 🦎): `}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Deposit Limit: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultData.depositLimit === -1 ? '-' : formatAmount(vaultData?.depositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Total Assets: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${formatAmount(vaultData?.totalAssets || 0, 2)} ${vault.WANT_SYMBOL}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Total AUM: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
-							</Suspense>
-						</p>
-					</div>
-				</div>
-				<div className={`font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last week): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.week || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (last month): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.month || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Gross APR (inception): '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultAPY}>
-								{`${vaultAPY?.inception || '-'}`}
-							</Suspense>
-						</p>
-					</div>
-				</div>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Price Per Share: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${vaultData.pricePerShare}`}
-							</Suspense>
-						</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Available limit: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>
-							<Suspense wait={!vaultData.loaded}>
-								{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}
-							</Suspense>
-						</p>
-					</div>
-					<div className={'progress-bar'}>
-						<span className={'bg-white dark:bg-dark-600 text-black dark:text-white -ml-2 mr-2 hidden md:inline'}>
-							&nbsp;{'['}&nbsp;
-							<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={50} />
-							&nbsp;{']'}&nbsp;
-						</span>
-						<span className={'bg-white dark:bg-dark-600 text-black dark:text-white -ml-2 mr-2 inline md:hidden'}>
-							&nbsp;{'['}&nbsp;
-							<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={30} />
-							&nbsp;{']'}&nbsp;
-						</span>
-						{`${vault.VAULT_STATUS === 'withdraw' ? '100' : (vaultData.progress * 100).toFixed(2)}%`}
-					</div>
-				</div>
-			</section>
-			<Strategies vault={vault} chainID={chainID} />
-			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Your Account: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50 font-bold'}>{ens || `${truncateAddress(address)}`}</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Your vault shares: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.balanceOf || 0, 2)}`}</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{'Your shares value: '}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${vaultData.balanceOfValue === 'NaN' ? '-' : formatAmount(vaultData?.balanceOfValue || 0, 2)}`}</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.wantBalance || 0, 2)}`}</p>
-					</div>
-					<div>
-						<p className={'inline text-ygray-900 dark:text-white'}>{`Your ${chainCoin} Balance: `}</p>
-						<p className={'inline text-ygray-700 dark:text-dark-50'}>{`${formatAmount(vaultData?.coinBalance || 0, 2)}`}</p>
-					</div>
-				</div>
-			</section>
-			<section aria-label={'ACTIONS'} className={'mt-8 my-4'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'APE-IN/OUT'}</h1>
-				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono font-medium text-ygray-700 dark:text-dark-50 text-sm'}>{'Deposit closed.'}</p>
-				</div>
-
-				{vault.ZAP_ADDR ?
-					<div className={'flex flex-col mb-6'}>
-						<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-							<div className={'flex flex-row items-center mb-2 mr-2'} style={{height: '33px'}}>
-								<input
-									className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
-									style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
-									type={'number'}
-									min={'0'}
-									value={zapAmount}
-									onChange={(e) => set_zapAmount(e.target.value)} />
-								<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
-									{chainCoin}&nbsp;
-								</div>
-							</div>
-						</div>
-						<div>
-							{
-								vaultData.depositLimit !== 0 && vault.VAULT_STATUS !== 'withdraw' ?
-									<>
-										<button
-											onClick={() => {
-												if (isDepositing || Number(zapAmount) === 0)
-													return;
-												set_isDepositing(true);
-												apeInVault({provider, contractAddress: vault.ZAP_ADDR, amount: ethers.utils.parseUnits(zapAmount, vaultData.decimals)}, ({error}) => {
-													set_isDepositing(false);
-													if (error)
-														return;
-													fetchPostDepositOrWithdraw();
-												});
-											}}
-											disabled={isDepositing || Number(zapAmount) === 0}
-											className={`${isDepositing || Number(zapAmount) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mb-2 mr-8`}>
-											{'🏦 Zap in'}
-										</button>
-									</>
-									: null
-							}
-							<button
-								onClick={() => {
-									if (isZapOutApproving)
-										return;
-									set_isZapOutApproving(true);
-									approveToken({provider, contractAddress: vault.VAULT_ADDR, amount: ethers.constants.MaxUint256, from: vault.ZAP_ADDR}, ({error}) => {
-										set_isZapOutApproving(false);
-										if (error)
-											return;
-										fetchZapOutApproval();
-									});
-								}}
-								disabled={vaultData.allowanceZapOut > 0 || isZapOutApproving}
-								className={`${vaultData.allowanceZapOut > 0 || isZapOutApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-								{vaultData.allowanceZapOut > 0 ? '✅ Approved' : '🚀 Approve Zap Out'}
-							</button>
-							<button
-								onClick={() => {
-									if (isWithdrawing || Number(vaultData.balanceOf) === 0 || vaultData.allowanceZapOut === 0)
-										return;
-									set_isWithdrawing(true);
-									apeOutVault({
-										provider,
-										contractAddress: vault.ZAP_ADDR,
-										amount: zapAmount ? ethers.utils.parseUnits(zapAmount, vaultData.decimals) : (vaultData.balanceOfRaw).toString(),
-									}, ({error}) => {
-										set_isWithdrawing(false);
-										if (error)
-											return;
-										fetchPostDepositOrWithdraw();
-									});
-								}}
-								disabled={Number(vaultData.balanceOf) === 0 || vaultData?.allowanceZapOut === 0}
-								className={`${Number(vaultData.balanceOf) === 0 || vaultData?.allowanceZapOut === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-								{'💸 Zap out'}
-							</button>
-						</div>
-					</div> : null}
-
-
-				<div className={'flex flex-col'}>
-					<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-						<div className={'flex flex-row items-center mb-2 mr-2'} style={{height: '33px'}}>
-							<input
-								className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
-								style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
-								type={'number'}
-								min={'0'}
-								value={amount}
-								onChange={(e) => set_amount(e.target.value)} />
-							<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
-								{vault.WANT_SYMBOL}
-							</div>
-						</div>
-					</div>
-					<div>
-						{
-							vaultData.depositLimit !== 0 && vault.VAULT_STATUS !== 'withdraw' ?
-								<>
-									<button
-										onClick={() => {
-											if (isApproving)
-												return;
-											set_isApproving(true);
-											approveToken({provider, contractAddress: vault.WANT_ADDR, amount: ethers.constants.MaxUint256, from: vault.VAULT_ADDR}, ({error}) => {
-												set_isApproving(false);
-												if (error)
-													return;
-												fetchApproval();
-											});
-										}}
-										className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-										{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
-									</button>
-									<button
-										onClick={() => {
-											if (isDepositing || (vaultData.allowance < Number(amount) || Number(amount) === 0) || isDepositing)
-												return;
-											set_isDepositing(true);
-											depositToken({provider, contractAddress: vault.VAULT_ADDR, amount: ethers.utils.parseUnits(amount, vaultData.decimals)}, ({error}) => {
-												set_isDepositing(false);
-												if (error)
-													return;
-												fetchPostDepositOrWithdraw();
-											});
-										}}
-										disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
-										className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-										{'🏦 Deposit'}
-									</button>
-									<button
-										onClick={() => {
-											if (isDepositing || (vaultData.allowance < Number(amount)) || isDepositing || vaultData.wantBalanceRaw.isZero())
-												return;
-											set_isDepositing(true);
-											depositToken({provider, contractAddress: vault.VAULT_ADDR, amount: vaultData.wantBalanceRaw}, ({error}) => {
-												set_isDepositing(false);
-												if (error)
-													return;
-												fetchPostDepositOrWithdraw();
-											});
-										}}
-										disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
-										className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-										{'🏦 Deposit All'}
-									</button>
-								</>
-								: null
-						}
-						<button
-							onClick={() => {
-								if (isWithdrawing || Number(vaultData.balanceOf) === 0)
-									return;
-								set_isWithdrawing(true);
-								withdrawToken({
-									provider,
-									contractAddress: vault.VAULT_ADDR,
-									amount: ethers.utils.parseUnits(amount, vaultData.decimals),
-								}, ({error}) => {
-									set_isWithdrawing(false);
-									if (error)
-										return;
-									fetchPostDepositOrWithdraw();
-								});
-							}}
-							disabled={Number(vaultData.balanceOf) === 0}
-							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
-							{'💸 Withdraw'}
-						</button>
-						<button
-							onClick={() => {
-								if (isWithdrawing || Number(vaultData.balanceOf) === 0)
-									return;
-								set_isWithdrawing(true);
-								withdrawToken({
-									provider,
-									contractAddress: vault.VAULT_ADDR,
-									amount: ethers.constants.MaxUint256,
-								}, ({error}) => {
-									set_isWithdrawing(false);
-									if (error)
-										return;
-									fetchPostDepositOrWithdraw();
-								});
-							}}
-							disabled={Number(vaultData.balanceOf) === 0}
-							className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold`}>
-							{'💸 Withdraw All'}
-						</button>
-					</div>
-				</div>
-			</section>
-		</div>
-	);
-}
-
-function	Wrapper({vault, prices}) {
-	const	{provider, getProvider, active, address, ens, chainID} = useWeb3();
-	const	[modalLoginOpen, set_modalLoginOpen] = useState(false);
+function	Wrapper({vault, slug, prices}) {
+	const	{provider, getProvider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
+	const	{communityVaults} = useFactory();
+	const	[currentVault, set_currentVault] = React.useState(vault);
 	const	windowInFocus = useWindowInFocus();
 
+	/* 🔵 - Yearn Finance ******************************************************
+	** Trigger a suggestion to switch chain if the user is on the wrong chain
+	**************************************************************************/
 	const onSwitchChain = useCallback((newChainID) => {
 		if (newChainID === chainID) {
 			return;
 		}
-		if (!provider || !active) {
+		if (!provider || !isActive) {
 			console.error('Not initialized');
 			return;
 		}
@@ -803,24 +31,39 @@ function	Wrapper({vault, prices}) {
 		} else {
 			provider.send('wallet_addEthereumChain', [chains[newChainID].chain_swap, address]).catch((error) => console.error(error));
 		}
-	}, [active, address, chainID, provider]);
-
-	useEffect(() => {
+	}, [isActive, address, chainID, provider]);
+	useClientEffect(() => {
+		if (!vault) {
+			return;
+		}
 		if (windowInFocus && chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
 			onSwitchChain(vault.CHAIN_ID);
 		}
-	}, [chainID, onSwitchChain, vault.CHAIN_ID, windowInFocus]);
+	}, [chainID, onSwitchChain, vault, windowInFocus]);
 
+	useClientEffect(() => {
+		if (!vault && communityVaults !== undefined) {
+			const	_currentVault = communityVaults.find((v) => v.VAULT_ADDR === toAddress(slug));
+			set_currentVault(_currentVault);
+		}
+	}, [vault, communityVaults]);
 
-	if (!active) {
+	if (!currentVault) {
+		return null;
+	}
+
+	/* 🔵 - Yearn Finance ******************************************************
+	** User's wallet is not active, print something to ask him to connect first
+	**************************************************************************/
+	if (!isActive) {
 		return (
 			<section aria-label={'NO_WALLET'}>
 				<NextSeo
 					openGraph={{
-						title: vault.TITLE,
+						title: currentVault.TITLE,
 						images: [
 							{
-								url: `https://og-image-tbouder.vercel.app/${vault.LOGO}.jpeg`,
+								url: `https://og-image-tbouder.vercel.app/${currentVault.LOGO}.jpeg`,
 								width: 1200,
 								height: 1200,
 								alt: 'Apes',
@@ -829,27 +72,29 @@ function	Wrapper({vault, prices}) {
 					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'text-4xl font-mono font-medium text-ygray-900 dark:text-white leading-11'}>{'Not connected'}</p>
+					<p className={'text-4xl font-mono font-medium text-neutral-700 leading-11'}>{'Not connected'}</p>
 					<button
-						onClick={() => set_modalLoginOpen(true)}
-						className={'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300 transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						onClick={openModalLogin}
+						className={'bg-neutral-50 hover:bg-neutral-100 transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-medium mt-8'}>
 						{'🔌 Connect wallet'}
 					</button>
 				</div>
-				<ModalLogin open={modalLoginOpen} set_open={set_modalLoginOpen} />
 			</section>
 		);
 	}
 
-	if (chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
+	/* 🔵 - Yearn Finance ******************************************************
+	** User's wallet is connected to the wrong chain, ask him to switch
+	**************************************************************************/
+	if (chainID !== currentVault.CHAIN_ID && !(chainID === 1337)) {
 		return (
 			<section aria-label={'WRONG_CHAIN'}>
 				<NextSeo
 					openGraph={{
-						title: vault.TITLE,
+						title: currentVault.TITLE,
 						images: [
 							{
-								url: `https://og.major.farm/${vault.LOGO}.jpeg`,
+								url: `https://og.major.farm/${currentVault.LOGO}.jpeg`,
 								width: 800,
 								height: 600,
 								alt: 'Apes',
@@ -858,31 +103,42 @@ function	Wrapper({vault, prices}) {
 					}} />
 				<div className={'flex flex-col justify-center items-center mt-8'}>
 					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'text-4xl font-mono font-medium text-ygray-900 dark:text-white leading-11'}>{'Wrong Chain'}</p>
+					<p className={'text-4xl font-mono font-medium text-neutral-700 leading-11'}>{'Wrong Chain'}</p>
 					<button
-						onClick={() => onSwitchChain(vault.CHAIN_ID)}
-						className={'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300 transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						onClick={() => onSwitchChain(currentVault.CHAIN_ID)}
+						className={'bg-neutral-50 hover:bg-neutral-100 transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-medium mt-8'}>
 						{'🔀 Change network'}
 					</button>
 				</div>
 			</section>
 		);
 	}
+
+	/* 🔵 - Yearn Finance ******************************************************
+	** All good, render the vault data
+	**************************************************************************/
 	return (
 		<>
 			<NextSeo
 				openGraph={{
-					title: vault.TITLE,
+					title: currentVault.TITLE,
 					images: [
 						{
-							url: `https://og-image-tbouder.vercel.app/${vault.LOGO}.jpeg`,
+							url: `https://og-image-tbouder.vercel.app/${currentVault.LOGO}.jpeg`,
 							width: 1200,
 							height: 1200,
 							alt: 'Apes',
 						}
 					]
 				}} />
-			<Index vault={vault} provider={provider} getProvider={getProvider} active={active} address={address} ens={ens} chainID={chainID} prices={prices} />
+			<VaultDetails
+				vault={currentVault}
+				provider={provider}
+				getProvider={getProvider}
+				address={address}
+				ens={ens}
+				chainID={chainID}
+				prices={prices} />
 		</>
 	);
 }
@@ -891,11 +147,14 @@ function	Wrapper({vault, prices}) {
 export async function getStaticPaths() {
 	const	slug = Object.keys(vaults).filter(key => key !== 'yvsteth').map(key => ({params: {slug: key}})) || [];
 
-	return	{paths: slug, fallback: false};
+	return	{paths: slug, fallback: true};
 }
 
 export async function getStaticProps({params}) {
-	return {props: {vault: vaults[params.slug]}};
+	if ((params.slug.toLowerCase()).startsWith('0x')) {
+		return {props: {vault: null, slug: params.slug}};
+	}
+	return {props: {vault: vaults[params.slug], slug: params.slug}};
 }
 
 export default Wrapper;

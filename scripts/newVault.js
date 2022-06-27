@@ -63,18 +63,17 @@ const	ENUM_CHAIN = {
 	'Arbitrum One (42161)': 42161,
 	'Gnosis Chain (100)' : 100,
 };
-const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
 	if (!address) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	if (address === 'GENESIS') {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	try {
 		return ethers.utils.getAddress(address);
 	} catch (error) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 };
 
@@ -187,7 +186,7 @@ inquirer.prompt(questions).then(async ({
 	vaultStatus = defaultVaultStatus,
 }) => {
 	const	address = toAddress(vaultAddress);
-	if (address === ADDRESS_ZERO) {
+	if (address === ethers.constants.AddressZero) {
 		throw 'Cannot be address 0';
 	}
 	const	provider = getProvider(ENUM_CHAIN[vaultChain]);

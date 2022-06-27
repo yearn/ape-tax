@@ -10,10 +10,9 @@ import	Head							from	'next/head';
 import	{Toaster}						from	'react-hot-toast';
 import	useSWR							from	'swr';
 import	{DefaultSeo}					from	'next-seo';
-import	{Web3ReactProvider}				from	'@web3-react-fork/core';
-import	{ethers}						from	'ethers';
-import	{Web3ContextApp}				from	'contexts/useWeb3';
-import	useUI, {UIContextApp}			from	'contexts/useUI';
+import	{WithYearn, useUI}				from	'@yearn-finance/web-lib/contexts';
+import	{FactoryContextApp}				from	'contexts/useFactory';
+import	{BalancerGaugeContextApp}		from	'contexts/useBalancerGauges';
 import	Navbar							from	'components/Navbar';
 import	useSecret						from	'hook/useSecret';
 import	vaults							from	'utils/vaults.json';
@@ -47,9 +46,6 @@ function	AppWrapper(props) {
 				<meta name={'msapplication-TileColor'} content={'#9fcc2e'} />
 				<meta name={'theme-color'} content={'#ffffff'} />
 				<meta charSet={'utf-8'} />
-				<link rel={'preconnect'} href={'https://fonts.googleapis.com'} />
-				<link rel={'preconnect'} href={'https://fonts.gstatic.com'} crossOrigin={'true'} />
-				<link href={'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'} rel={'stylesheet'} />
 
 				<meta name={'robots'} content={'index,nofollow'} />
 				<meta name={'googlebot'} content={'index,nofollow'} />
@@ -80,7 +76,7 @@ function	AppWrapper(props) {
 					site: '@ape_tax',
 					cardType: 'summary_large_image',
 				}} />
-			<main id={'app'} className={'p-4 relative bg-white dark:bg-dark-600'} style={{minHeight: '100vh'}}>
+			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
 					<Navbar router={router} />
 				</div>
@@ -92,9 +88,9 @@ function	AppWrapper(props) {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-ygray-600 dark:text-white'}>
+				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-neutral-500'}>
 					<a href={'https://twitter.com/ape_tax'} target={'_blank'} rel={'noreferrer'} className={'dashed-underline-gray cursor-pointer'}>
-						{'Made with 💙 by the 🦍 community'}
+						{'Made with 💙 by the 🦍 community'}
 					</a>
 					<p className={'mx-2'}>
 						{' - '}
@@ -104,31 +100,32 @@ function	AppWrapper(props) {
 					</p>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
-				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-ygray-700 dark:text-dark-50 font-semibold border border-solid border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 noBr noShadow toaster'}} />
+				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-neutral-500 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0 noBr noShadow toaster'}} />
 			</main>
 		</>
 	);
 }
 
-const getLibrary = (provider) => {
-	return new ethers.providers.Web3Provider(provider);
-};
-
 function	MyApp(props) {
-	const	{Component, router, pageProps} = props;
+	const	{Component, pageProps} = props;
 	
 	return (
-		<UIContextApp>
-			<Web3ReactProvider getLibrary={getLibrary}>
-				<Web3ContextApp router={router}>
+		<WithYearn options={{
+			ui: {
+				shouldUseThemes: true,
+				shouldUseDefaultToaster: false
+			}
+		}}>
+			<BalancerGaugeContextApp>
+				<FactoryContextApp>
 					<AppWrapper
 						Component={Component}
 						pageProps={pageProps}
 						element={props.element}
 						router={props.router} />
-				</Web3ContextApp>
-			</Web3ReactProvider>
-		</UIContextApp>
+				</FactoryContextApp>
+			</BalancerGaugeContextApp>
+		</WithYearn>
 	);
 }
 
