@@ -10,7 +10,8 @@ import	Link												from	'next/link';
 import	useSWR												from	'swr';
 import	axios												from	'axios';
 import	{ethers}											from	'ethers';
-import	useWeb3												from	'contexts/useWeb3';
+import	{useWeb3}											from	'@yearn-finance/web-lib/contexts';
+import	useFactory											from	'contexts/useFactory';
 import	{formatAmount}										from	'utils';
 import	vaults												from	'utils/vaults.json';
 import	chains												from	'utils/chains.json';
@@ -23,12 +24,12 @@ function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
 			<>
-				<span className={'bg-tag-info text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 hidden lg:inline'}>
+				<span className={'bg-accent-500 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 hidden lg:inline'}>
 					<a href={'https://yearn.finance/vaults'} target={'_blank'} rel={'noopener noreferrer'}>
 						{'Use Production'}
 					</a>
 				</span>
-				<span className={'bg-tag-info text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 inline lg:hidden'}>
+				<span className={'bg-accent-500 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 inline lg:hidden'}>
 					<a href={'https://yearn.finance/vaults'} target={'_blank'} rel={'noopener noreferrer'}>
 						{'Prod'}
 					</a>
@@ -38,21 +39,21 @@ function	Tag({status}) {
 	}
 	if (status === 'disabled') {
 		return (
-			<span className={'bg-tag-warning text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'bg-yellow-900 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
 				{'Disabled'}
 			</span>
 		);
 	}
 	if (status === 'withdraw') {
 		return (
-			<span className={'bg-tag-withdraw text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'bg-red-900 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
 				{'Withdraw'}
 			</span>
 		);
 	}
 	if (status === 'new') {
 		return (
-			<span className={'bg-tag-new text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'bg-[#10B981] text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
 				{'New'}
 			</span>
 		);
@@ -65,7 +66,7 @@ function	DisabledVaults({vaultsInactive}) {
 		return null;
 	}
 	return (
-		<div className={'max-w-5xl p-4 pb-2 my-4 font-mono text-sm font-normal text-white bg-tag-withdraw'}>
+		<div className={'max-w-5xl p-4 pb-2 my-4 font-mono text-sm font-normal text-[#485570] bg-red-900'}>
 			{'⚠️ '}<strong>{'WARNING'}</strong>{' 🚨 '}<strong>{'YOU ARE USING DEPRECATED VAULTS'}</strong> {'You have funds in deprecated vaults. Theses vaults are no longer generating any profit and are now an image from the past. Please remove your funds from these vaults.'}
 			<div className={'mt-4'}>
 				<ul className={'grid grid-cols-2 gap-2'}>
@@ -80,7 +81,7 @@ function	DisabledVaults({vaultsInactive}) {
 											))
 										}
 									</span>
-									<span className={'ml-4 text-base font-normal text-white font-mono dashed-underline-white cursor-pointer'}>
+									<span className={'ml-4 text-base font-normal text-[#485570] font-mono dashed-underline-white cursor-pointer'}>
 										{vault.TITLE}
 									</span>
 								</div>
@@ -96,7 +97,8 @@ function	DisabledVaults({vaultsInactive}) {
 
 const		fetcher = url => axios.get(url).then(res => res.data);
 function	Index() {
-	const	{provider, active, address, chainID} = useWeb3();
+	const	{provider, isActive, address, chainID} = useWeb3();
+	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState([]);
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState([]);
@@ -105,7 +107,7 @@ function	Index() {
 	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`, fetcher);
 
 	useEffect(() => {
-		if (!active) {
+		if (!isActive) {
 			return;
 		}
 		const	_vaultsActiveExperimental = [];
@@ -156,10 +158,10 @@ function	Index() {
 		set_vaultsActiveWeird(_vaultsActiveWeird);
 		set_vaultsInactive(_vaultsInactive);
 		set_nonce(n => n + 1);
-	}, [chainID, active]);
+	}, [chainID, isActive]);
 
 	useEffect(() => {
-		if (active) {
+		if (isActive) {
 			Promise.all(vaultsInactive.map(async ({VAULT_ADDR}) => {
 				const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
 				const	balance = await vaultContract.balanceOf(address);
@@ -172,69 +174,81 @@ function	Index() {
 			});
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vaultsInactive, active]);
+	}, [vaultsInactive, isActive]);
 
-	if (!active) {
+	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'text-sm font-mono font-semibold text-ygray-900 dark:text-white'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'text-sm font-mono font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
 
 	return (
-		<section>
+		<main className={'max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'text-3xl font-mono font-semibold text-neutral-700 leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'text-xl font-mono font-semibold text-ygray-900 dark:text-white leading-9'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'text-xl font-mono font-semibold text-neutral-700 leading-9'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
+			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
-			<div className={'max-w-5xl mt-8'}>
-				<span className={'text-base font-semibold text-ygray-900 dark:text-white font-mono'}>
-					{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
-				</span>
-				<span className={'text-base font-normal text-ygray-900 dark:text-white font-mono'}>
-					{` $${formatAmount(tvl?.tvl || 0, 2)}`}
-				</span>
-			</div>
 
-			<div className={'max-w-5xl mb-8 text-xs opacity-60'}>
+			<section aria-label={'TVL & new Vault'} className={'grid grid-cols-2 my-8'}>
 				<div>
-					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
-						{'Endorsed:'}
-					</span>
-					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
-					</span>
+					<div>
+						<span className={'text-base font-semibold text-neutral-700 font-mono'}>
+							{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
+						</span>
+						<span className={'text-base font-normal text-neutral-700 font-mono'}>
+							{` $${formatAmount(tvl?.tvl || 0, 2)}`}
+						</span>
+					</div>
+
+					<div className={'text-xs opacity-60'}>
+						<div>
+							<span className={'font-semibold text-neutral-700 font-mono'}>
+								{'Endorsed:'}
+							</span>
+							<span className={'font-normal text-neutral-700 font-mono'}>
+								{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
+							</span>
+						</div>
+						<div>
+							<span className={'font-semibold text-neutral-700 font-mono'}>
+								{'Experimental:'}
+							</span>
+							<span className={'font-normal text-neutral-700 font-mono'}>
+								{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
+							</span>
+						</div>
+						<div>
+							<span className={'font-semibold text-neutral-700 font-mono'}>
+								{'Deprecated:'}
+							</span>
+							<span className={'font-normal text-neutral-700 font-mono'}>
+								{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
+							</span>
+						</div>
+					</div>
 				</div>
-				<div>
-					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
-						{'Experimental:'}
-					</span>
-					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
-					</span>
+				<div className={'items-center flex'}>
+					<Link href={'/newVault'}>
+						<span className={'text-neutral-700 font-mono border px-4 py-2 border-dashed border-neutral-500 text-sm transition-colors bg-neutral-200 hover:bg-neutral-0 cursor-pointer'}>
+							{'🏦 Deploy your own vault'}
+						</span>
+					</Link>
 				</div>
-				<div>
-					<span className={'font-semibold text-ygray-900 dark:text-white font-mono'}>
-						{'Deprecated:'}
-					</span>
-					<span className={'font-normal text-ygray-900 dark:text-white font-mono'}>
-						{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
-					</span>
-				</div>
-			</div>
+			</section>
 
 			<div className={'max-w-5xl grid grid-cols-2 gap-2'}>
 				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-ygray-900 dark:text-white font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
+					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -247,7 +261,7 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-ygray-700 dark:text-dark-50 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
 											{vault.TITLE}
 											<Tag status={vault.VAULT_STATUS} />
 										</span>
@@ -259,7 +273,7 @@ function	Index() {
 				</div>
 
 				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-ygray-900 dark:text-white font-mono font-semibold mb-4'}>{'🧠 Weird'}</h2>
+					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -272,7 +286,7 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-ygray-700 dark:text-dark-50 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
@@ -281,9 +295,28 @@ function	Index() {
 							</li>
 						))}
 					</ul>
+
+					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4 mt-12'}>{'🦍 Community'}</h2>
+					<ul>
+						{(communityVaults || [])?.map((vault) => (
+							<li key={vault.VAULT_ADDR} className={'cursor-pointer'}>
+								<Link href={`/${vault.VAULT_ADDR}`}>
+									<div className={'my-4 flex flex-row items-center'}>
+										<span className={'flex flex-row items-center'}>
+											{'🦍🦍'}
+										</span>
+										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
+											{vault.SYMBOL}
+										</span>
+									</div>
+								</Link>
+							</li>
+						))}
+					</ul>
+
 				</div>
 			</div>
-		</section>
+		</main>
 	);
 }
 

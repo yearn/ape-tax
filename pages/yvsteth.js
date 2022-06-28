@@ -6,21 +6,22 @@
 ******************************************************************************/
 
 import	React, {useState, useEffect}					from	'react';
-import	{ethers}										from	'ethers';
-import	useWeb3											from	'contexts/useWeb3';
+import	{ethers, BigNumber}								from	'ethers';
+import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
+import	{truncateHex}									from	'@yearn-finance/web-lib/utils';
 import	vaults											from	'utils/vaults.json';
 import	chains											from	'utils/chains.json';
 import	{fetchCryptoPrice}								from	'utils/API';
-import	{bigNumber, formatAmount, truncateAddress}		from	'utils';
+import	{formatAmount}									from	'utils';
 import	{approveToken, depositToken, withdrawToken}		from	'utils/actions';
 
 function	InfoMessage() {
 	return (
 		<>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
+			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. It's extremely risky and will probably be discarded when the test is over. Proceed with extreme caution."}
 			</div>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-ygray-700 bg-tag-warning'}>
+			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
 				{'📣 '}<strong>{'DISCLAIMER'}</strong> {'When you transfer and deposit, your ETH will be converted into stETH 1:1 and deposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.'}
 			</div>
 		</>
@@ -28,7 +29,7 @@ function	InfoMessage() {
 }
 
 function	Index() {
-	const	{provider, active, address, ens} = useWeb3();
+	const	{provider, isActive, address, ens} = useWeb3();
 	const	vault = vaults['yvsteth'];
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
@@ -45,7 +46,7 @@ function	Index() {
 		totalAUM: 0,
 		allowance: 0,
 		version: '-',
-		wantBalanceRaw: bigNumber.from(0),
+		wantBalanceRaw: BigNumber.from(0),
 	});
 	const	[isApproving, set_isApproving] = useState(false);
 	const	[isDepositing, set_isDepositing] = useState(false);
@@ -56,7 +57,7 @@ function	Index() {
 	** the UI.
 	**************************************************************************/
 	useEffect(() => {
-		if (!vault || !active || !provider || !address) {
+		if (!vault || !isActive || !provider || !address) {
 			return;
 		}
 		const	wantContract = new ethers.Contract(
@@ -104,13 +105,13 @@ function	Index() {
 				allowance: Number(ethers.utils.formatUnits(wantAllowance, decimals))
 			});
 		});
-	}, [vault, active, provider, address]);
+	}, [vault, isActive, provider, address]);
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
 	**************************************************************************/
 	async function	fetchApproval() {
-		if (!vault || !active || !provider || !address) {
+		if (!vault || !isActive || !provider || !address) {
 			return;
 		}
 		const	wantContract = new ethers.Contract(
@@ -120,7 +121,7 @@ function	Index() {
 		set_vaultData(v => ({...v, allowance: Number(ethers.utils.formatUnits(allowance, v.decimals))}));
 	}
 	async function	fetchPostDepositOrWithdraw() {
-		if (!vault || !active || !provider || !address) {
+		if (!vault || !isActive || !provider || !address) {
 			return;
 		}
 		const	wantContract = new ethers.Contract(
@@ -163,14 +164,14 @@ function	Index() {
 	}
 
 	return (
-		<section className={'mt-8 text-ygray-700 dark:text-dark-50'}>
+		<section className={'mt-8 text-neutral-500'}>
 			<div>
-				<h1 className={'text-7xl font-mono font-semibold text-ygray-900 dark:text-white leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'text-3xl font-mono font-semibold text-ygray-900 dark:text-white'}>{vault.TITLE}</h1>
+				<h1 className={'text-7xl font-mono font-semibold text-neutral-700 leading-120px'}>{vault.LOGO}</h1>
+				<h1 className={'text-3xl font-mono font-semibold text-neutral-700'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage />
 			<section aria-label={'DETAILS'}>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Vault: '}</p>
 						<a
@@ -200,7 +201,7 @@ function	Index() {
 						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData?.totalAUM || 0, 2)}`}</p>
 					</div>
 				</div>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
+				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
 						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
@@ -213,11 +214,11 @@ function	Index() {
 			</section>
 
 			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'text-2xl font-mono font-semibold text-ygray-900 dark:text-white mb-6'}>{'Wallet'}</h1>
-				<div className={'font-mono text-ygray-700 dark:text-dark-50 font-medium text-sm mb-4'}>
+				<h1 className={'text-2xl font-mono font-semibold text-neutral-700 mb-6'}>{'Wallet'}</h1>
+				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
-						<p className={'inline font-bold'}>{ens || `${truncateAddress(address)}`}</p>
+						<p className={'inline font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Your vault shares: '}</p>
@@ -239,22 +240,22 @@ function	Index() {
 			</section>
 			<section aria-label={'ACTIONS'} className={'my-4'}>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-					<label className={'font-mono font-semibold text-sm mb-1.5 text-ygray-900 dark:text-white'}>{'Amount'}</label>
+					<label className={'font-mono font-semibold text-sm mb-1.5 text-neutral-700'}>{'Amount'}</label>
 					<div className={'flex flex-row items-center'}>
 						<input
-							className={'text-xs px-2 py-1.5 text-ygray-700 dark:text-dark-50 border-ygray-200 dark:border-dark-200 font-mono bg-white dark:bg-dark-600 bg-opacity-0 dark:bg-opacity-0'}
+							className={'text-xs px-2 py-1.5 text-neutral-500 border-neutral-400 font-mono bg-neutral-0 bg-opacity-0'}
 							style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 							type={'number'}
 							min={'0'}
 							value={amount}
 							onChange={(e) => set_amount(e.target.value)} />
-						<div className={'bg-ygray-50 dark:bg-dark-400 text-xs font-mono px-2 py-1.5 border border-ygray-200 dark:border-dark-200 border-solid border-l-0 text-ygray-400 dark:text-white'} style={{height: '33px'}}>
+						<div className={'bg-neutral-50 text-xs font-mono px-2 py-1.5 border border-neutral-400 border-solid border-l-0 text-neutral-400'} style={{height: '33px'}}>
 							{vault.WANT_SYMBOL}
 						</div>
 					</div>
 				</div>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono font-medium text-ygray-700 dark:text-dark-50 text-sm'}>{'Deposit closed.'}</p>
+					<p className={'font-mono font-medium text-neutral-500 text-sm'}>{'Deposit closed.'}</p>
 				</div>
 				<div className={'mt-10'}>
 					<button
@@ -275,7 +276,7 @@ function	Index() {
 							});
 						}}
 						disabled={vaultData.allowance > 0 || isApproving}
-						className={`${vaultData.allowance > 0 || isApproving ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance > 0 || isApproving ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 						{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
 					</button>
 					<button
@@ -295,7 +296,7 @@ function	Index() {
 							});
 						}}
 						disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
-						className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 						{'🏦 Deposit'}
 					</button>
 					<button
@@ -315,7 +316,7 @@ function	Index() {
 							});
 						}}
 						disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
-						className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
 						{'🏦 Deposit All'}
 					</button>
 					<button
@@ -335,7 +336,7 @@ function	Index() {
 							});
 						}}
 						disabled={Number(vaultData.balanceOf) === 0}
-						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-ygray-50 dark:bg-dark-400 opacity-30 cursor-not-allowed' : 'bg-ygray-50 dark:bg-dark-400 hover:bg-ygray-100 dark:hover:bg-dark-300'} transition-colors font-mono border border-solid border-ygray-600 dark:border-dark-200 text-sm px-1.5 py-1.5 font-semibold`}>
+						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>

@@ -56,24 +56,24 @@ function	getProvider(chain = 1) {
 
 const	ENUM_CHAIN = {
 	'Mainnet (1)': 1,
+	'Rinkeby (4)': 4,
 	'BSC (56)': 56,
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
 	'Arbitrum One (42161)': 42161,
 	'Gnosis Chain (100)' : 100,
 };
-const	ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 const	toAddress = (address) => {
 	if (!address) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	if (address === 'GENESIS') {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 	try {
 		return ethers.utils.getAddress(address);
 	} catch (error) {
-		return ADDRESS_ZERO;
+		return ethers.constants.AddressZero;
 	}
 };
 
@@ -115,11 +115,13 @@ if (!args.chain || !([1, 56, 137, 250, 42161, 100]).includes(args.chain)) {
 		type: 'list',
 		name: 'vaultChain',
 		message: 'Which chain ?',
-		choices: ['Mainnet (1)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)'],
+		choices: ['Mainnet (1)', 'Rinkeby (4)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)'],
 	},);
 } else {
 	if (args.chain === 1)
 		defaultVaultChain = 'Mainnet (1)';
+	if (args.chain === 4)
+		defaultVaultChain = 'Rinkeby (4)';
 	if (args.chain === 56)
 		defaultVaultChain = 'BSC (56)';
 	if (args.chain === 137)
@@ -184,7 +186,7 @@ inquirer.prompt(questions).then(async ({
 	vaultStatus = defaultVaultStatus,
 }) => {
 	const	address = toAddress(vaultAddress);
-	if (address === ADDRESS_ZERO) {
+	if (address === ethers.constants.AddressZero) {
 		throw 'Cannot be address 0';
 	}
 	const	provider = getProvider(ENUM_CHAIN[vaultChain]);

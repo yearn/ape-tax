@@ -171,3 +171,70 @@ export async function	apeOutVault({provider, contractAddress, amount}, callback)
 		callback({error, data: undefined});
 	}
 }
+
+export async function	createNewVaultsAndStrategies({provider, gauge}, callback) {
+	const	_toast = toast.loading('Creating new Vault...');
+	const	signer = provider.getSigner();
+	const	contract = new ethers.Contract(
+		process.env.YEARN_BALANCER_FACTORY_ADDRESS,
+		[
+			'function createNewVaultsAndStrategies(address _gauge) external returns (address vault, address auraStrategy)',
+			'function alreadyExistsFromGauge(address) public view returns (address)'
+		],
+		signer
+	);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		console.log(`Creating vault for gauge ${gauge} ...`);
+		const	transaction = await contract.createNewVaultsAndStrategies(gauge);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			toast.dismiss(_toast);
+			toast.success('Transaction successful');
+			const	newVaultAddress = await contract.alreadyExistsFromGauge(gauge);
+			callback({error: false, data: newVaultAddress});
+		} else {
+			toast.dismiss(_toast);
+			toast.error('Transaction failed');
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		toast.dismiss(_toast);
+		toast.error('Transaction failed');
+		callback({error, data: undefined});
+	}
+}
+
+export async function	harvestStrategy({provider, strategyAddress}, callback) {
+	const	_toast = toast.loading('Harvesting strategy...');
+	const	signer = provider.getSigner();
+	const	contract = new ethers.Contract(
+		process.env.YEARN_FACTORY_KEEPER_WRAPPER,
+		['function harvestStrategy(address) public'],
+		signer
+	);
+
+	/**********************************************************************
+	**	If the call is successful, try to perform the actual TX
+	**********************************************************************/
+	try {
+		const	transaction = await contract.harvestStrategy(strategyAddress);
+		const	transactionResult = await transaction.wait();
+		if (transactionResult.status === 1) {
+			toast.dismiss(_toast);
+			toast.success('Transaction successful');
+			callback({error: false, data: undefined});
+		} else {
+			toast.dismiss(_toast);
+			toast.error('Transaction failed');
+			callback({error: true, data: undefined});
+		}
+	} catch (error) {
+		toast.dismiss(_toast);
+		toast.error('Transaction failed');
+		callback({error, data: undefined});
+	}
+}

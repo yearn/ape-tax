@@ -5,23 +5,13 @@
 **	@Filename:				vaults.js
 ******************************************************************************/
 
-import	{ethers}				from	'ethers';
-import	{Provider, Contract}	from	'ethcall';
+import	{ethers, BigNumber}		from	'ethers';
+import	{Contract}				from	'ethcall';
+import	{providers}				from	'@yearn-finance/web-lib/utils';
 import	{fn}					from	'utils/fn';
 import	vaults					from	'utils/vaults.json';
 import	yVaultABI				from	'utils/ABI/yVault.abi.json';
 import	{prepareGrossData}		from	'pages/api/specificApy';
-
-async function newEthCallProvider(provider, chainID) {
-	const	ethcallProvider = new Provider();
-	if (chainID === 1337) {
-		await	ethcallProvider.init(new ethers.providers.JsonRpcProvider('http://localhost:8545'));
-		ethcallProvider.multicall.address = '0xc04d660976c923ddba750341fe5923e47900cf24';
-		return ethcallProvider;
-	}
-	await	ethcallProvider.init(provider);
-	return	ethcallProvider;
-}
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
@@ -60,7 +50,7 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await newEthCallProvider(provider, network);
+	const	ethcallProvider = await providers.newEthCallProvider(provider);
 	const	_vaults = [];
 	const	_calls = [];
 
@@ -75,7 +65,6 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 			return;	
 		}
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
-		provider.getCode(v.VAULT_ADDR).then(e => console.log(e));
 		_calls.push(...[
 			vaultContract.apiVersion(),
 			vaultContract.depositLimit(),
@@ -108,10 +97,10 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 			return;	
 		}
 		let	apiVersion = '0';
-		let	depositLimit = ethers.BigNumber.from('0');
-		let	totalAssets = ethers.BigNumber.from('0');
-		let	availableDepositLimit = ethers.BigNumber.from('0');
-		let	pricePerShare = ethers.BigNumber.from('0');
+		let	depositLimit = BigNumber.from('0');
+		let	totalAssets = BigNumber.from('0');
+		let	availableDepositLimit = BigNumber.from('0');
+		let	pricePerShare = BigNumber.from('0');
 		let	decimals = 18;
 		let	activation = '0';
 
