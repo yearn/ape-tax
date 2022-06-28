@@ -178,7 +178,7 @@ function	Index() {
 				<div className={'w-full border p-4 border-dashed border-neutral-500 mx-auto'}>
 					<div>
 						<p className={'text-3xl font-semibold text-neutral-700 font-mono'}>
-							{'Add new Vault'}
+							{'Add New Vault'}
 						</p>
 					</div>
 
