@@ -1068,18 +1068,6 @@
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
-  "radioactive-dai": {
-    "TITLE": "Radioactive DAI",
-    "LOGO": "☢️💵",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x1CfE7a61571DaeB44BD997c877884Ea3eEa8712F",
-    "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    "WANT_SYMBOL": "DAI",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 1
-  },
   "lazy-synapses": {
     "TITLE": "Lazy Synapses",
     "LOGO": "💤🧠",
@@ -1151,5 +1139,17 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 42161
+  },
+  "g-unit": {
+    "TITLE": "0.5 DAI presents G-UNIT",
+    "LOGO": "💵💵",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x1CfE7a61571DaeB44BD997c877884Ea3eEa8712F",
+    "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
