@@ -6,14 +6,13 @@
 ******************************************************************************/
 
 import	React							from	'react';
-import	Head							from	'next/head';
 import	{Toaster}						from	'react-hot-toast';
 import	useSWR							from	'swr';
-import	{DefaultSeo}					from	'next-seo';
 import	{WithYearn, useUI}				from	'@yearn-finance/web-lib/contexts';
 import	{FactoryContextApp}				from	'contexts/useFactory';
 import	{BalancerGaugeContextApp}		from	'contexts/useBalancerGauges';
 import	Navbar							from	'components/Navbar';
+import	Meta							from	'components/Meta';
 import	useSecret						from	'hook/useSecret';
 import	vaults							from	'utils/vaults.json';
 
@@ -31,51 +30,12 @@ function	AppWrapper(props) {
 	const	{Component, pageProps, router} = props;
 	const	{switchTheme} = useUI();
 	const	hasSecretCode = useSecretCode();
-	const	WEBSITE_URI = process.env.WEBSITE_URI;
 	const	vaultsCGIds = [...new Set(Object.values(vaults).map(vault => vault.COINGECKO_SYMBOL.toLowerCase()))];
 	const	{data} = useSWR(`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`, fetcher, {revalidateOnMount: true, revalidateOnReconnect: true, refreshInterval: 30000, shouldRetryOnError: true, dedupingInterval: 1000, focusThrottleInterval: 5000});
 
 	return (
 		<>
-			<Head>
-				<title>{'Experimental Experiments Registry'}</title>
-				<link rel={'icon'} href={'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>'} />
-				<meta httpEquiv={'X-UA-Compatible'} content={'IE=edge'} />
-				<meta name={'viewport'} content={'width=device-width, initial-scale=1'} />
-				<meta name={'description'} content={'Experimental Experiments Registry'} />
-				<meta name={'msapplication-TileColor'} content={'#9fcc2e'} />
-				<meta name={'theme-color'} content={'#ffffff'} />
-				<meta charSet={'utf-8'} />
-
-				<meta name={'robots'} content={'index,nofollow'} />
-				<meta name={'googlebot'} content={'index,nofollow'} />
-				<meta charSet={'utf-8'} />
-			</Head>
-			<DefaultSeo
-				title={'Experimental Experiments Registry'}
-				defaultTitle={'Experimental Experiments Registry'}
-				description={'Experimental Experiments Registry'}
-				openGraph={{
-					type: 'website',
-					locale: 'en_US',
-					url: WEBSITE_URI,
-					site_name: 'ape.tax',
-					title: 'ape.tax',
-					description: 'Experimental Experiments Registry',
-					images: [
-						{
-							url: `${WEBSITE_URI}og.jpg`,
-							width: 1200,
-							height: 675,
-							alt: 'Apes',
-						}
-					]
-				}}
-				twitter={{
-					handle: '@ape_tax',
-					site: '@ape_tax',
-					cardType: 'summary_large_image',
-				}} />
+			<Meta />
 			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
 				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
 					<Navbar router={router} />

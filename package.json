@@ -35,7 +35,7 @@
     "graphql-request": "^4.3.0",
     "memoizee": "^0.4.15",
     "next": "^12.1.6",
-    "next-seo": "^5.4.0",
+    "next-seo": "^5.5.0",
     "postcss": "^8.4.14",
     "postcss-nesting": "^10.1.9",
     "react": "18.2.0",
