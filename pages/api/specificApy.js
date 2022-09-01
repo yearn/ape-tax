@@ -8,9 +8,10 @@
 import	axios					from	'axios';
 import	{ethers}				from	'ethers';
 import	{Contract}				from	'ethcall';
-import	{providers}				from	'@yearn-finance/web-lib/utils';
+import	{providers, toAddress}	from	'@yearn-finance/web-lib/utils';
 import	vaults					from	'utils/vaults.json';
-import	yVaultABI				from	'utils/ABI/yVault.abi.json';
+import	YVAULT_ABI				from	'utils/ABI/yVault.abi';
+import	FACTORY_ABI				from	'utils/ABI/factory.abi';
 import	Web3Contract			from	'web3-eth-contract';
 
 async function	fetchBlockTimestamp(timestamp, network = 1) {
@@ -134,22 +135,22 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 		_grossAPRWeek = '-';
 		_grossAPRMonth = '-';
 	} else if (activationTimestamp > oneMonthAgo) {
-		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
-		Web3Contract.setProvider(getWeb3Provider(vault.CHAIN_ID));
+		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vault?.CHAIN_ID || 1));
 		const [_pastPricePerShareWeek] = await Promise.all([
-			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
+			new Web3Contract(YVAULT_ABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
 		]);
 		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
 		_grossAPRMonth = '-';
 	} else {
-		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault.CHAIN_ID) || 0);
-		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault.CHAIN_ID) || 0);
-		Web3Contract.setProvider(getWeb3Provider(vault.CHAIN_ID));
+		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
+		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault?.CHAIN_ID || 1) || 0);
+		Web3Contract.setProvider(getWeb3Provider(vault?.CHAIN_ID || 1));
 		const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
-			new Web3Contract(yVaultABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
+			new Web3Contract(YVAULT_ABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
+			new Web3Contract(YVAULT_ABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
 		]);
 		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
 		const	pastPriceMonth = ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber());
@@ -173,14 +174,61 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 	};
 }
 
+async function getCommunityVaults() {
+	const	currentProvider = providers.getProvider(1 || 1337);
+	const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+
+	const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
+	const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]);
+
+	const	vaultListCalls = [];
+	for (let i = 0; i < numVaults; i++) {
+		vaultListCalls.push(contract.deployedVaults(i));
+	}
+	const	deployedVaults = await ethcallProvider.tryAll(vaultListCalls);
+
+	const	vaultDetailsCalls = [];
+	for (const vault of deployedVaults) {
+		const	vaultContract = new Contract(vault, YVAULT_ABI);
+		vaultDetailsCalls.push(vaultContract.name());
+		vaultDetailsCalls.push(vaultContract.symbol());
+		vaultDetailsCalls.push(vaultContract.token());
+	}
+	const	vaultDetails = await ethcallProvider.tryAll(vaultDetailsCalls);
+
+	const	vaults = [];
+	let		rIndex = 0;
+	for (let i = 0; i < numVaults; i++) {
+		const	name = vaultDetails[rIndex++];
+		const	symbol = vaultDetails[rIndex++];
+		const	token = vaultDetails[rIndex++];
+		vaults.push({
+			LOGO: '🦍🦍',
+			VAULT_ABI: 'yVaultV2',
+			VAULT_TYPE: 'community',
+			VAULT_ADDR: toAddress(deployedVaults[i]),
+			TITLE: name,
+			SYMBOL: symbol,
+			WANT_ADDR: toAddress(token),
+			WANT_SYMBOL: symbol.replace('yvBlp', ''),
+			COINGECKO_SYMBOL: '',
+			VAULT_STATUS: 'active',
+			CHAIN_ID: 1,
+			PRICE_SOURCE: 'Lens 🔮'
+		});
+	}
+
+	return vaults;
+}
+
 async function getSpecificAPY({network, address, rpc}) {
 	let		provider = getProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
 	const	ethcallProvider = await providers.newEthCallProvider(provider);
-	const	vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
-	const	vaultContractMultiCall = new Contract(address, yVaultABI);
+	const	vaultContractMultiCall = new Contract(address, YVAULT_ABI);
+	let		vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 
 	const	callResult = await ethcallProvider.tryAll([
 		vaultContractMultiCall.pricePerShare(),
@@ -188,6 +236,12 @@ async function getSpecificAPY({network, address, rpc}) {
 		vaultContractMultiCall.activation(),
 	]);
 	const	[pricePerShare, decimals, activation] = callResult;
+
+	if (!vaultToUse) {
+		const	communityVaults = await getCommunityVaults();
+		vaultToUse = Object.values(communityVaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
+	}
+
 	return prepareGrossData({
 		vault: vaultToUse,
 		pricePerShare,
