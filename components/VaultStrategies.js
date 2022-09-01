@@ -56,7 +56,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			]);
 
 			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
-				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
+				const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
 				set_strategiesData((s) => {
 					s[toAddress(strategyAddress)] = {
 						address: strategyAddress,
