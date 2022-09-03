@@ -56,16 +56,40 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			]);
 
 			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
-				const	details = await performGet(`https://meta.yearn.network/strategies/${vault.CHAIN_ID}/${strategyAddress}`);
-				set_strategiesData((s) => {
-					s[toAddress(strategyAddress)] = {
-						address: strategyAddress,
-						name: name,
-						description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
-						creditAvailable: creditAvailable
-					};
-					return (s);
-				});
+				try {
+					const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
+					if (details) {
+						set_strategiesData((s) => {
+							s[toAddress(strategyAddress)] = {
+								address: strategyAddress,
+								name: name,
+								description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
+								creditAvailable: creditAvailable
+							};
+							return (s);
+						});	
+					} else {
+						set_strategiesData((s) => {
+							s[toAddress(strategyAddress)] = {
+								address: strategyAddress,
+								name: name,
+								description: 'Description not provided for this strategy.',
+								creditAvailable: creditAvailable
+							};
+							return (s);
+						});
+					}
+				} catch (error) {
+					set_strategiesData((s) => {
+						s[toAddress(strategyAddress)] = {
+							address: strategyAddress,
+							name: name,
+							description: 'Description not provided for this strategy.',
+							creditAvailable: creditAvailable
+						};
+						return (s);
+					});
+				}
 			} else {
 				set_strategiesData((s) => {
 					s[toAddress(strategyAddress)] = {

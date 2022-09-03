@@ -1,0 +1,17 @@
+{
+	"name": "ape.tax",
+	"short_name": "ape.tax",
+	"description": "Experimental Experiments Registry",
+	"iconPath": "./favicons/apple-icon.png",
+	"locale": "en-US",
+	"uri": "https://ape.tax/",
+	"og": "https://ape.tax/og.jpg",
+	"twitter": "@ape_tax",
+	"github": "https://github.com/saltyfacu/ape-tax",
+	"theme_color": "#FFFFFF",
+	"background_color": "#FFFFFF",
+	"title_color": "#000000",
+	"start_url": "/",
+	"display": "standalone",
+	"orientation": "portrait"
+}
