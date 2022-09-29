@@ -815,18 +815,6 @@
     "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
-  "hedged-dollar": {
-    "TITLE": "Hedged Dollar",
-    "LOGO": "🦔🦅",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7158c1Bee7a0Fa5BD6AFFc77b2309991D7ADCdd4",
-    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "WANT_SYMBOL": "USDC",
-    "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 1
-  },
   "the-fantom": {
     "TITLE": "The Fantom",
     "LOGO": "👻👻",
@@ -1101,7 +1089,7 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 1
   },
   "santa-bills": {
@@ -1140,9 +1128,21 @@
     "VAULT_STATUS": "new",
     "CHAIN_ID": 42161
   },
-  "g-unit": {
-    "TITLE": "0.5 DAI presents G-UNIT",
-    "LOGO": "💵💵",
+  "meet-your-maker": {
+    "TITLE": "Meet Your Maker-lev",
+    "LOGO": "🌌🌠",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x7158c1Bee7a0Fa5BD6AFFc77b2309991D7ADCdd4",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "carpe-daiem": {
+    "TITLE": "Carpe DAIem",
+    "LOGO": "🦄🦄",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0x1CfE7a61571DaeB44BD997c877884Ea3eEa8712F",
