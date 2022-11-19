@@ -548,7 +548,7 @@
     "WANT_ADDR": "0x514910771af9ca656af840dff83e8264ecf986ca",
     "WANT_SYMBOL": "LINK",
     "COINGECKO_SYMBOL": "chainlink",
-    "VAULT_STATUS": "endorsed",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "matic_woofy": {
@@ -752,7 +752,7 @@
     "WANT_ADDR": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "WANT_SYMBOL": "COMP",
     "COINGECKO_SYMBOL": "compound-governance-token",
-    "VAULT_STATUS": "endorsed",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "spookystars": {
@@ -764,7 +764,7 @@
     "WANT_ADDR": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
     "WANT_SYMBOL": "AAVE",
     "COINGECKO_SYMBOL": "aave",
-    "VAULT_STATUS": "endorsed",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "truecereal": {
@@ -776,7 +776,7 @@
     "WANT_ADDR": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "WANT_SYMBOL": "TUSD",
     "COINGECKO_SYMBOL": "true-usd",
-    "VAULT_STATUS": "endorsed",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "synthetic-btc": {
@@ -788,7 +788,7 @@
     "WANT_ADDR": "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
     "WANT_SYMBOL": "sBTC",
     "COINGECKO_SYMBOL": "sbtc",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "yfi-wifey": {
@@ -800,19 +800,7 @@
     "WANT_ADDR": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
     "WANT_SYMBOL": "YFI",
     "COINGECKO_SYMBOL": "yearn-finance",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 1
-  },
-  "wether-aether": {
-    "TITLE": "wEther Aether",
-    "LOGO": "⚖️💫",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x5120FeaBd5C21883a4696dBCC5D123d6270637E9",
-    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    "WANT_SYMBOL": "WETH",
-    "COINGECKO_SYMBOL": "weth",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 1
   },
   "the-fantom": {
@@ -828,9 +816,9 @@
     "VAULT_STATUS": "endorsed",
     "CHAIN_ID": 250
   },
-  "get-bridged-or-dai-farmin": {
-    "TITLE": "Get bridge'd or DAI farmin'",
-    "LOGO": "🌁 ⚰️",
+  "triple-boosted-benjamins": {
+    "TITLE": "Triple Boosted Benjamins",
+    "LOGO": "🔭🪁",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0x1F8ad2cec4a2595Ff3cdA9e8a39C0b1BE1A02014",
@@ -1053,7 +1041,7 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "lazy-synapses": {
@@ -1089,7 +1077,7 @@
     "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "santa-bills": {
@@ -1113,7 +1101,7 @@
     "WANT_ADDR": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
     "WANT_SYMBOL": "SUSHI",
     "COINGECKO_SYMBOL": "sushi",
-    "VAULT_STATUS": "active",
+    "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
   "arbi-2crv": {
@@ -1149,6 +1137,18 @@
     "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "maker-a-clone": {
+    "TITLE": "Make-a-Clone",
+    "LOGO": "🧬🐑",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x5120FeaBd5C21883a4696dBCC5D123d6270637E9",
+    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
