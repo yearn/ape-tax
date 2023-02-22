@@ -1140,9 +1140,9 @@
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   },
-  "maker-a-clone": {
-    "TITLE": "Make-a-Clone",
-    "LOGO": "🧬🐑",
+  "methamorphosis": {
+    "TITLE": "mETHaMORPHOsis",
+    "LOGO": "🐛🦋",
     "VAULT_ABI": "yVaultV2",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0x5120FeaBd5C21883a4696dBCC5D123d6270637E9",
