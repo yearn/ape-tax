@@ -125,3 +125,34 @@
 	height: 34px !important;
 	margin-top: -0.5rem !important;
 }
+
+/* -- ElementWithActions.tsx ------------------------------------------- */
+.yearn--elementWithActions-copy {
+	@apply cursor-copy px-1 md:px-2;
+}
+.yearn--elementWithActions-linkout {
+	@apply cursor-alias;
+	& > a {@apply cursor-alias;}
+}
+.yearn--elementWithActions-icon {
+	@apply w-4 h-4 transition-colors;
+	color: var(--elementWithActions-action-color);
+	&:hover {
+		color: var(--elementWithActions-action-color-hover);
+	}
+}
+.yearn--elementWithActions {
+	@apply font-mono font-bold text-left;
+	color: var(--elementWithActions-text-color);
+	& ~ button {
+		@apply flex justify-center items-center p-0 w-8 h-8;
+		border-radius: var(--default-rounded);
+	}
+}
+
+.yearn--elementWithActions-wrapper {
+	--elementWithActions-text-color: hsl(var(--color-neutral-700));
+	--elementWithActions-action-color: hsl(var(--color-primary-500));
+	--elementWithActions-action-color-hover: hsl(var(--color-primary-600));
+	@apply flex flex-row items-center;
+}
