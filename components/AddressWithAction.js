@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {useSettings, useWeb3} from '@yearn-finance/web-lib/contexts';
+import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import IconCopy from '@yearn-finance/web-lib/icons/IconCopy';
 import IconLinkOut from '@yearn-finance/web-lib/icons/IconLinkOut';
-import {copyToClipboard, toENS} from '@yearn-finance/web-lib/utils';
+import {toENS} from '@yearn-finance/web-lib/utils/address';
+import {copyToClipboard} from '@yearn-finance/web-lib/utils/helpers';
 
 function	AddressWithActions(props) {
 	const	{address, explorer = '', truncate = 5, wrapperClassName, className = ''} = props;
