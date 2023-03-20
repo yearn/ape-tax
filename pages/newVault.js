@@ -1,11 +1,11 @@
 import React, {Fragment, useState} from 'react';
+import {AddressWithActions} from 'components/AddressWithAction';
 import useBalancerGauge from 'contexts/useBalancerGauges';
 import useFactory from 'contexts/useFactory';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import {createNewVaultsAndStrategies} from 'utils/actions';
 import {Combobox, Transition} from '@headlessui/react';
-import {AddressWithActions} from '@yearn-finance/web-lib';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
