@@ -42,6 +42,8 @@ function	getSlugFromString(str) {
 function	getProvider(chain = 1) {
 	if (chain === 1) {
 		return new ethers.providers.AlchemyProvider('homestead');
+	} else if (chain === 10) {
+		return new ethers.providers.JsonRpcProvider('https://1rpc.io/op');
 	} else if (chain === 137) {
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
 	} else if (chain === 250) {
@@ -57,6 +59,7 @@ function	getProvider(chain = 1) {
 const	ENUM_CHAIN = {
 	'Mainnet (1)': 1,
 	'Rinkeby (4)': 4,
+	'Optimism (10)': 10,
 	'BSC (56)': 56,
 	'Polygon (137)': 137,
 	'Fantom Opera (250)': 250,
@@ -108,20 +111,22 @@ if (!args.logo) {
 /******************************************************************************
 **	If the chain is not in the arguments, let's prompt it.
 **	The chain will be associated with the `CHAINID` key. Numbers are expected.
-**	Possible value : 1, 56, 137, 250, 42161, 100
+**	Possible value : 1, 10, 56, 137, 250, 42161, 100
 ******************************************************************************/
-if (!args.chain || !([1, 56, 137, 250, 42161, 100]).includes(args.chain)) {
+if (!args.chain || !([1, 10, 56, 137, 250, 42161, 100]).includes(args.chain)) {
 	questions.push(		{
 		type: 'list',
 		name: 'vaultChain',
 		message: 'Which chain ?',
-		choices: ['Mainnet (1)', 'Rinkeby (4)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)'],
+		choices: ['Mainnet (1)', 'Rinkeby (4)', 'Optimism (10)', 'BSC (56)', 'Polygon (137)', 'Fantom Opera (250)', 'Arbitrum One (42161)', 'Gnosis Chain (100)'],
 	},);
 } else {
 	if (args.chain === 1)
 		defaultVaultChain = 'Mainnet (1)';
 	if (args.chain === 4)
 		defaultVaultChain = 'Rinkeby (4)';
+	if (args.chain === 10)
+		defaultVaultChain = 'Optimsm (10)';
 	if (args.chain === 56)
 		defaultVaultChain = 'BSC (56)';
 	if (args.chain === 137)

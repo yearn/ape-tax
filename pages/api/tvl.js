@@ -1,16 +1,9 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Sunday September 5th 2021
-**	@Filename:				vaults.js
-******************************************************************************/
-
-import	axios					from	'axios';
-import	{ethers}				from	'ethers';
-import	{Contract}				from	'ethcall';
-import	{providers}				from	'@yearn-finance/web-lib/utils';
-import	vaults					from	'utils/vaults.json';
-import	yVaultABI				from	'utils/ABI/yVault.abi.json';
+import {Contract} from 'ethcall';
+import {ethers} from 'ethers';
+import yVaultABI from 'utils/ABI/yVault.abi.json';
+import vaults from 'utils/vaults.json';
+import axios from 'axios';
+import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
@@ -33,33 +26,35 @@ async function asyncForEach(array, callback) {
 	}
 }
 
-function getProvider(chain = 1) {
+function getLocalProvider(chain = 1) {
 	if (chain === 1) {
 		if (process.env.ALCHEMY_KEY) {
 			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		} else {
-			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-		}
-	} else if (chain === 137) {
+		} 
+		return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
+		
+	} if (chain === 137) {
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
+	} if (chain === 10) {
+		return new ethers.providers.JsonRpcProvider('https://1rpc.io/op');
+	} if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 56) {
+	} if (chain === 56) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
-	} else if (chain === 1337) {
+	} if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	} else if (chain === 100) {
+	} if (chain === 100) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
 }
 
 async function getTVL({network, rpc}) {
-	let		provider = getProvider(network);
+	let		provider = getLocalProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await providers.newEthCallProvider(provider);
+	const	ethcallProvider = await newEthCallProvider(provider);
 	const	_calls = [];
 	const	_cgIDS = [];
 	let		_tvlEndorsed = 0;
@@ -73,7 +68,7 @@ async function getTVL({network, rpc}) {
 		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI);
 		_calls.push(...[
 			vaultContract.totalAssets(),
-			vaultContract.decimals(),
+			vaultContract.decimals()
 		]);
 		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});

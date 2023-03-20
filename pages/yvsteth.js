@@ -1,27 +1,20 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Saturday August 21st 2021
-**	@Filename:				yvsteth.js
-******************************************************************************/
-
-import	React, {useState, useEffect}					from	'react';
-import	{ethers, BigNumber}								from	'ethers';
-import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
-import	{truncateHex}									from	'@yearn-finance/web-lib/utils';
-import	vaults											from	'utils/vaults.json';
-import	chains											from	'utils/chains.json';
-import	{fetchCryptoPrice}								from	'utils/API';
-import	{formatAmount}									from	'utils';
-import	{approveToken, depositToken, withdrawToken}		from	'utils/actions';
+import React, {useEffect, useState} from 'react';
+import {BigNumber, ethers} from 'ethers';
+import {formatAmount} from 'utils';
+import {approveToken, depositToken, withdrawToken} from 'utils/actions';
+import {fetchCryptoPrice} from 'utils/API';
+import chains from 'utils/chains.json';
+import vaults from 'utils/vaults.json';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 function	InfoMessage() {
 	return (
 		<>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
+			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. It's extremely risky and will probably be discarded when the test is over. Proceed with extreme caution."}
 			</div>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
+			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
 				{'📣 '}<strong>{'DISCLAIMER'}</strong> {'When you transfer and deposit, your ETH will be converted into stETH 1:1 and deposit in the vault. You will not be able to redeem stETH for ETH until txs are enables in ETH2.0.'}
 			</div>
 		</>
@@ -30,7 +23,7 @@ function	InfoMessage() {
 
 function	Index() {
 	const	{provider, isActive, address, ens} = useWeb3();
-	const	vault = vaults['yvsteth'];
+	const	vault = vaults.yvsteth;
 	const	chainExplorer = chains[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(0);
@@ -46,7 +39,7 @@ function	Index() {
 		totalAUM: 0,
 		allowance: 0,
 		version: '-',
-		wantBalanceRaw: BigNumber.from(0),
+		wantBalanceRaw: BigNumber.from(0)
 	});
 	const	[isApproving, set_isApproving] = useState(false);
 	const	[isDepositing, set_isDepositing] = useState(false);
@@ -72,7 +65,7 @@ function	Index() {
 				'function totalSupply() public view returns (uint256)',
 				'function pricePerShare() public view returns (uint256)',
 				'function decimals() public view returns (uint256)',
-				'function balanceOf(address) public view returns (uint256)',
+				'function balanceOf(address) public view returns (uint256)'
 			],
 			provider
 		);
@@ -86,8 +79,8 @@ function	Index() {
 			fetchCryptoPrice((vault.COINGECKO_SYMBOL.toLowerCase())),
 			provider.getBalance(address),
 			wantContract.balanceOf(address),
-			wantContract.allowance(address, vault.VAULT_ADDR),
-		]).then(async ([version, totalSupply , pricePerShare, decimals, balanceOf, wantPrice, coinBalance, wantBalance, wantAllowance]) => {
+			wantContract.allowance(address, vault.VAULT_ADDR)
+		]).then(async ([version, totalSupply, pricePerShare, decimals, balanceOf, wantPrice, coinBalance, wantBalance, wantAllowance]) => {
 			const	price = wantPrice[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 
 			set_vaultData({
@@ -134,7 +127,7 @@ function	Index() {
 			vault.VAULT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
 				'function totalSupply() public view returns (uint256)',
-				'function pricePerShare() public view returns (uint256)',
+				'function pricePerShare() public view returns (uint256)'
 			], provider);
 		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, totalSupply, pricePerShare] = await Promise.all([
 			wantContract.allowance(address, vault.VAULT_ADDR),
@@ -142,7 +135,7 @@ function	Index() {
 			vaultContract.balanceOf(address),
 			provider.getBalance(address),
 			vaultContract.totalSupply(),
-			vaultContract.pricePerShare(),
+			vaultContract.pricePerShare()
 		]);
 		set_vaultData(v => ({
 			...v,
@@ -166,17 +159,19 @@ function	Index() {
 	return (
 		<section className={'mt-8 text-neutral-500'}>
 			<div>
-				<h1 className={'text-7xl font-mono font-semibold text-neutral-700 leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'text-3xl font-mono font-semibold text-neutral-700'}>{vault.TITLE}</h1>
+				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-700'}>{vault.LOGO}</h1>
+				<h1 className={'font-mono text-3xl font-semibold text-neutral-700'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage />
 			<section aria-label={'DETAILS'}>
-				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 					<div>
 						<p className={'inline'}>{'Vault: '}</p>
 						<a
 							className={'dashed-underline-gray'}
-							href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`} target={'_blank'} rel={'noreferrer'}>
+							href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`}
+							target={'_blank'}
+							rel={'noreferrer'}>
 							{'📃 Contract'}
 						</a>
 					</div>
@@ -201,7 +196,7 @@ function	Index() {
 						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData?.totalAUM || 0, 2)}`}</p>
 					</div>
 				</div>
-				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
 						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
@@ -214,8 +209,8 @@ function	Index() {
 			</section>
 
 			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'text-2xl font-mono font-semibold text-neutral-700 mb-6'}>{'Wallet'}</h1>
-				<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+				<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'Wallet'}</h1>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
 						<p className={'inline font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
@@ -240,28 +235,29 @@ function	Index() {
 			</section>
 			<section aria-label={'ACTIONS'} className={'my-4'}>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-					<label className={'font-mono font-semibold text-sm mb-1.5 text-neutral-700'}>{'Amount'}</label>
+					<label className={'mb-1.5 font-mono text-sm font-semibold text-neutral-700'}>{'Amount'}</label>
 					<div className={'flex flex-row items-center'}>
 						<input
-							className={'text-xs px-2 py-1.5 text-neutral-500 border-neutral-400 font-mono bg-neutral-0 bg-opacity-0'}
+							className={'border-neutral-400 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
 							style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 							type={'number'}
 							min={'0'}
 							value={amount}
 							onChange={(e) => set_amount(e.target.value)} />
-						<div className={'bg-neutral-50 text-xs font-mono px-2 py-1.5 border border-neutral-400 border-solid border-l-0 text-neutral-400'} style={{height: '33px'}}>
+						<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-400 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
 							{vault.WANT_SYMBOL}
 						</div>
 					</div>
 				</div>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono font-medium text-neutral-500 text-sm'}>{'Deposit closed.'}</p>
+					<p className={'font-mono text-sm font-medium text-neutral-500'}>{'Deposit closed.'}</p>
 				</div>
 				<div className={'mt-10'}>
 					<button
 						onClick={() => {
-							if (isApproving)
+							if (isApproving) {
 								return;
+							}
 							set_isApproving(true);
 							approveToken({
 								provider,
@@ -270,73 +266,80 @@ function	Index() {
 								from: vault.VAULT_ADDR
 							}, ({error}) => {
 								set_isApproving(false);
-								if (error)
+								if (error) {
 									return;
+								}
 								fetchApproval();
 							});
 						}}
 						disabled={vaultData.allowance > 0 || isApproving}
-						className={`${vaultData.allowance > 0 || isApproving ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance > 0 || isApproving ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mr-2 mb-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{vaultData.allowance > 0 ? '✅ Approved' : '🚀 Approve Vault'}
 					</button>
 					<button
 						onClick={() => {
-							if (isDepositing)
+							if (isDepositing) {
 								return;
+							}
 							set_isDepositing(true);
 							depositToken({
 								provider,
 								contractAddress: vault.VAULT_ADDR,
-								amount: ethers.utils.parseUnits(amount, vaultData.decimals),
+								amount: ethers.utils.parseUnits(amount, vaultData.decimals)
 							}, ({error}) => {
 								set_isDepositing(false);
-								if (error)
+								if (error) {
 									return;
+								}
 								fetchPostDepositOrWithdraw();
 							});
 						}}
 						disabled={vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing}
-						className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance === 0 || (Number(amount) === 0) || isDepositing ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mr-2 mb-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{'🏦 Deposit'}
 					</button>
 					<button
 						onClick={() => {
-							if (isDepositing)
+							if (isDepositing) {
 								return;
+							}
 							set_isDepositing(true);
 							depositToken({
 								provider,
 								contractAddress: vault.VAULT_ADDR,
-								amount: vaultData.wantBalanceRaw,
+								amount: vaultData.wantBalanceRaw
 							}, ({error}) => {
 								set_isDepositing(false);
-								if (error)
+								if (error) {
 									return;
+								}
 								fetchPostDepositOrWithdraw();
 							});
 						}}
 						disabled={vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero()}
-						className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2`}>
+						className={`${vaultData.allowance === 0 || isDepositing || vaultData?.wantBalanceRaw?.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mr-2 mb-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{'🏦 Deposit All'}
 					</button>
 					<button
 						onClick={() => {
-							if (isWithdrawing)
+							if (isWithdrawing) {
 								return;
+							}
 							set_isWithdrawing(true);
 							withdrawToken({
 								provider,
 								contractAddress: vault.VAULT_ADDR,
-								amount: ethers.constants.MaxUint256,
+								amount: ethers.constants.MaxUint256
 							}, ({error}) => {
 								set_isWithdrawing(false);
-								if (error)
+								if (error) {
 									return;
+								}
 								fetchPostDepositOrWithdraw();
 							});
 						}}
 						disabled={Number(vaultData.balanceOf) === 0}
-						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold`}>
+						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>

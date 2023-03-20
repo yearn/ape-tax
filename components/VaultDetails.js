@@ -1,11 +1,11 @@
-import	React, {useState, useEffect}	from	'react';
-import	axios							from	'axios';
-import	useSWR							from	'swr';
-import	{useWeb3}						from	'@yearn-finance/web-lib/contexts';
-import	Suspense						from	'components/Suspense';
-import	ProgressChart					from	'components/ProgressChart';
-import	chains							from	'utils/chains.json';
-import	{formatAmount}					from	'utils';
+import React, {useEffect, useState} from 'react';
+import ProgressChart from 'components/ProgressChart';
+import Suspense from 'components/Suspense';
+import {formatAmount} from 'utils';
+import chains from 'utils/chains.json';
+import axios from 'axios';
+import useSWR from 'swr';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 
 const		fetcher = url => axios.get(url).then(res => res.data);
 function	VaultDetails({vault, vaultData}) {
@@ -20,12 +20,14 @@ function	VaultDetails({vault, vaultData}) {
 
 	return (
 		<section aria-label={'DETAILS'}>
-			<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+			<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Vault: '}</p>
 					<a
 						className={'dashed-underline-gray text-neutral-500'}
-						href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`} target={'_blank'} rel={'noreferrer'}>
+						href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`}
+						target={'_blank'}
+						rel={'noreferrer'}>
 						{'📃 Contract'}
 					</a>
 				</div>
@@ -68,7 +70,7 @@ function	VaultDetails({vault, vaultData}) {
 					</p>
 				</div>
 			</div>
-			<div className={`font-mono text-neutral-500 font-medium text-sm mb-4 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+			<div className={`mb-4 font-mono text-sm font-medium text-neutral-500 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Gross APR (last week): '}</p>
 					<p className={'inline text-neutral-500'}>
@@ -94,7 +96,7 @@ function	VaultDetails({vault, vaultData}) {
 					</p>
 				</div>
 			</div>
-			<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+			<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Price Per Share: '}</p>
 					<p className={'inline text-neutral-500'}>
@@ -107,17 +109,17 @@ function	VaultDetails({vault, vaultData}) {
 					<p className={'inline text-neutral-700'}>{'Available limit: '}</p>
 					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${formatAmount(vaultData.availableDepositLimit || 0 , 2)} ${vault.WANT_SYMBOL}`}
+							{`${formatAmount(vaultData.availableDepositLimit || 0, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
 				</div>
 				<div className={'progress-bar'}>
-					<span className={'bg-neutral-0 text-neutral-900 -ml-2 mr-2 hidden md:inline'}>
+					<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-900 md:inline'}>
 							&nbsp;{'['}&nbsp;
 						<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={50} />
 							&nbsp;{']'}&nbsp;
 					</span>
-					<span className={'bg-neutral-0 text-neutral-900 -ml-2 mr-2 inline md:hidden'}>
+					<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-900 md:hidden'}>
 							&nbsp;{'['}&nbsp;
 						<ProgressChart progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress} width={30} />
 							&nbsp;{']'}&nbsp;

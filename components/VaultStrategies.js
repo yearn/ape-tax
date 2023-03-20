@@ -1,14 +1,15 @@
 
-import	React, {useState, useEffect, useCallback}		from	'react';
-import	{ethers}										from	'ethers';
-import	{Contract}										from	'ethcall';
-import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
-import	{providers, toAddress}							from	'@yearn-finance/web-lib/utils';
-import	chains											from	'utils/chains.json';
-import	{performGet}									from	'utils/API';
-import	{parseMarkdown}									from	'utils';
-import	{harvestStrategy}								from	'utils/actions';
-import	YVAULT_ABI										from	'utils/ABI/yVault.abi';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Contract} from 'ethcall';
+import {ethers} from 'ethers';
+import {parseMarkdown} from 'utils';
+import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import {harvestStrategy} from 'utils/actions';
+import {performGet} from 'utils/API';
+import chains from 'utils/chains.json';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 	const	{provider, isActive, address} = useWeb3();
@@ -30,8 +31,8 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			return;
 		}
 
-		const	currentProvider = provider || providers.getProvider(chainID || 1337);
-		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+		const	currentProvider = provider || getProvider(chainID || 1337);
+		const	ethcallProvider = await newEthCallProvider(currentProvider);
 		const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI);
 		let		shouldBreak = false;
 		for (let index = 0; index < 20; index++) {
@@ -55,7 +56,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 				strategyContract.name()
 			]);
 
-			if ([1, 250, 42161].includes(Number(vault.CHAIN_ID))) {
+			if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
 				try {
 					const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
 					if (details) {
@@ -117,7 +118,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 		if (!vault || !provider || !address) {
 			return;
 		}
-		const	providerToUse = provider || providers.getProvider(chainID === 1337 ? 1337 : vault.CHAIN_ID);
+		const	providerToUse = provider || getProvider(chainID === 1337 ? 1337 : vault.CHAIN_ID);
 		const	wantContract = new ethers.Contract(
 			vault.WANT_ADDR, [
 				'function balanceOf(address) public view returns (uint256)',
@@ -131,7 +132,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 				'function depositLimit() public view returns (uint256)',
 				'function totalAssets() public view returns (uint256)',
 				'function availableDepositLimit() public view returns (uint256)',
-				'function pricePerShare() public view returns (uint256)',
+				'function pricePerShare() public view returns (uint256)'
 			], providerToUse);
 		
 		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, depositLimit, totalAssets, availableDepositLimit, pricePerShare] = await Promise.all([
@@ -142,7 +143,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			vaultContract.depositLimit(),
 			vaultContract.totalAssets(),
 			vaultContract.availableDepositLimit(),
-			vaultContract.pricePerShare(),
+			vaultContract.pricePerShare()
 		]);
 		onUpdateVaultData(v => ({
 			...v,
@@ -158,18 +159,20 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			availableDepositLimit: Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals)).toFixed(2),
 			pricePerShare: Number(ethers.utils.formatUnits(pricePerShare, v.decimals)).toFixed(4),
 			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice).toFixed(2),
-			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals)),
+			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
 		}));
 	}
 
 	function	onHarvestStrategy(strategyAddress) {
-		if (isHarvesting)
+		if (isHarvesting) {
 			return;
+		}
 		set_isHarvesting(true);
 		harvestStrategy({provider, strategyAddress}, ({error}) => {
 			set_isHarvesting(false);
-			if (error)
+			if (error) {
 				return;
+			}
 			prepreStrategiesData();
 			fetchPostDepositOrWithdraw();
 		});
@@ -177,34 +180,40 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
-			<h1 className={'text-2xl font-mono font-semibold text-neutral-700 mb-6'}>{'Strategies'}</h1>
+			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'Strategies'}</h1>
 			{
 				Object.values(strategiesData).map((strategy, index) => (
 
-					<div key={index} className={'font-mono text-neutral-500 text-sm mb-4'}>
+					<div key={index} className={'mb-4 font-mono text-sm text-neutral-500'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>
 						</div>
-						<div className={'max-w-xl w-full text-justify'}>
+						<div className={'w-full max-w-xl text-justify'}>
 							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 						<div>
 							<a
 								className={'dashed-underline-gray text-xs'}
-								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
+								href={`${chainExplorer}/address/${strategy.address}#code`}
+								target={'_blank'}
+								rel={'noreferrer'}>
 								{'📃 Contract'}
 							</a>
 						</div>
-						{vault.VAULT_TYPE === 'community' ? <div>
-							<button
-								disabled={isHarvesting || !isActive || !provider || strategy.creditAvailable.isZero()}
-								onClick={() => onHarvestStrategy(strategy.address)}
-								className={'dashed-underline-gray text-xs'}
-								href={`${chainExplorer}/address/${strategy.address}#code`} target={'_blank'} rel={'noreferrer'}>
-								{strategy.creditAvailable.isZero() ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${ethers.utils.formatUnits(strategy.creditAvailable, decimals)} ${vault.WANT_SYMBOL}`}
-							</button>
-						</div> : null}
+						{vault.VAULT_TYPE === 'community' ? (
+							<div>
+								<button
+									disabled={isHarvesting || !isActive || !provider || strategy.creditAvailable.isZero()}
+									onClick={() => onHarvestStrategy(strategy.address)}
+									className={'dashed-underline-gray text-xs'}
+									href={`${chainExplorer}/address/${strategy.address}#code`}
+									target={'_blank'}
+									rel={'noreferrer'}>
+									{strategy.creditAvailable.isZero() ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${ethers.utils.formatUnits(strategy.creditAvailable, decimals)} ${vault.WANT_SYMBOL}`}
+								</button>
+							</div>
+						) : null}
 					</div>
 				))
 			}

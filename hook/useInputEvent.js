@@ -1,11 +1,5 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				useInputEvent.js
-******************************************************************************/
-
 import {useEffect, useState} from 'react';
+
 export const useInputEvent = () => {
 	const [key, setKey] = useState(null);
 	useEffect(() => {

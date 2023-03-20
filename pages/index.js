@@ -1,21 +1,14 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				index.js
-******************************************************************************/
-
-import	React, {useState, useEffect}						from	'react';
-import	Link												from	'next/link';
-import	useSWR												from	'swr';
-import	axios												from	'axios';
-import	{ethers}											from	'ethers';
-import	{useWeb3}											from	'@yearn-finance/web-lib/contexts';
-import	useFactory											from	'contexts/useFactory';
-import	{formatAmount}										from	'utils';
-import	vaults												from	'utils/vaults.json';
-import	chains												from	'utils/chains.json';
-import	GraphemeSplitter									from	'grapheme-splitter';
+import React, {useEffect, useState} from 'react';
+import Link from 'next/link';
+import useFactory from 'contexts/useFactory';
+import {ethers} from 'ethers';
+import GraphemeSplitter from 'grapheme-splitter';
+import {formatAmount} from 'utils';
+import chains from 'utils/chains.json';
+import vaults from 'utils/vaults.json';
+import axios from 'axios';
+import useSWR from 'swr';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 
 const	splitter = new GraphemeSplitter();
 const	sortBy = (arr, k) => arr.concat().sort((a, b) => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
@@ -24,13 +17,19 @@ function	Tag({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
 			<>
-				<span className={'bg-accent-500 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 hidden lg:inline'}>
-					<a href={'https://yearn.finance/vaults'} target={'_blank'} rel={'noopener noreferrer'}>
+				<span className={'ml-2 hidden rounded-md bg-accent-500 px-2 py-1 font-mono text-xxs text-white lg:inline'}>
+					<a
+						href={'https://yearn.finance/vaults'}
+						target={'_blank'}
+						rel={'noopener noreferrer'}>
 						{'Use Production'}
 					</a>
 				</span>
-				<span className={'bg-accent-500 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2 inline lg:hidden'}>
-					<a href={'https://yearn.finance/vaults'} target={'_blank'} rel={'noopener noreferrer'}>
+				<span className={'ml-2 inline rounded-md bg-accent-500 px-2 py-1 font-mono text-xxs text-white lg:hidden'}>
+					<a
+						href={'https://yearn.finance/vaults'}
+						target={'_blank'}
+						rel={'noopener noreferrer'}>
 						{'Prod'}
 					</a>
 				</span>
@@ -39,21 +38,21 @@ function	Tag({status}) {
 	}
 	if (status === 'disabled') {
 		return (
-			<span className={'bg-yellow-900 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'ml-2 rounded-md bg-yellow-900 px-2 py-1 font-mono text-xxs text-white'}>
 				{'Disabled'}
 			</span>
 		);
 	}
 	if (status === 'withdraw') {
 		return (
-			<span className={'bg-red-900 text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'ml-2 rounded-md bg-red-900 px-2 py-1 font-mono text-xxs text-white'}>
 				{'Withdraw'}
 			</span>
 		);
 	}
 	if (status === 'new') {
 		return (
-			<span className={'bg-[#10B981] text-white font-mono rounded-md px-2 text-xxs py-1 ml-2'}>
+			<span className={'ml-2 rounded-md bg-[#10B981] px-2 py-1 font-mono text-xxs text-white'}>
 				{'New'}
 			</span>
 		);
@@ -66,22 +65,22 @@ function	DisabledVaults({vaultsInactive}) {
 		return null;
 	}
 	return (
-		<div className={'max-w-5xl p-4 pb-2 my-4 font-mono text-sm font-normal text-[#485570] bg-red-900'}>
+		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 font-mono text-sm font-normal text-[#485570]'}>
 			{'⚠️ '}<strong>{'WARNING'}</strong>{' 🚨 '}<strong>{'YOU ARE USING DEPRECATED VAULTS'}</strong> {'You have funds in deprecated vaults. Theses vaults are no longer generating any profit and are now an image from the past. Please remove your funds from these vaults.'}
 			<div className={'mt-4'}>
 				<ul className={'grid grid-cols-2 gap-2'}>
 					{vaultsInactive?.map((vault) => (
-						<li key={vault.VAULT_SLUG} className={'col-span-2 md:col-span-1 w-full mb-1 cursor-pointer'}>
-							<Link href={`/${vault.VAULT_SLUG}`}>
+						<li key={vault.VAULT_SLUG} className={'col-span-2 mb-1 w-full cursor-pointer md:col-span-1'}>
+							<Link legacyBehavior href={`/${vault.VAULT_SLUG}`}>
 								<div className={'flex flex-row items-center'}>
 									<span className={'flex flex-row items-center'}>
 										{
 											vault.LOGO_ARR.map((letter, index) => (
-												<div className={index === 0 ? 'text-left w-5' : 'text-right w-5'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
+												<div className={index === 0 ? 'w-5 text-left' : 'w-5 text-right'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
 											))
 										}
 									</span>
-									<span className={'ml-4 text-base font-normal text-[#485570] font-mono dashed-underline-white cursor-pointer'}>
+									<span className={'dashed-underline-white ml-4 cursor-pointer font-mono text-base font-normal text-[#485570]'}>
 										{vault.TITLE}
 									</span>
 								</div>
@@ -179,7 +178,7 @@ function	Index() {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'text-sm font-mono font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
@@ -188,80 +187,80 @@ function	Index() {
 		<main className={'max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'text-3xl font-mono font-semibold text-neutral-700 leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-700'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'text-xl font-mono font-semibold text-neutral-700 leading-9'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-700'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
+			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 
-			<section aria-label={'TVL & new Vault'} className={'grid grid-cols-2 my-8'}>
+			<section aria-label={'TVL & new Vault'} className={'my-8 grid grid-cols-2'}>
 				<div>
 					<div>
-						<span className={'text-base font-semibold text-neutral-700 font-mono'}>
+						<span className={'font-mono text-base font-semibold text-neutral-700'}>
 							{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 						</span>
-						<span className={'text-base font-normal text-neutral-700 font-mono'}>
+						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl || 0, 2)}`}
 						</span>
 					</div>
 
 					<div className={'text-xs opacity-60'}>
 						<div>
-							<span className={'font-semibold text-neutral-700 font-mono'}>
+							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Endorsed:'}
 							</span>
-							<span className={'font-normal text-neutral-700 font-mono'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-semibold text-neutral-700 font-mono'}>
+							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Experimental:'}
 							</span>
-							<span className={'font-normal text-neutral-700 font-mono'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-semibold text-neutral-700 font-mono'}>
+							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Deprecated:'}
 							</span>
-							<span className={'font-normal text-neutral-700 font-mono'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
 							</span>
 						</div>
 					</div>
 				</div>
-				<div className={'items-center flex'}>
+				<div className={'flex items-center'}>
 					<Link href={'/newVault'}>
-						<span className={'text-neutral-700 font-mono border px-4 py-2 border-dashed border-neutral-500 text-sm transition-colors bg-neutral-200 hover:bg-neutral-0 cursor-pointer'}>
+						<span className={'cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0'}>
 							{'🏦 Deploy your own vault'}
 						</span>
 					</Link>
 				</div>
 			</section>
 
-			<div className={'max-w-5xl grid grid-cols-2 gap-2'}>
-				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4'}>{'🚀 Experimental'}</h2>
+			<div className={'grid max-w-5xl grid-cols-2 gap-2'}>
+				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
-								<Link href={`/${vault.VAULT_SLUG}`}>
+								<Link legacyBehavior href={`/${vault.VAULT_SLUG}`}>
 									<div className={'my-4 flex flex-row items-center'}>
 										<span className={'flex flex-row items-center'}>
 											{
 												vault.LOGO_ARR.map((letter, index) => (
-													<div className={index === 0 ? 'text-left w-5' : 'text-right w-5'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
+													<div className={index === 0 ? 'w-5 text-left' : 'w-5 text-right'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.TITLE}
 											<Tag status={vault.VAULT_STATUS} />
 										</span>
@@ -272,8 +271,8 @@ function	Index() {
 					</ul>
 				</div>
 
-				<div className={'col-span-2 md:col-span-1 mb-4 w-full'}>
-					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4'}>{'🧠 Weird'}</h2>
+				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -282,11 +281,11 @@ function	Index() {
 										<span className={'flex flex-row items-center'}>
 											{
 												vault.LOGO_ARR.map((letter, index) => (
-													<div className={index === 0 ? 'text-left w-5' : 'text-right w-5'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
+													<div className={index === 0 ? 'w-5 text-left' : 'w-5 text-right'} key={`${vault.VAULT_SLUG}${index}${letter}`}>{letter}</div>
 												))
 											}
 										</span>
-										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
@@ -296,7 +295,7 @@ function	Index() {
 						))}
 					</ul>
 
-					<h2 className={'text-2xl text-neutral-700 font-mono font-semibold mb-4 mt-12'}>{'🦍 Community'}</h2>
+					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-700'}>{'🦍 Community'}</h2>
 					<ul>
 						{(communityVaults || [])?.map((vault) => (
 							<li key={vault.VAULT_ADDR} className={'cursor-pointer'}>
@@ -305,7 +304,7 @@ function	Index() {
 										<span className={'flex flex-row items-center'}>
 											{'🦍🦍'}
 										</span>
-										<span className={'ml-4 text-base font-normal text-neutral-500 font-mono dashed-underline-gray cursor-pointer'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.SYMBOL}
 										</span>
 									</div>

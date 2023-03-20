@@ -1,20 +1,20 @@
-import	React								from	'react';
-import	{useWeb3}							from	'@yearn-finance/web-lib/contexts';
-import	{truncateHex}						from	'@yearn-finance/web-lib/utils';
-import	{formatAmount}						from	'utils';
-import	chains								from	'utils/chains.json';
+import React from 'react';
+import {formatAmount} from 'utils';
+import chains from 'utils/chains.json';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {truncateHex} from '@yearn-finance/web-lib/utils/address';
 
-function	VaultWallet({vault, vaultData}) {
+function VaultWallet({vault, vaultData}) {
 	const	{address, ens} = useWeb3();
 	const	chainCoin = chains[vault?.CHAIN_ID]?.coin || 'ETH';
 
 	return (
 		<section aria-label={'WALLET'} className={'mt-8'}>
-			<h1 className={'text-2xl font-mono font-semibold text-neutral-700 mb-6'}>{'Wallet'}</h1>
-			<div className={'font-mono text-neutral-500 font-medium text-sm mb-4'}>
+			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'Wallet'}</h1>
+			<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your Account: '}</p>
-					<p className={'inline text-neutral-500 font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
+					<p className={'inline font-bold text-neutral-500'}>{ens || `${truncateHex(address, 5)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your vault shares: '}</p>

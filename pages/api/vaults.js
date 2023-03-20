@@ -5,13 +5,13 @@
 **	@Filename:				vaults.js
 ******************************************************************************/
 
-import	{ethers, BigNumber}		from	'ethers';
-import	{Contract}				from	'ethcall';
-import	{providers}				from	'@yearn-finance/web-lib/utils';
-import	{fn}					from	'utils/fn';
-import	vaults					from	'utils/vaults.json';
-import	yVaultABI				from	'utils/ABI/yVault.abi.json';
-import	{prepareGrossData}		from	'pages/api/specificApy';
+import {Contract} from 'ethcall';
+import {BigNumber, ethers} from 'ethers';
+import {prepareGrossData} from 'pages/api/specificApy';
+import yVaultABI from 'utils/ABI/yVault.abi.json';
+import {fn} from 'utils/fn';
+import vaults from 'utils/vaults.json';
+import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 const chunk = (arr, size) => arr.reduce((acc, e, i) => (i % size ? acc[acc.length - 1].push(e) : acc.push([e]), acc), []);
 
@@ -21,24 +21,26 @@ async function asyncForEach(array, callback) {
 	}
 }
 
-function getProvider(chain = 1) {
+function getLocalProvider(chain = 1) {
 	if (chain === 1) {
 		if (process.env.ALCHEMY_KEY) {
 			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		} else {
-			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-		}
-	} else if (chain === 56) {
+		} 
+		return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
+		
+	} if (chain === 10) {
+		return new ethers.providers.JsonRpcProvider('https://1rpc.io/op');
+	} if (chain === 56) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
-	} else if (chain === 100) {
+	} if (chain === 100) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
-	} else if (chain === 137) {
+	} if (chain === 137) {
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
+	} if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 1337) {
+	} if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	} else if (chain === 42161) {
+	} if (chain === 42161) {
 		return new ethers.providers.JsonRpcProvider('https://arbitrumrpc.com');
 	} 
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
@@ -46,11 +48,11 @@ function getProvider(chain = 1) {
 
 export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 	network = Number(network);
-	let		provider = getProvider(network);
+	let		provider = getLocalProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await providers.newEthCallProvider(provider);
+	const	ethcallProvider = await newEthCallProvider(provider);
 	const	_vaults = [];
 	const	_calls = [];
 
@@ -72,7 +74,7 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 			vaultContract.availableDepositLimit(),
 			vaultContract.pricePerShare(),
 			vaultContract.decimals(),
-			vaultContract.activation(),
+			vaultContract.activation()
 		]);
 	});
 	let		isCallASuccess = true;
@@ -104,8 +106,9 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 		let	decimals = 18;
 		let	activation = '0';
 
-		if (isCallASuccess)
+		if (isCallASuccess) {
 			[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, activation] = chunkedCallResult[index];
+		}
 		const	dec = Number(decimals);
 		index++;
 
@@ -114,7 +117,7 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 				vault: v,
 				pricePerShare,
 				decimals,
-				activation,
+				activation
 			});
 			_vaults.push({
 				title: v.TITLE,
@@ -137,12 +140,12 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 				APY: {
 					week: grossData.week,
 					month: grossData.month,
-					inception: grossData.inception,
+					inception: grossData.inception
 				},
 				want: {
 					address: v.WANT_ADDR,
 					symbol: v.WANT_SYMBOL,
-					cgID: v.COINGECKO_SYMBOL,
+					cgID: v.COINGECKO_SYMBOL
 				}
 			});
 		} else {
@@ -167,7 +170,7 @@ export default fn(async ({network = 1, rpc, status = 'active', apy = 0}) => {
 				want: {
 					address: v.WANT_ADDR,
 					symbol: v.WANT_SYMBOL,
-					cgID: v.COINGECKO_SYMBOL,
+					cgID: v.COINGECKO_SYMBOL
 				}
 			});
 		}

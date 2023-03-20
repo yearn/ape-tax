@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				API.js
-******************************************************************************/
-
 import	axios			from	'axios';
 
 export const	performGet = (url) => {
@@ -39,6 +32,14 @@ export async function	fetchCryptoPrice(from, to = 'usd') {
 }
 
 export async function	fetchBlockTimestamp(timestamp, network = 1) {
+	if (network === 10) {
+		const	result = await performGet(`https://api-optimistic.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.OPTISCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
 	if (network === 250) {
 		const	result = await performGet(`https://api.ftmscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.FTMSCAN_API}`);
 
