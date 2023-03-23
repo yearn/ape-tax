@@ -164,10 +164,10 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 	}, [chainID, networks, prices, provider, vault]);
 
 	return (
-		<div className={'mt-8 text-neutral-500'}>
+		<div className={'mt-8 text-neutral-700'}>
 			<div>
-				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-700'}>{vault.LOGO}</h1>
-				<h1 className={'font-mono text-3xl font-semibold text-neutral-700'}>{vault.TITLE}</h1>
+				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-900'}>{vault.LOGO}</h1>
+				<h1 className={'font-mono text-3xl font-semibold text-neutral-900'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage status={vault.VAULT_STATUS} />
 			<VaultDetails vault={vault} vaultData={vaultData} />

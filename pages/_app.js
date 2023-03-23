@@ -45,7 +45,7 @@ function	AppWrapper(props) {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-500'}>
+				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-700'}>
 					<a
 						href={'https://twitter.com/ape_tax'}
 						target={'_blank'}
@@ -61,7 +61,7 @@ function	AppWrapper(props) {
 					</p>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
-				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-neutral-500 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0 noBr noShadow toaster'}} />
+				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-neutral-700 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0 noBr noShadow toaster'}} />
 			</main>
 		</>
 	);

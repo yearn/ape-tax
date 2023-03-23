@@ -33,7 +33,7 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 			<div className={'relative'}>
 				<div className={'w-full'}>
 					<Combobox.Input
-						className={'w-full border-neutral-400 bg-white/0 py-1.5 px-2 font-mono text-neutral-500 focus:border-neutral-700 focus:ring-0 active:ring-0'}
+						className={'w-full border-neutral-400 bg-white/0 py-1.5 px-2 font-mono text-neutral-700 focus:border-neutral-700 focus:ring-0 active:ring-0'}
 						displayValue={(gauge) => gauge?.address}
 						onChange={(event) => setQuery(event.target.value)}
 					/>
@@ -43,7 +43,7 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 							viewBox={'0 0 20 20'}
 							fill={'currentColor'}
 							aria-hidden={'true'}
-							className={'h-5 w-5 text-neutral-500'}>
+							className={'h-5 w-5 text-neutral-700'}>
 							<path
 								fillRule={'evenodd'}
 								d={'M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z'}
@@ -61,20 +61,20 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 				>
 					<Combobox.Options className={'absolute mt-1 max-h-60 w-full overflow-auto border border-neutral-400 bg-neutral-0 py-1 text-base focus:outline-none'}>
 						{!filteredGauges || (filteredGauges || [])?.length === 0 && query !== '' ? (
-							<div className={'relative cursor-default select-none py-2 px-4 text-neutral-500'}>
+							<div className={'relative cursor-default select-none py-2 px-4 text-neutral-700'}>
 								{'Nothing found.'}
 							</div>
 						) : (
 							(filteredGauges || []).map((gauge) => (
 								<Combobox.Option
 									key={gauge.address}
-									className={({active}) => `relative cursor-pointer select-none py-2 px-4 ${active ? 'bg-neutral-100 text-neutral-700' : 'text-neutral-500'}`}
+									className={({active}) => `relative cursor-pointer select-none py-2 px-4 ${active ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-700'}`}
 									value={gauge}>
 									{({selected}) => (
 										<>
 											<div className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-												<p className={'text-base tabular-nums text-neutral-700'}>{gauge.address}</p>
-												<p className={'text-sm text-neutral-500'}>{gauge.name}</p>
+												<p className={'text-base tabular-nums text-neutral-900'}>{gauge.address}</p>
+												<p className={'text-sm text-neutral-700'}>{gauge.name}</p>
 											</div>
 										</>
 									)}
@@ -169,7 +169,7 @@ function	Index() {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'font-mono text-sm font-semibold text-neutral-900'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
@@ -178,10 +178,10 @@ function	Index() {
 		<main className={'mt-8 max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-700'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-700'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
@@ -191,13 +191,13 @@ function	Index() {
 			<section aria-label={'New Vault'} className={'my-8 grid grid-cols-1'}>
 				<div className={'mx-auto w-full border border-dashed border-neutral-500 p-4'}>
 					<div>
-						<p className={'font-mono text-3xl font-semibold text-neutral-700'}>
+						<p className={'font-mono text-3xl font-semibold text-neutral-900'}>
 							{'Add New Vault'}
 						</p>
 					</div>
 
 					<div className={'my-6 text-xs'}>
-						<div className={'space-y-4 font-mono text-base text-neutral-700'}>
+						<div className={'space-y-4 font-mono text-base text-neutral-900'}>
 							<p>{'Deploy a new vault and start autocompounding the yield from your Balancer deposits'}</p>
 							<p>{'Remember, this is an experimental experiment'}</p>
 						</div>
@@ -205,29 +205,29 @@ function	Index() {
 
 					<div>
 						<div className={'mt-12 mb-6 flex flex-col space-y-2'}>
-							<label className={'-mb-1 text-xs font-semibold text-neutral-700/60'}>{'Gauge Address'}</label>
+							<label className={'-mb-1 text-xs font-semibold text-neutral-900/60'}>{'Gauge Address'}</label>
 							<ComboBox selectedGauge={selectedGauge} set_selectedGauge={set_selectedGauge} />
 						</div>
 						<div className={'mb-12 flex flex-col space-y-3'}>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Name'}</label>
-								<p className={'font-mono text-neutral-500'}>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Name'}</label>
+								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `Balancer ${gaugeInfo.symbol} Auto-Compounding yVault` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Symbol'}</label>
-								<p className={'font-mono text-neutral-500'}>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Symbol'}</label>
+								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `yvBlp${gaugeInfo.symbol}` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Address'}</label>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Address'}</label>
 								{gaugeInfo.deployed ? <AddressWithActions
 									explorer={'https://etherscan.io'}
-									className={'font-mono font-normal text-neutral-500'}
+									className={'font-mono font-normal text-neutral-700'}
 									address={gaugeInfo.vaultAddress}
-									truncate={0} /> : <p className={'h-8 font-mono text-neutral-500'}>{'-'}</p>
+									truncate={0} /> : <p className={'h-8 font-mono text-neutral-700'}>{'-'}</p>
 								}
 							</div>
 						</div>

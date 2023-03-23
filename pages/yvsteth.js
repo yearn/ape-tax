@@ -157,14 +157,14 @@ function	Index() {
 	}
 
 	return (
-		<section className={'mt-8 text-neutral-500'}>
+		<section className={'mt-8 text-neutral-700'}>
 			<div>
-				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-700'}>{vault.LOGO}</h1>
-				<h1 className={'font-mono text-3xl font-semibold text-neutral-700'}>{vault.TITLE}</h1>
+				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-900'}>{vault.LOGO}</h1>
+				<h1 className={'font-mono text-3xl font-semibold text-neutral-900'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage />
 			<section aria-label={'DETAILS'}>
-				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
 					<div>
 						<p className={'inline'}>{'Vault: '}</p>
 						<a
@@ -196,7 +196,7 @@ function	Index() {
 						<p className={'inline'}>{`$${vaultData.totalAUM === 'NaN' ? '-' : formatAmount(vaultData?.totalAUM || 0, 2)}`}</p>
 					</div>
 				</div>
-				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
 						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
@@ -209,8 +209,8 @@ function	Index() {
 			</section>
 
 			<section aria-label={'WALLET'} className={'mt-8'}>
-				<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'Wallet'}</h1>
-				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
+				<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'Wallet'}</h1>
+				<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
 					<div>
 						<p className={'inline'}>{'Your Account: '}</p>
 						<p className={'inline font-bold'}>{ens || `${truncateHex(address, 5)}`}</p>
@@ -235,22 +235,22 @@ function	Index() {
 			</section>
 			<section aria-label={'ACTIONS'} className={'my-4'}>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-					<label className={'mb-1.5 font-mono text-sm font-semibold text-neutral-700'}>{'Amount'}</label>
+					<label className={'mb-1.5 font-mono text-sm font-semibold text-neutral-900'}>{'Amount'}</label>
 					<div className={'flex flex-row items-center'}>
 						<input
-							className={'border-neutral-400 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
+							className={'border-neutral-400 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-700'}
 							style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 							type={'number'}
 							min={'0'}
 							value={amount}
 							onChange={(e) => set_amount(e.target.value)} />
-						<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-400 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
+						<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-400 px-2 py-1.5 font-mono text-xs text-neutral-500'} style={{height: '33px'}}>
 							{vault.WANT_SYMBOL}
 						</div>
 					</div>
 				</div>
 				<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-					<p className={'font-mono text-sm font-medium text-neutral-500'}>{'Deposit closed.'}</p>
+					<p className={'font-mono text-sm font-medium text-neutral-700'}>{'Deposit closed.'}</p>
 				</div>
 				<div className={'mt-10'}>
 					<button

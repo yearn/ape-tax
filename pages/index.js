@@ -178,7 +178,7 @@ function	Index() {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'font-mono text-sm font-semibold text-neutral-900'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
@@ -187,10 +187,10 @@ function	Index() {
 		<main className={'max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-700'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-700'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
@@ -201,36 +201,36 @@ function	Index() {
 			<section aria-label={'TVL & new Vault'} className={'my-8 grid grid-cols-2'}>
 				<div>
 					<div>
-						<span className={'font-mono text-base font-semibold text-neutral-700'}>
+						<span className={'font-mono text-base font-semibold text-neutral-900'}>
 							{`${chains[chainID]?.displayName || 'Chain'} TVL:`}
 						</span>
-						<span className={'font-mono text-base font-normal text-neutral-700'}>
+						<span className={'font-mono text-base font-normal text-neutral-900'}>
 							{` $${formatAmount(tvl?.tvl || 0, 2)}`}
 						</span>
 					</div>
 
 					<div className={'text-xs opacity-60'}>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-mono font-semibold text-neutral-900'}>
 								{'Endorsed:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-900'}>
 								{` $${formatAmount(tvl?.tvlEndorsed || 0, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-mono font-semibold text-neutral-900'}>
 								{'Experimental:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-900'}>
 								{` $${formatAmount(tvl?.tvlExperimental || 0, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-mono font-semibold text-neutral-900'}>
 								{'Deprecated:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-900'}>
 								{` $${formatAmount(tvl?.tvlDeprecated || 0, 2)}`}
 							</span>
 						</div>
@@ -238,7 +238,7 @@ function	Index() {
 				</div>
 				<div className={'flex items-center'}>
 					<Link href={'/newVault'}>
-						<span className={'cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0'}>
+						<span className={'cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-900 transition-colors hover:bg-neutral-0'}>
 							{'🏦 Deploy your own vault'}
 						</span>
 					</Link>
@@ -247,7 +247,7 @@ function	Index() {
 
 			<div className={'grid max-w-5xl grid-cols-2 gap-2'}>
 				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🚀 Experimental'}</h2>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -260,7 +260,7 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 											<Tag status={vault.VAULT_STATUS} />
 										</span>
@@ -272,7 +272,7 @@ function	Index() {
 				</div>
 
 				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🧠 Weird'}</h2>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault) => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -285,7 +285,7 @@ function	Index() {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
@@ -295,7 +295,7 @@ function	Index() {
 						))}
 					</ul>
 
-					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-700'}>{'🦍 Community'}</h2>
+					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-900'}>{'🦍 Community'}</h2>
 					<ul>
 						{(communityVaults || [])?.map((vault) => (
 							<li key={vault.VAULT_ADDR} className={'cursor-pointer'}>
@@ -304,7 +304,7 @@ function	Index() {
 										<span className={'flex flex-row items-center'}>
 											{'🦍🦍'}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.SYMBOL}
 										</span>
 									</div>

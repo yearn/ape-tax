@@ -73,7 +73,7 @@ function Wrapper({vault, slug, prices}) {
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
 					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
+					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-900'}>{'Not connected'}</p>
 					<button
 						onClick={openModalLogin}
 						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
@@ -104,7 +104,7 @@ function Wrapper({vault, slug, prices}) {
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
 					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
+					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-900'}>{'Wrong Chain'}</p>
 					<button
 						onClick={() => onSwitchChain(currentVault.CHAIN_ID)}
 						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>

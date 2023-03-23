@@ -180,11 +180,11 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
-			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'Strategies'}</h1>
+			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'Strategies'}</h1>
 			{
 				Object.values(strategiesData).map((strategy, index) => (
 
-					<div key={index} className={'mb-4 font-mono text-sm text-neutral-500'}>
+					<div key={index} className={'mb-4 font-mono text-sm text-neutral-700'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>

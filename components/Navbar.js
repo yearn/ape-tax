@@ -58,7 +58,7 @@ function	Navbar({router}) {
 			return (
 				<button
 					onClick={openLoginModal}
-					className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-500'}>
+					className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
 					<span className={'hidden md:block'}>{'Connect wallet'}</span>
 					<span className={'block md:hidden'}>{'+'}</span>
 				</button>
@@ -68,7 +68,7 @@ function	Navbar({router}) {
 			<p
 				onClick={onDesactivate}
 				suppressHydrationWarning
-				className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-500'}>
+				className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
 				<svg
 					className={'mr-0 md:mr-2'}
 					width={'16'}
@@ -88,7 +88,7 @@ function	Navbar({router}) {
 				<div>
 					{router.route !== '/' ? (
 						<Link href={'/'}>
-							<p className={'dashed-underline-gray cursor-pointer font-mono text-xs font-semibold text-neutral-500 transition-all'}>
+							<p className={'dashed-underline-gray cursor-pointer font-mono text-xs font-semibold text-neutral-700 transition-all'}>
 								{'<< Back home'}
 							</p>
 						</Link>
@@ -98,7 +98,7 @@ function	Navbar({router}) {
 					{router.route === '/' ? 
 						<select
 							value={chainID}
-							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-500 md:flex'}
+							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-700 md:flex'}
 							onChange={e => onSwitchChain(e.target.value)}>
 							{Object.values(chains).map((chain, index) => (
 								<option key={index} value={chain.chainID}>{chain.name}</option>
