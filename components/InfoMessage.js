@@ -3,7 +3,7 @@ import	React	from	'react';
 function	InfoMessage({status}) {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
-			<div className={'my-4 max-w-5xl bg-accent-500 p-4 font-mono text-sm font-normal text-white'}>
+			<div className={'my-4 max-w-5xl bg-yearn-blue p-4 font-mono text-sm font-normal text-white'}>
 				{'🚀 '}<strong>{'YEARN WEBSITE'}</strong> {"this vault is in Yearn Finance website. You don't need to move your funds."}
 			</div>
 		);
