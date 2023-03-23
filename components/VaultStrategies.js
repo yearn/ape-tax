@@ -104,7 +104,7 @@ function	Strategies({vault, decimals, chainID, onUpdateVaultData}) {
 			}
 			set_nonce(n => n + 1);
 		}
-	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, provider]);
+	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL, provider]);
 
 	useEffect(() => {
 		if (!vault || !isActive || !provider || !address) {

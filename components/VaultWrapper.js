@@ -10,6 +10,7 @@ import ERC20ABI from 'utils/ABI/erc20.abi.json';
 import LENS_ABI from 'utils/ABI/lens.abi.json';
 import YVAULTABI from 'utils/ABI/yVault.abi.json';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
+import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 const		defaultVaultData = {
@@ -36,6 +37,7 @@ const		defaultVaultData = {
 
 
 function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) {
+	const	{safeChainID} = useChainID();
 	const	{networks} = useSettings();
 	const	[vaultData, set_vaultData] = useState(defaultVaultData);
 	const	prepareVaultData = useCallback(async () => {
@@ -46,24 +48,9 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
 			return;
 		}
-		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 10 && network.chainId !== 1337) {
-			providerToUse = getProvider(10);
-		}
-		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
-			providerToUse = getProvider(250);
-		}
-		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
-			providerToUse = getProvider(4);
-		}
-		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
-			providerToUse = getProvider(137);
-		}
-		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
-			providerToUse = getProvider(42161);
-		}
-		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
-			providerToUse = getProvider(100);
+		let		providerToUse = provider || getProvider(safeChainID);
+		if (chainID === 1337) {
+			providerToUse = provider;
 		}
 
 		const	vaultContract = new ethers.Contract(
@@ -81,7 +68,6 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 			providerToUse
 		);
 		const	ethcallProvider = await newEthCallProvider(providerToUse);
-
 		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
 		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI);
 		const	callResult = await ethcallProvider.all([
@@ -125,7 +111,7 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 		}
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vault, provider, address, chainID]);
+	}, [vault, provider, address, chainID, safeChainID]);
 
 	useEffect(() => {
 		prepareVaultData();
@@ -134,23 +120,24 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 	/**************************************************************************
 	** If we had some issues getting the prices ... Let's try again
 	**************************************************************************/
+	const	fetchPrice = useCallback(async () => {
+		const	currentProvider = provider || getProvider(vault.CHAIN_ID || 1337);
+		const	ethcallProvider = await newEthCallProvider(currentProvider);
+		const	lensPriceContract = new Contract(networks[safeChainID].lensOracleAddress, LENS_ABI);
+		const	[price] = await ethcallProvider.tryAll([lensPriceContract.getPriceUsdcRecommended(vault.WANT_ADDR)]);
+		const	normalizedPrice = Number(ethers.utils.formatUnits(price, 6));
+		set_vaultData(v => ({
+			...v,
+			wantPrice: normalizedPrice,
+			wantPriceError: false,
+			balanceOfValue: (v.balanceOf * v.pricePerShare * normalizedPrice).toFixed(2),
+			totalAUM: (v.totalAssets * normalizedPrice).toFixed(2)
+		}));
+	}, [safeChainID, getProvider, networks, provider, vault.CHAIN_ID, vault.WANT_ADDR]);
+
 	useEffect(() => {
 		if (vault?.PRICE_SOURCE?.startsWith('Lens')) {
-			const	currentProvider = provider || getProvider(vault.CHAIN_ID || 1337);
-			newEthCallProvider(currentProvider).then((ethcallProvider) => {
-				const	lensPriceContract = new Contract(networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1].lensAddress, LENS_ABI);
-				ethcallProvider.tryAll([lensPriceContract.getPriceUsdcRecommended(vault.WANT_ADDR)]).then(([price]) => {
-					const normalizedPrice = Number(ethers.utils.formatUnits(price, 6));
-					set_vaultData(v => ({
-						...v,
-						wantPrice: normalizedPrice,
-						wantPriceError: false,
-						balanceOfValue: (v.balanceOf * v.pricePerShare * normalizedPrice).toFixed(2),
-						totalAUM: (v.totalAssets * normalizedPrice).toFixed(2)
-					}));
-				});
-			});
-
+			fetchPrice();
 		} else {
 			const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 			set_vaultData(v => ({
@@ -161,7 +148,7 @@ function	VaultWrapper({vault, provider, getProvider, address, chainID, prices}) 
 				totalAUM: (v.totalAssets * price).toFixed(2)
 			}));
 		}
-	}, [chainID, networks, prices, provider, vault]);
+	}, [prices, vault, fetchPrice]);
 
 	return (
 		<div className={'mt-8 text-neutral-700'}>
