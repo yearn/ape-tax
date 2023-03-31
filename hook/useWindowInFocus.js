@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday September 29th 2021
-**	@Filename:				useWindowInFocus.js
-******************************************************************************/
-
 import React from 'react';
 
 const useWindowInFocus = () => {

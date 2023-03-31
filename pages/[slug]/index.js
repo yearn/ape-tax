@@ -1,15 +1,16 @@
-import	React, {useCallback}				from	'react';
-import	{NextSeo}							from	'next-seo';
-import	{useWeb3}							from	'@yearn-finance/web-lib/contexts';
-import	{useClientEffect}					from	'@yearn-finance/web-lib/hooks';
-import	{toAddress, providers}				from	'@yearn-finance/web-lib/utils';
-import	VaultDetails						from	'components/VaultWrapper';
-import	useFactory							from	'contexts/useFactory';
-import	useWindowInFocus					from	'hook/useWindowInFocus';
-import	vaults								from	'utils/vaults.json';
-import	chains								from	'utils/chains.json';
+import React, {useCallback} from 'react';
+import {NextSeo} from 'next-seo';
+import VaultDetails from 'components/VaultWrapper';
+import useFactory from 'contexts/useFactory';
+import useWindowInFocus from 'hook/useWindowInFocus';
+import chains from 'utils/chains.json';
+import vaults from 'utils/vaults.json';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
-function	Wrapper({vault, slug, prices}) {
+function Wrapper({vault, slug, prices}) {
 	const	{provider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = React.useState(vault);
@@ -66,16 +67,16 @@ function	Wrapper({vault, slug, prices}) {
 								url: `https://og-image-tbouder.vercel.app/${currentVault.LOGO}.jpeg`,
 								width: 1200,
 								height: 1200,
-								alt: 'Apes',
+								alt: 'Apes'
 							}
 						]
 					}} />
-				<div className={'flex flex-col justify-center items-center mt-8'}>
-					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'text-4xl font-mono font-medium text-neutral-700 leading-11'}>{'Not connected'}</p>
+				<div className={'mt-8 flex flex-col items-center justify-center'}>
+					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌🔌'}</p>
+					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-900'}>{'Not connected'}</p>
 					<button
 						onClick={openModalLogin}
-						className={'bg-neutral-50 hover:bg-neutral-100 transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔌 Connect wallet'}
 					</button>
 				</div>
@@ -97,16 +98,16 @@ function	Wrapper({vault, slug, prices}) {
 								url: `https://og.major.farm/${currentVault.LOGO}.jpeg`,
 								width: 800,
 								height: 600,
-								alt: 'Apes',
+								alt: 'Apes'
 							}
 						]
 					}} />
-				<div className={'flex flex-col justify-center items-center mt-8'}>
-					<p className={'text-4xl font-mono font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'text-4xl font-mono font-medium text-neutral-700 leading-11'}>{'Wrong Chain'}</p>
+				<div className={'mt-8 flex flex-col items-center justify-center'}>
+					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌⛓'}</p>
+					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-900'}>{'Wrong Chain'}</p>
 					<button
 						onClick={() => onSwitchChain(currentVault.CHAIN_ID)}
-						className={'bg-neutral-50 hover:bg-neutral-100 transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-medium mt-8'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔀 Change network'}
 					</button>
 				</div>
@@ -127,14 +128,14 @@ function	Wrapper({vault, slug, prices}) {
 							url: `https://og-image-tbouder.vercel.app/${currentVault.LOGO}.jpeg`,
 							width: 1200,
 							height: 1200,
-							alt: 'Apes',
+							alt: 'Apes'
 						}
 					]
 				}} />
 			<VaultDetails
 				vault={currentVault}
 				provider={provider}
-				getProvider={providers.getProvider}
+				getProvider={getProvider}
 				address={address}
 				ens={ens}
 				chainID={chainID}

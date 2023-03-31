@@ -1,20 +1,14 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				_app.js
-******************************************************************************/
-
-import	React							from	'react';
-import	{Toaster}						from	'react-hot-toast';
-import	useSWR							from	'swr';
-import	{WithYearn, useUI}				from	'@yearn-finance/web-lib/contexts';
-import	{FactoryContextApp}				from	'contexts/useFactory';
-import	{BalancerGaugeContextApp}		from	'contexts/useBalancerGauges';
-import	Navbar							from	'components/Navbar';
-import	Meta							from	'components/Meta';
-import	useSecret						from	'hook/useSecret';
-import	vaults							from	'utils/vaults.json';
+import React from 'react';
+import {Toaster} from 'react-hot-toast';
+import Meta from 'components/Meta';
+import Navbar from 'components/Navbar';
+import {BalancerGaugeContextApp} from 'contexts/useBalancerGauges';
+import {FactoryContextApp} from 'contexts/useFactory';
+import useSecret from 'hook/useSecret';
+import vaults from 'utils/vaults.json';
+import useSWR from 'swr';
+import {useUI} from '@yearn-finance/web-lib/contexts/useUI';
+import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 
 import	'style/Default.css';
 import	'tailwindcss/tailwind.css';
@@ -36,8 +30,11 @@ function	AppWrapper(props) {
 	return (
 		<>
 			<Meta />
-			<main id={'app'} className={'p-4 relative'} style={{minHeight: '100vh'}}>
-				<div className={'z-30 pointer-events-auto absolute top-0 left-0 right-0 px-4'}>
+			<main
+				id={'app'}
+				className={'relative p-4'}
+				style={{minHeight: '100vh'}}>
+				<div className={'pointer-events-auto absolute inset-x-0 top-0 z-30 px-4'}>
 					<Navbar router={router} />
 				</div>
 				<div className={'mb-8'}>
@@ -48,8 +45,12 @@ function	AppWrapper(props) {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute bottom-3 font-mono text-xxs left-0 right-0 flex justify-center items-center text-neutral-500'}>
-					<a href={'https://twitter.com/ape_tax'} target={'_blank'} rel={'noreferrer'} className={'dashed-underline-gray cursor-pointer'}>
+				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-700'}>
+					<a
+						href={'https://twitter.com/ape_tax'}
+						target={'_blank'}
+						rel={'noreferrer'}
+						className={'dashed-underline-gray cursor-pointer'}>
 						{'Made with 💙 by the 🦍 community'}
 					</a>
 					<p className={'mx-2'}>
@@ -60,7 +61,7 @@ function	AppWrapper(props) {
 					</p>
 				</div>
 				{hasSecretCode ? <div className={'absolute inset-0 z-50 bg-cover'} style={{backgroundImage: 'url("/splash_apetax.png")'}} /> : null}
-				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-neutral-500 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0 noBr noShadow toaster'}} />
+				<Toaster position={'top-center'} toastOptions={{className: 'leading-4 text-xs text-neutral-700 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0 noBr noShadow toaster'}} />
 			</main>
 		</>
 	);
@@ -70,12 +71,13 @@ function	MyApp(props) {
 	const	{Component, pageProps} = props;
 	
 	return (
-		<WithYearn options={{
-			ui: {
-				shouldUseThemes: true,
-				shouldUseDefaultToaster: false
-			}
-		}}>
+		<WithYearn
+			options={{
+				ui: {
+					shouldUseThemes: true,
+					shouldUseDefaultToaster: false
+				}
+			}}>
 			<BalancerGaugeContextApp>
 				<FactoryContextApp>
 					<AppWrapper

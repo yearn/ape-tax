@@ -1,16 +1,4 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				next.config.js
-******************************************************************************/
-
-const Dotenv = require('dotenv-webpack');
-
 module.exports = ({
-	plugins: [
-		new Dotenv()
-	],
 	env: {
 		/* 🔵 - Yearn Finance **************************************************
 		** Stuff used for the SEO or some related elements, like the title, the
@@ -53,11 +41,13 @@ module.exports = ({
 		**********************************************************************/
 		WEB_SOCKET_URL: {
 			1: process.env.WS_URL_MAINNET,
+			10: process.env.WS_URL_OPTIMISM,
 			250: process.env.WS_URL_FANTOM,
 			42161: process.env.WS_URL_ARBITRUM
 		},
 		JSON_RPC_URL: {
 			1: process.env.RPC_URL_MAINNET,
+			10: process.env.RPC_URL_OPTIMISM,
 			250: process.env.RPC_URL_FANTOM,
 			42161: process.env.RPC_URL_ARBITRUM
 		},
@@ -68,11 +58,12 @@ module.exports = ({
 		FTMSCAN_API: process.env.FTMSCAN_API,
 		ETHERSCAN_API: process.env.ETHERSCAN_API,
 		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
+		OPTISCAN_API: process.env.OPTISCAN_API,
 		BSCSCAN_API: process.env.BSCSCAN_API,
 		MORALIS_ARBITRUM_KEY: process.env.MORALIS_ARBITRUM_KEY,
 
 		AURA_BOOSTER_ADDRESS: '0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10',
 		YEARN_BALANCER_FACTORY_ADDRESS: '0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709',
-		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D',
+		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D'
 	}
 });

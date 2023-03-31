@@ -1,12 +1,5 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				actions.js
-******************************************************************************/
-
-import	{ethers}			from	'ethers';
 import	toast				from	'react-hot-toast';
+import	{ethers}			from	'ethers';
 
 export async function	approveToken({provider, contractAddress, amount, from}, callback) {
 	const	_toast = toast.loading('Approving token...');

@@ -1,16 +1,9 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				Navbar.js
-******************************************************************************/
-
-import	React, {useState}		from	'react';
-import	Link					from	'next/link';
-import	{useClientEffect}		from	'@yearn-finance/web-lib/hooks';
-import	{useWeb3}				from	'@yearn-finance/web-lib/contexts';
-import	{truncateHex}			from	'@yearn-finance/web-lib/utils';
-import	chains					from	'utils/chains.json';
+import React, {useState} from 'react';
+import Link from 'next/link';
+import chains from 'utils/chains.json';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
+import {truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 function	Navbar({router}) {
 	const	{isActive, address, provider, ens, chainID, onDesactivate, openLoginModal} = useWeb3();
@@ -18,8 +11,9 @@ function	Navbar({router}) {
 
 	useClientEffect(() => {
 		const	timeout = setTimeout(() => {
-			if (initialPopup)
+			if (initialPopup) {
 				return;
+			}
 
 			if (!address) {
 				openLoginModal();
@@ -64,7 +58,7 @@ function	Navbar({router}) {
 			return (
 				<button
 					onClick={openLoginModal}
-					className={'inline-flex px-3 py-2 items-center leading-4 text-xs cursor-pointer whitespace-nowrap text-neutral-500 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0'}>
+					className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
 					<span className={'hidden md:block'}>{'Connect wallet'}</span>
 					<span className={'block md:hidden'}>{'+'}</span>
 				</button>
@@ -74,8 +68,14 @@ function	Navbar({router}) {
 			<p
 				onClick={onDesactivate}
 				suppressHydrationWarning
-				className={'inline-flex px-3 py-2 items-center leading-4 text-xs cursor-pointer whitespace-nowrap text-neutral-500 font-semibold border border-solid border-neutral-400 font-mono bg-neutral-0'}>
-				<svg className={'mr-0 md:mr-2'} width={'16'} height={'16'} viewBox={'0 0 16 16'} fill={'none'} xmlns={'http://www.w3.org/2000/svg'}>
+				className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
+				<svg
+					className={'mr-0 md:mr-2'}
+					width={'16'}
+					height={'16'}
+					viewBox={'0 0 16 16'}
+					fill={'none'}
+					xmlns={'http://www.w3.org/2000/svg'}>
 					<path d={'M12.6667 0H3.33333C1.46667 0 0 1.46667 0 3.33333V12.6667C0 14.5333 1.46667 16 3.33333 16H12.6667C14.5333 16 16 14.5333 16 12.6667V3.33333C16 1.46667 14.5333 0 12.6667 0ZM4.66667 5C5.2 5 5.66667 5.46667 5.66667 6C5.66667 6.53333 5.2 7 4.66667 7C4.13333 7 3.66667 6.53333 3.66667 6C3.66667 5.46667 4.13333 5 4.66667 5ZM12.0667 10.4C10.9333 11.4667 9.46667 12.0667 8 12.0667C6.53333 12.0667 5 11.4667 3.93333 10.4C3.8 10.2667 3.73333 10.1333 3.73333 9.93333C3.73333 9.53333 4 9.26667 4.4 9.26667C4.6 9.26667 4.73333 9.33333 4.86667 9.46667C5.73333 10.3333 6.86667 10.8 8 10.8C9.13333 10.8 10.2667 10.3333 11.1333 9.46667C11.2667 9.33333 11.4 9.26667 11.6 9.26667C12 9.26667 12.2667 9.53333 12.2667 9.93333C12.2667 10.1333 12.2 10.2667 12.0667 10.4ZM11.3333 7C10.8 7 10.3333 6.53333 10.3333 6C10.3333 5.46667 10.8 5 11.3333 5C11.8667 5 12.3333 5.46667 12.3333 6C12.3333 6.53333 11.8667 7 11.3333 7Z'} fill={stringToColour(ens || `${truncateHex(address, 5)}`)}/>
 				</svg>
 				<span className={'hidden md:block'}>{ens || `${truncateHex(address, 5)}`}</span>
@@ -83,20 +83,22 @@ function	Navbar({router}) {
 		);
 	}
 	return (
-		<nav className={'w-full h-12 flex flex-row justify-center'}>
-			<div className={'items-center justify-between flex flex-row w-full'}>
+		<nav className={'flex h-12 w-full flex-row justify-center'}>
+			<div className={'flex w-full flex-row items-center justify-between'}>
 				<div>
-					{router.route !== '/' ? <Link href={'/'}>
-						<p className={'font-mono text-xs font-semibold text-neutral-500 dashed-underline-gray cursor-pointer transition-all'}>
-							{'<< Back home'}
-						</p>
-					</Link> : null}
+					{router.route !== '/' ? (
+						<Link href={'/'}>
+							<p className={'dashed-underline-gray cursor-pointer font-mono text-xs font-semibold text-neutral-700 transition-all'}>
+								{'<< Back home'}
+							</p>
+						</Link>
+					) : null}
 				</div>
-				<div className={'items-center justify-end flex-row flex'}>
+				<div className={'flex flex-row items-center justify-end'}>
 					{router.route === '/' ? 
 						<select
 							value={chainID}
-							className={'m-0 mr-2 px-3 py-2 items-center leading-4 cursor-pointer whitespace-nowrap border border-solid border-neutral-400 text-xs font-mono bg-neutral-0 font-semibold text-neutral-500 pr-7 hidden md:flex'}
+							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-400 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-700 md:flex'}
 							onChange={e => onSwitchChain(e.target.value)}>
 							{Object.values(chains).map((chain, index) => (
 								<option key={index} value={chain.chainID}>{chain.name}</option>

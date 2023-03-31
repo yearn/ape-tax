@@ -1,14 +1,16 @@
-import	React, {Fragment, useState}							from	'react';
-import	{ethers}											from	'ethers';
-import	{Contract}											from	'ethcall';
-import	{Combobox, Transition}								from	'@headlessui/react';
-import	{useWeb3}											from	'@yearn-finance/web-lib/contexts';
-import	{toAddress, performBatchedUpdates, providers,
-	isZeroAddress, defaultTxStatus}							from	'@yearn-finance/web-lib/utils';
-import	{AddressWithActions}								from	'@yearn-finance/web-lib';
-import	useFactory											from	'contexts/useFactory';
-import	useBalancerGauge									from	'contexts/useBalancerGauges';
-import	{createNewVaultsAndStrategies}						from	'utils/actions';
+import React, {Fragment, useState} from 'react';
+import {AddressWithActions} from 'components/AddressWithAction';
+import useBalancerGauge from 'contexts/useBalancerGauges';
+import useFactory from 'contexts/useFactory';
+import {Contract} from 'ethcall';
+import {ethers} from 'ethers';
+import {createNewVaultsAndStrategies} from 'utils/actions';
+import {Combobox, Transition} from '@headlessui/react';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
+import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
+import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
+import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 function ComboBox({selectedGauge, set_selectedGauge}) {
 	const	{balancerGauges} = useBalancerGauge();
@@ -31,12 +33,23 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 			<div className={'relative'}>
 				<div className={'w-full'}>
 					<Combobox.Input
-						className={'py-1.5 text-neutral-500 border-neutral-400 font-mono bg-opacity-0 w-full px-2 bg-white/0 active:ring-0 focus:ring-0 focus:border-neutral-700'}
+						className={'w-full border-neutral-400 bg-white/0 py-1.5 px-2 font-mono text-neutral-700 focus:border-neutral-700 focus:ring-0 active:ring-0'}
 						displayValue={(gauge) => gauge?.address}
 						onChange={(event) => setQuery(event.target.value)}
 					/>
 					<Combobox.Button className={'absolute inset-y-0 right-0 flex items-center pr-2'}>
-						<svg xmlns={'http://www.w3.org/2000/svg'} viewBox={'0 0 20 20'} fill={'currentColor'} aria-hidden={'true'} className={'h-5 w-5 text-neutral-500'}><path fillRule={'evenodd'} d={'M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z'} clipRule={'evenodd'}></path></svg>
+						<svg
+							xmlns={'http://www.w3.org/2000/svg'}
+							viewBox={'0 0 20 20'}
+							fill={'currentColor'}
+							aria-hidden={'true'}
+							className={'h-5 w-5 text-neutral-700'}>
+							<path
+								fillRule={'evenodd'}
+								d={'M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z'}
+								clipRule={'evenodd'}>
+							</path>
+						</svg>
 					</Combobox.Button>
 				</div>
 				<Transition
@@ -46,22 +59,22 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 					leaveTo={'opacity-0'}
 					afterLeave={() => setQuery('')}
 				>
-					<Combobox.Options className={'absolute mt-1 max-h-60 w-full overflow-auto bg-neutral-0 py-1 text-base focus:outline-none border border-neutral-400'}>
+					<Combobox.Options className={'absolute mt-1 max-h-60 w-full overflow-auto border border-neutral-400 bg-neutral-0 py-1 text-base focus:outline-none'}>
 						{!filteredGauges || (filteredGauges || [])?.length === 0 && query !== '' ? (
-							<div className={'relative cursor-default select-none py-2 px-4 text-neutral-500'}>
+							<div className={'relative cursor-default select-none py-2 px-4 text-neutral-700'}>
 								{'Nothing found.'}
 							</div>
 						) : (
 							(filteredGauges || []).map((gauge) => (
 								<Combobox.Option
 									key={gauge.address}
-									className={({active}) => `relative cursor-pointer select-none py-2 px-4 ${active ? 'bg-neutral-100 text-neutral-700' : 'text-neutral-500'}`}
+									className={({active}) => `relative cursor-pointer select-none py-2 px-4 ${active ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-700'}`}
 									value={gauge}>
 									{({selected}) => (
 										<>
 											<div className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
-												<p className={'text-base text-neutral-700 tabular-nums'}>{gauge.address}</p>
-												<p className={'text-sm text-neutral-500'}>{gauge.name}</p>
+												<p className={'text-base tabular-nums text-neutral-900'}>{gauge.address}</p>
+												<p className={'text-sm text-neutral-700'}>{gauge.name}</p>
 											</div>
 										</>
 									)}
@@ -91,9 +104,9 @@ function	Index() {
 	** will be thrown indicating that the vault already exists.
 	**************************************************************************/
 	const	checkGauge = React.useCallback(async () => {
-		const	ethcallProvider = await providers.newEthCallProvider(provider);
-		const	balancerGlobalContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, [{'stateMutability':'view','type':'function','name':'alreadyExistsFromGauge','inputs':[{'name':'address','type':'address'}],'outputs':[{'name':'','type':'address'}]}]);
-		const	gaugeContract = new Contract(selectedGauge?.address, [{'stateMutability':'view','type':'function','name':'name','inputs':[],'outputs':[{'name':'','type':'string'}]},{'stateMutability':'view','type':'function','name':'symbol','inputs':[],'outputs':[{'name':'','type':'string'}]}]);
+		const	ethcallProvider = await newEthCallProvider(provider);
+		const	balancerGlobalContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, [{'stateMutability':'view', 'type':'function', 'name':'alreadyExistsFromGauge', 'inputs':[{'name':'address', 'type':'address'}], 'outputs':[{'name':'', 'type':'address'}]}]);
+		const	gaugeContract = new Contract(selectedGauge?.address, [{'stateMutability':'view', 'type':'function', 'name':'name', 'inputs':[], 'outputs':[{'name':'', 'type':'string'}]}, {'stateMutability':'view', 'type':'function', 'name':'symbol', 'inputs':[], 'outputs':[{'name':'', 'type':'string'}]}]);
 
 		const	callResult = await ethcallProvider.tryAll([
 			balancerGlobalContract.alreadyExistsFromGauge(selectedGauge?.address),
@@ -129,8 +142,9 @@ function	Index() {
 	** transaction to create a new vault for the given gauge address.
 	**************************************************************************/
 	async function	onCreateVault() {
-		if (txStatusCreateVault.pending)
+		if (txStatusCreateVault.pending) {
 			return;
+		}
 		set_txStatusCreateVault({...txStatusCreateVault, pending: true});
 		createNewVaultsAndStrategies({provider, gauge: selectedGauge.address}, ({error, data}) => {
 			if (error) {
@@ -155,72 +169,72 @@ function	Index() {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'text-sm font-mono font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'font-mono text-sm font-semibold text-neutral-900'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
 			</section>
 		);
 	}
 
 	return (
-		<main className={'max-w-5xl mt-8'}>
+		<main className={'mt-8 max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'text-3xl font-mono font-semibold text-neutral-700 leading-9 mb-6'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'text-xl font-mono font-semibold text-neutral-700 leading-9'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
-			<div className={'max-w-5xl p-4 my-4 font-mono text-sm font-normal text-[#485570] bg-yellow-900'}>
+			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 
-			<section aria-label={'New Vault'} className={'grid grid-cols-1 my-8'}>
-				<div className={'w-full border p-4 border-dashed border-neutral-500 mx-auto'}>
+			<section aria-label={'New Vault'} className={'my-8 grid grid-cols-1'}>
+				<div className={'mx-auto w-full border border-dashed border-neutral-500 p-4'}>
 					<div>
-						<p className={'text-3xl font-semibold text-neutral-700 font-mono'}>
+						<p className={'font-mono text-3xl font-semibold text-neutral-900'}>
 							{'Add New Vault'}
 						</p>
 					</div>
 
-					<div className={'text-xs my-6'}>
-						<div className={'text-neutral-700 font-mono text-base space-y-4'}>
+					<div className={'my-6 text-xs'}>
+						<div className={'space-y-4 font-mono text-base text-neutral-900'}>
 							<p>{'Deploy a new vault and start autocompounding the yield from your Balancer deposits'}</p>
 							<p>{'Remember, this is an experimental experiment'}</p>
 						</div>
 					</div>
 
 					<div>
-						<div className={'flex flex-col space-y-2 mt-12 mb-6'}>
-							<label className={'text-neutral-700/60 text-xs font-semibold -mb-1'}>{'Gauge Address'}</label>
+						<div className={'mt-12 mb-6 flex flex-col space-y-2'}>
+							<label className={'-mb-1 text-xs font-semibold text-neutral-900/60'}>{'Gauge Address'}</label>
 							<ComboBox selectedGauge={selectedGauge} set_selectedGauge={set_selectedGauge} />
 						</div>
-						<div className={'flex flex-col space-y-3 mb-12'}>
+						<div className={'mb-12 flex flex-col space-y-3'}>
 							<div>
-								<label className={'text-neutral-700/60 text-xs font-semibold'}>{'Vault Name'}</label>
-								<p className={'text-neutral-500 font-mono'}>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Name'}</label>
+								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `Balancer ${gaugeInfo.symbol} Auto-Compounding yVault` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-neutral-700/60 text-xs font-semibold'}>{'Vault Symbol'}</label>
-								<p className={'text-neutral-500 font-mono'}>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Symbol'}</label>
+								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `yvBlp${gaugeInfo.symbol}` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-neutral-700/60 text-xs font-semibold'}>{'Vault Address'}</label>
+								<label className={'text-xs font-semibold text-neutral-900/60'}>{'Vault Address'}</label>
 								{gaugeInfo.deployed ? <AddressWithActions
 									explorer={'https://etherscan.io'}
-									className={'text-neutral-500 font-mono font-normal'}
+									className={'font-mono font-normal text-neutral-700'}
 									address={gaugeInfo.vaultAddress}
-									truncate={0} /> : <p className={'text-neutral-500 font-mono h-8'}>{'-'}</p>
+									truncate={0} /> : <p className={'h-8 font-mono text-neutral-700'}>{'-'}</p>
 								}
 							</div>
 						</div>
 						<button
 							onClick={onCreateVault}
 							disabled={!selectedGauge || isZeroAddress(selectedGauge.address) || error || txStatusCreateVault.pending}
-							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || error ? 'bg-neutral-50 opacity-30 cursor-not-allowed' : 'bg-neutral-50 hover:bg-neutral-100'} transition-colors font-mono border border-solid border-neutral-500 text-sm px-1.5 py-1.5 font-semibold mr-2 mb-2 text-neutral-900 w-full`}>
+							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || error ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mr-2 mb-2 w-full border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold text-neutral-900 transition-colors`}>
 							{error ? '❌ A vault already exists for this gauge' : '🤯 Create your own Vault'}
 						</button>
 					</div>

@@ -1,18 +1,12 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Sunday September 5th 2021
-**	@Filename:				vaults.js
-******************************************************************************/
-
-import	axios					from	'axios';
-import	{ethers}				from	'ethers';
-import	{Contract}				from	'ethcall';
-import	{providers, toAddress}	from	'@yearn-finance/web-lib/utils';
-import	vaults					from	'utils/vaults.json';
-import	YVAULT_ABI				from	'utils/ABI/yVault.abi';
-import	FACTORY_ABI				from	'utils/ABI/factory.abi';
-import	Web3Contract			from	'web3-eth-contract';
+import {Contract} from 'ethcall';
+import {ethers} from 'ethers';
+import FACTORY_ABI from 'utils/ABI/factory.abi';
+import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import vaults from 'utils/vaults.json';
+import Web3Contract from 'web3-eth-contract';
+import axios from 'axios';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 async function	fetchBlockTimestamp(timestamp, network = 1) {
 	if (network === 250) {
@@ -33,6 +27,14 @@ async function	fetchBlockTimestamp(timestamp, network = 1) {
 	}
 	if (network === 137) {
 		const	result = await performGet(`https://api.polygonscan.com/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.POLYGONSCAN_API}`);
+
+		if (result) {
+			return result.result;
+		}
+		return null;
+	}
+	if (network === 10) {
+		const	result = await performGet(`https://api-optimistic.etherscan.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.OPTISCAN_API}`);
 
 		if (result) {
 			return result.result;
@@ -78,27 +80,29 @@ export const	performGet = (url) => {
 	);
 };
 
-function getProvider(chain = 1) {
+function getLocalProvider(chain = 1) {
 	if (chain === 1) {
 		if (process.env.ALCHEMY_KEY) {
 			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		} else {
-			return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-		}
-	} else if (chain === 'polygon' || chain === 137) {
+		} 
+		return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
+		
+	} if (chain === 'polygon' || chain === 137) {
 		if (process.env.ALCHEMY_KEY_POLYGON) {
 			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
 		}
 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	} else if (chain === 250) {
+	} if (chain === 10) {
+		return new ethers.providers.JsonRpcProvider('https://1rpc.io/op');
+	} if (chain === 250) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	} else if (chain === 56) {
+	} if (chain === 56) {
 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org');
-	} else if (chain === 42161) {
+	} if (chain === 42161) {
 		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	} else if (chain === 1337) {
+	} if (chain === 1337) {
 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	} else if (chain === 100) {
+	} if (chain === 100) {
 		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
 	}
 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
@@ -106,17 +110,19 @@ function getProvider(chain = 1) {
 function getWeb3Provider(chain = 1) {
 	if (chain === 1) {
 		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
-	} else if (chain === 'polygon' || chain === 137) {
+	} if (chain === 'polygon' || chain === 137) {
 		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
-	} else if (chain === 250) {
+	} if (chain === 10) {
+		return ('https://1rpc.io/op');
+	} if (chain === 250) {
 		return ('https://rpc.ftm.tools');
-	} else if (chain === 56) {
+	} if (chain === 56) {
 		return ('https://bsc-dataseed1.defibit.io/');
-	} else if (chain === 42161) {
+	} if (chain === 42161) {
 		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	} else if (chain === 1337) {
+	} if (chain === 1337) {
 		return ('http://localhost:8545');
-	} else if (chain === 100) {
+	} if (chain === 100) {
 		return ('https://rpc.gnosischain.com/');
 	}
 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
@@ -137,9 +143,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 	} else if (activationTimestamp > oneMonthAgo) {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
 		Web3Contract.setProvider(getWeb3Provider(vault?.CHAIN_ID || 1));
-		const [_pastPricePerShareWeek] = await Promise.all([
-			new Web3Contract(YVAULT_ABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
-		]);
+		const [_pastPricePerShareWeek] = await Promise.all([new Web3Contract(YVAULT_ABI, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo)]);
 		const	pastPriceWeek = ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber());
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
@@ -175,8 +179,8 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}) {
 }
 
 async function getCommunityVaults() {
-	const	currentProvider = providers.getProvider(1 || 1337);
-	const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+	const	currentProvider = getLocalProvider(1 || 1337);
+	const	ethcallProvider = await newEthCallProvider(currentProvider);
 
 	const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
 	const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]);
@@ -222,18 +226,18 @@ async function getCommunityVaults() {
 }
 
 async function getSpecificAPY({network, address, rpc}) {
-	let		provider = getProvider(network);
+	let		provider = getLocalProvider(network);
 	if (rpc !== undefined) {
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
-	const	ethcallProvider = await providers.newEthCallProvider(provider);
+	const	ethcallProvider = await newEthCallProvider(provider);
 	const	vaultContractMultiCall = new Contract(address, YVAULT_ABI);
 	let		vaultToUse = Object.values(vaults).find((v) => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 
 	const	callResult = await ethcallProvider.tryAll([
 		vaultContractMultiCall.pricePerShare(),
 		vaultContractMultiCall.decimals(),
-		vaultContractMultiCall.activation(),
+		vaultContractMultiCall.activation()
 	]);
 	const	[pricePerShare, decimals, activation] = callResult;
 
@@ -246,7 +250,7 @@ async function getSpecificAPY({network, address, rpc}) {
 		vault: vaultToUse,
 		pricePerShare,
 		decimals,
-		activation,
+		activation
 	});
 }
 

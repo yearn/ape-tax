@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				useSecret.js
-******************************************************************************/
-
 import {useEffect, useState} from 'react';
 import {useInputEvent} from 'hook/useInputEvent';
 
@@ -14,7 +7,9 @@ const useSecretCode = (secretCode) => {
 	const key = useInputEvent();
 
 	useEffect(() => {
-		if (key == null) return;
+		if (key == null) {
+			return;
+		}
 		if (key !== secretCode[count]) {
 			setCount(0);
 			return;

@@ -1,9 +1,11 @@
-import	React, {useContext, createContext}				from	'react';
-import	{Contract}										from	'ethcall';
-import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
-import	{providers, performBatchedUpdates, toAddress}	from	'@yearn-finance/web-lib/utils';
-import	FACTORY_ABI										from	'utils/ABI/factory.abi';
-import	YVAULT_ABI										from	'utils/ABI/yVault.abi';
+import React, {createContext, useContext} from 'react';
+import {Contract} from 'ethcall';
+import FACTORY_ABI from 'utils/ABI/factory.abi';
+import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
+import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 /* 🔵 - Yearn Finance **********************************************************
 ** The Factory Context is used to retrieve the list of community vaults
@@ -26,8 +28,8 @@ export const FactoryContextApp = ({children}) => {
 			});
 			return;
 		}
-		const	currentProvider = provider || providers.getProvider(chainID || 1337);
-		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+		const	currentProvider = provider || getProvider(chainID || 1337);
+		const	ethcallProvider = await newEthCallProvider(currentProvider);
 
 		const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
 		const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]);

@@ -1,12 +1,13 @@
-import	React, {useContext, createContext}				from	'react';
-import	{Contract}										from	'ethcall';
-import	{request}										from	'graphql-request';
-import	{useWeb3}										from	'@yearn-finance/web-lib/contexts';
-import	{providers, performBatchedUpdates, toAddress,
-	isZeroAddress}										from	'@yearn-finance/web-lib/utils';
-import	FACTORY_ABI										from	'utils/ABI/factory.abi';
-import	YVAULT_ABI										from	'utils/ABI/yVault.abi';
-import	AURA_BOOSTER_ABI								from	'utils/ABI/auraBooster.abi';
+import React, {createContext, useContext} from 'react';
+import {Contract} from 'ethcall';
+import {request} from 'graphql-request';
+import AURA_BOOSTER_ABI from 'utils/ABI/auraBooster.abi';
+import FACTORY_ABI from 'utils/ABI/factory.abi';
+import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
+import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
+import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 /* 🔵 - Yearn Finance **********************************************************
 ** BalancerGauge is used to retrieve the list of gauges available through
@@ -47,8 +48,8 @@ export const BalancerGaugeContextApp = ({children}) => {
 		const	auraPoolsCall = [];
 
 		const	gaugeList = listOfGauges.gauges.filter(e => e.type.name === 'Ethereum');
-		const	currentProvider = provider || providers.getProvider(chainID || 1337);
-		const	ethcallProvider = await providers.newEthCallProvider(currentProvider);
+		const	currentProvider = provider || getProvider(chainID || 1337);
+		const	ethcallProvider = await newEthCallProvider(currentProvider);
 		const	balancerFactoryContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, FACTORY_ABI);
 		const	auraBoosterContract = new Contract(process.env.AURA_BOOSTER_ADDRESS, AURA_BOOSTER_ABI);
 
