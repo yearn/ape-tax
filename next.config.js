@@ -1,4 +1,18 @@
-module.exports = ({
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+const runtimeCaching = require('next-pwa/cache');
+const withTM = require('next-transpile-modules')(['@yearn-finance/web-lib'], {resolveSymlinks: false});
+const withPWA = require('next-pwa')({
+	dest: './public/',
+	register: true,
+	skipWaiting: true,
+	runtimeCaching,
+	buildExcludes: [/middleware-manifest.json$/]
+});
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+	enabled: process.env.ANALYZE === 'true'
+});
+
+module.exports = withTM(withBundleAnalyzer(withPWA({
 	env: {
 		/* 🔵 - Yearn Finance **************************************************
 		** Stuff used for the SEO or some related elements, like the title, the
@@ -16,25 +30,6 @@ module.exports = ({
 		WEBSITE_TITLE: 'ape.tax',
 		WEBSITE_DESCRIPTION: 'Experimental Experiments Registry',
 		PROJECT_GITHUB_URL: 'https://github.com/saltyfacu/ape-tax',
-
-		/* 🔵 - Yearn Finance **************************************************
-		** Some config used to control the behaviour of the web library. By
-		** default, all of theses are set to false.
-		** USE_WALLET: should we allow the user to connect a wallet via
-		**             metamask or wallet connect?
-		** USE_PRICES: should we fetch the prices for a list of tokens? If true
-		**             the CG_IDS array should be populated with the tokens
-		**             to fetch.
-		** USE_PRICE_TRI_CRYPTO: should we fetch the special Tri Crypto token
-		** 			   price? (require blockchain call)
-		** USE_NETWORKS: indicate if the app should be able to change networks
-		**********************************************************************/
-		USE_WALLET: true,
-		USE_PRICES: false,
-		USE_PRICE_TRI_CRYPTO: false,
-		USE_NETWORKS: true,
-		CG_IDS: [],
-		TOKENS: [],
 
 		/* 🔵 - Yearn Finance **************************************************
 		** Config over the RPC
@@ -66,4 +61,4 @@ module.exports = ({
 		YEARN_BALANCER_FACTORY_ADDRESS: '0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709',
 		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D'
 	}
-});
+})));
