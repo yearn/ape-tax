@@ -1152,4 +1152,16 @@
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
   }
+  "harmonicgains": {
+    "TITLE": "harmonicgains",
+    "LOGO": "🎶🔴",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x780210e8826064B94e71f5b7BBB73d92637c48d6",
+    "WANT_ADDR": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 10
+  }
 }
