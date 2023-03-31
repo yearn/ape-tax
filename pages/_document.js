@@ -18,7 +18,7 @@ class MyDocument extends Document {
 						crossOrigin={'true'} />
 					<link href={'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap'} rel={'stylesheet'} />
 				</Head>
-				<body className={'bg-neutral-200 transition-colors duration-150'} data-theme={'light'}>
+				<body className={'bg-neutral-0 transition-colors duration-150'} data-theme={'light'}>
 					<Main />
 					<NextScript />
 				</body>
