@@ -7,6 +7,9 @@ module.exports = {
 	content: [
 		'./app/**/*.{js,ts,jsx,tsx}',
 		'./pages/**/*.{js,ts,jsx,tsx}',
+		'./components/**/*.{js,ts,jsx,tsx}',
+		'./hooks/**/*.{js,ts,jsx,tsx}',
+		'./contexts/**/*.{js,ts,jsx,tsx}',
 		'./apps/**/*.{js,ts,jsx,tsx}',
 		join(__dirname, 'node_modules', '@yearn-finance', 'web-lib', 'components', '**', '*.{js,ts,jsx,tsx}'),
 		join(__dirname, 'node_modules', '@yearn-finance', 'web-lib', 'contexts', '**', '*.{js,ts,jsx,tsx}'),

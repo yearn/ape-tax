@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import useSWR from 'swr';
-import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
@@ -11,10 +10,9 @@ import type {ReactElement} from 'react';
 import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
-	const	{chainID} = useWeb3();
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 
-	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${chainID === 1337 ? chainID : vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true}) as {data: Maybe<TSpecificAPIResult>};
+	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true}) as {data: Maybe<TSpecificAPIResult>};
 
 	const	[vaultAPY, set_vaultAPY] = useState<Maybe<TSpecificAPIResult>>(null);
 
@@ -105,7 +103,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Price Per Share: '}</p>
 					<p className={'inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${vaultData.pricePerShare}`}
+							{`${vaultData.pricePerShare.normalized}`}
 						</Suspense>
 					</p>
 				</div>

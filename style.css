@@ -156,3 +156,11 @@
 	--elementWithActions-action-color-hover: hsl(var(--color-primary-600));
 	@apply flex flex-row items-center;
 }
+
+.yearn--toast-options {
+	@apply !w-screen text-sm text-neutral-700 !px-4 !rounded-none !shadow-none !py-2 !max-w-full;
+}
+
+.yearn--toast-button {
+	@apply text-xs px-3 py-1 text-[#0657F9] bg-white;
+}

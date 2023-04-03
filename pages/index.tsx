@@ -6,6 +6,7 @@ import GraphemeSplitter from 'grapheme-splitter';
 import vaults from 'utils/vaults.json';
 import useSWR from 'swr';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
@@ -102,14 +103,15 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 }
 
 function	Index(): ReactElement {
-	const	{provider, isActive, address, chainID} = useWeb3();
+	const	{provider, isActive, address} = useWeb3();
+	const	{safeChainID} = useChainID();
 	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState<TVault[]>([]);
 	const	[vaultsActiveWeird, set_vaultsActiveWeird] = useState<TVault[]>([]);
 	const	[vaultsInactive, set_vaultsInactive] = useState<TVault[]>([]);
 	const	[vaultsInactiveForUser, set_vaultsInactiveForUser] = useState<TVault[]>([]);
-	const	{data: tvl} = useSWR(`api/tvl?network=${chainID}`, baseFetcher) as {data: TTVL};
+	const	{data: tvl} = useSWR(`api/tvl?network=${safeChainID}`, baseFetcher) as {data: TTVL};
 
 	useEffect((): void => {
 		if (!isActive) {
@@ -120,7 +122,7 @@ function	Index(): ReactElement {
 		const	_vaultsInactive: TVault[] = [];
 
 		Object.entries((vaults as TDict<TVault>)).reverse().map(([key, vault]): void => {
-			if (vault.CHAIN_ID !== chainID && !(vault.CHAIN_ID === 1 && chainID === 1337)) {
+			if (vault.CHAIN_ID !== safeChainID) {
 				return;
 			}
 			const splitted = splitter.splitGraphemes(vault.LOGO);
@@ -164,7 +166,7 @@ function	Index(): ReactElement {
 		set_vaultsActiveWeird(_vaultsActiveWeird);
 		set_vaultsInactive(_vaultsInactive);
 		set_nonce((n): number => n + 1);
-	}, [chainID, isActive]);
+	}, [safeChainID, isActive]);
 
 	useEffect((): void => {
 		if (isActive) {
@@ -209,7 +211,7 @@ function	Index(): ReactElement {
 				<div>
 					<div>
 						<span className={'font-mono text-base font-semibold text-neutral-700'}>
-							{`${CHAINS[chainID]?.displayName || 'Chain'} TVL:`}
+							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}
@@ -269,8 +271,8 @@ function	Index(): ReactElement {
 										</span>
 										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.TITLE}
-											<Tag status={vault.VAULT_STATUS} />
 										</span>
+										<Tag status={vault.VAULT_STATUS} />
 									</div>
 								</Link>
 							</li>

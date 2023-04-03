@@ -2,9 +2,8 @@ import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import FACTORY_ABI from 'utils/ABI/factory.abi.json';
 import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
-import {fetchBlockTimestamp, getProvider, getProviderURI} from 'utils/utils';
+import {fetchBlockTimestamp, getProvider} from 'utils/utils';
 import vaults from 'utils/vaults.json';
-import {Contract as Web3Contract} from 'web3-eth-contract';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {getProvider as getLibProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
@@ -27,26 +26,29 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	const	oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const	currentPrice = Number(ethers.utils.formatUnits(pricePerShare, decimals.toNumber()));
 
+	const	currentProvider = getProvider(vault?.CHAIN_ID || 1);
+	const	ethcallProvider = await newEthCallProvider(currentProvider);
+	const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI as never);
+
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
 		_grossAPRMonth = '-';
 	} else if (activationTimestamp > oneMonthAgo) {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
-		Web3Contract.setProvider(getProviderURI(vault?.CHAIN_ID || 1));
-		const [_pastPricePerShareWeek] = await Promise.all([new Web3Contract(YVAULT_ABI as never, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo)]);
-
+		const	[_pastPricePerShareWeek] = await ethcallProvider.tryAll([contract.pricePerShare()], blockOneWeekAgo) as [string];
 		const	pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
+
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
 		_grossAPRMonth = '-';
 	} else {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
 		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault?.CHAIN_ID || 1) || 0);
-		Web3Contract.setProvider(getProviderURI(vault?.CHAIN_ID || 1));
-		const [_pastPricePerShareWeek, _pastPricePerShareMonth] = await Promise.all([
-			new Web3Contract(YVAULT_ABI as never, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneWeekAgo),
-			new Web3Contract(YVAULT_ABI as never, vault.VAULT_ADDR).methods.pricePerShare().call(undefined, blockOneMonthAgo)
-		]);
+		const [[_pastPricePerShareWeek], [_pastPricePerShareMonth]] = await Promise.all([
+			ethcallProvider.tryAll([contract.pricePerShare()], blockOneWeekAgo),
+			ethcallProvider.tryAll([contract.pricePerShare()], blockOneMonthAgo)
+		]) as [[string], [string]];
+
 		const	pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
 		const	pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber()));
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);

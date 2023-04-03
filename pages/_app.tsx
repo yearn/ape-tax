@@ -1,11 +1,3 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Wednesday August 11th 2021
-**	@Filename:				_app.js
-******************************************************************************/
-
-
 import React from 'react';
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';

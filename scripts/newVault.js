@@ -1,10 +1,3 @@
-/******************************************************************************
-**	@Author:				The Ape Community
-**	@Twitter:				@ape_tax
-**	@Date:					Saturday August 21st 2021
-**	@Filename:				newVault.js
-******************************************************************************/
-
 const	inquirer = require('inquirer');
 const	{ethers} = require('ethers');
 const	axios = require('axios');

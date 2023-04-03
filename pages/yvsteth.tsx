@@ -218,7 +218,7 @@ function	Index(): ReactElement | null {
 				<div className={'mb-4 font-mono text-sm font-medium text-neutral-500'}>
 					<div>
 						<p className={'inline'}>{'Price Per Share: '}</p>
-						<p className={'inline'}>{`${vaultData.pricePerShare}`}</p>
+						<p className={'inline'}>{`${vaultData.pricePerShare.normalized}`}</p>
 					</div>
 					<div>
 						<p className={'inline'}>{'Available limit: '}</p>
