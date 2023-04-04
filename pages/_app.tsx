@@ -52,7 +52,7 @@ function	MyApp(props: AppProps): ReactElement {
 	return (
 		<WithYearn
 			options={{
-				web3: {supportedChainID: [1, 10, 250, 42161, 1337]},
+				web3: {supportedChainID: [1, 10, 137, 250, 42161, 1337]},
 				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
 				ui: {shouldUseThemes: false}
 			}}>
