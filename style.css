@@ -164,3 +164,11 @@
 .yearn--toast-button {
 	@apply text-xs px-3 py-1 text-[#0657F9] bg-white;
 }
+
+.yearn--button {
+	@apply mb-2 mr-2 border border-solid border-neutral-500 h-8 px-2 py-0 font-mono text-sm font-semibold transition-colors hover:bg-neutral-100;
+
+	&[aria-busy="true"] svg {
+		@apply text-neutral-900;
+	}
+}

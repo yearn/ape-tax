@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
-import useSWR from 'swr';
-import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
+import {ethers} from 'ethers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
@@ -12,7 +11,8 @@ import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 
-	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true}) as {data: Maybe<TSpecificAPIResult>};
+	// const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true}) as {data: Maybe<TSpecificAPIResult>};
+	const vaultAPYSWR = null;
 
 	const	[vaultAPY, set_vaultAPY] = useState<Maybe<TSpecificAPIResult>>(null);
 
@@ -51,7 +51,11 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Deposit Limit: '}</p>
 					<p className={'inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${vaultData.depositLimit.raw.isZero() ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
+							{
+								vaultData.depositLimit.raw.isZero() ? '-' :
+									vaultData.depositLimit.raw.gte(ethers.constants.MaxUint256) ? `∞ ${vault.WANT_SYMBOL}` :
+										`${formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}}`
+							}
 						</Suspense>
 					</p>
 				</div>
@@ -111,7 +115,11 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Available limit: '}</p>
 					<p className={'inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${formatAmount(vaultData.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
+							{
+								vaultData.availableDepositLimit.raw.isZero() ? '0' :
+									vaultData.availableDepositLimit.raw.gte(ethers.constants.MaxUint256) ? `∞ ${vault.WANT_SYMBOL}` :
+										`${formatAmount(vaultData?.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}}`
+							}
 						</Suspense>
 					</p>
 				</div>
