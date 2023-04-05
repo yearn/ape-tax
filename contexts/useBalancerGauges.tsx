@@ -65,13 +65,13 @@ export const BalancerGaugeContextApp = ({children}: {children: ReactElement}): R
 			}}`
 		) as TListOfGauges;
 
-		const	gaugeListDetailsCalls = [];
-		const	auraPoolsCall = [];
-		const	gaugeList = listOfGauges.gauges.filter((e): boolean => e.type.name === 'Ethereum');
 		let		currentProvider = provider || getProvider(safeChainID);
 		if (currentProvider?.network?.chainId !== 1) {
 			currentProvider = getProvider(safeChainID);
 		}
+		const	gaugeListDetailsCalls = [];
+		const	auraPoolsCall = [];
+		const	gaugeList = listOfGauges.gauges.filter((e): boolean => e.type.name === 'Ethereum');
 		const	ethcallProvider = await newEthCallProvider(currentProvider);
 		const	balancerFactoryContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS as string, FACTORY_ABI);
 		const	auraBoosterContract = new Contract(process.env.AURA_BOOSTER_ADDRESS as string, AURA_BOOSTER_ABI);

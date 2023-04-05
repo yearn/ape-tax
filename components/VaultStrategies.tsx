@@ -6,6 +6,7 @@ import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
@@ -21,6 +22,7 @@ type TStrategies = {
 }
 function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	const	{provider, isActive, address, chainID} = useWeb3();
+	const 	{safeChainID} = useChainID();
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
 	const	[, set_nonce] = useState(0);
@@ -39,7 +41,10 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			return;
 		}
 
-		const	currentProvider = provider || getProvider(chainID || 1337);
+		let		currentProvider = provider || getProvider(safeChainID);
+		if (currentProvider?.network?.chainId !== 1) {
+			currentProvider = getProvider(safeChainID);
+		}
 		const	ethcallProvider = await newEthCallProvider(currentProvider);
 		const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI as never);
 		let		shouldBreak = false;
@@ -53,31 +58,51 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			** retrieve the address of the strategy from withdrawQueue, looping
 			** through the max number of strategies until we hit 0
 			**************************************************************************/
-			const	[strategyAddress] = await ethcallProvider.tryAll([contract.withdrawalQueue(index)]) as [string];
-			if (strategyAddress === ethers.constants.AddressZero) {
+			let	strategyAddress = toAddress();
+			try {
+				const	[_strategyAddress] = await ethcallProvider.tryAll([contract.withdrawalQueue(index)]) as [string];
+				if (toAddress(_strategyAddress) === toAddress(ethers.constants.AddressZero)) {
+					shouldBreak = true;
+					continue;
+				}
+				strategyAddress = toAddress(_strategyAddress);
+			} catch (error) {
 				shouldBreak = true;
 				continue;
 			}
-			const	strategyContract = new Contract(strategyAddress, YVAULT_ABI as never);
-			const	[creditAvailable, name] = await ethcallProvider.tryAll([
-				contract.creditAvailable(strategyAddress),
-				strategyContract.name()
-			]) as [ethers.BigNumber, string];
 
-			if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
-				try {
-					const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
-					if (details) {
-						set_strategiesData((s): TDict<TStrategyData> => {
-							s[toAddress(strategyAddress)] = {
-								address: toAddress(strategyAddress),
-								name: name,
-								description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
-								creditAvailable: toNormalizedBN(creditAvailable)
-							};
-							return (s);
-						});
-					} else {
+			const	strategyContract = new Contract(strategyAddress, YVAULT_ABI as never);
+			try {
+				const	[creditAvailable, name] = await ethcallProvider.tryAll([
+					contract.creditAvailable(strategyAddress),
+					strategyContract.name()
+				]) as [ethers.BigNumber, string];
+
+				if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
+					try {
+						const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
+						if (details) {
+							set_strategiesData((s): TDict<TStrategyData> => {
+								s[toAddress(strategyAddress)] = {
+									address: toAddress(strategyAddress),
+									name: name,
+									description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
+									creditAvailable: toNormalizedBN(creditAvailable)
+								};
+								return (s);
+							});
+						} else {
+							set_strategiesData((s): TDict<TStrategyData> => {
+								s[toAddress(strategyAddress)] = {
+									address: toAddress(strategyAddress),
+									name: name,
+									description: 'Description not provided for this strategy.',
+									creditAvailable: toNormalizedBN(creditAvailable)
+								};
+								return (s);
+							});
+						}
+					} catch (error) {
 						set_strategiesData((s): TDict<TStrategyData> => {
 							s[toAddress(strategyAddress)] = {
 								address: toAddress(strategyAddress),
@@ -88,7 +113,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 							return (s);
 						});
 					}
-				} catch (error) {
+				} else {
 					set_strategiesData((s): TDict<TStrategyData> => {
 						s[toAddress(strategyAddress)] = {
 							address: toAddress(strategyAddress),
@@ -99,20 +124,12 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 						return (s);
 					});
 				}
-			} else {
-				set_strategiesData((s): TDict<TStrategyData> => {
-					s[toAddress(strategyAddress)] = {
-						address: toAddress(strategyAddress),
-						name: name,
-						description: 'Description not provided for this strategy.',
-						creditAvailable: toNormalizedBN(creditAvailable)
-					};
-					return (s);
-				});
+			} catch (error) {
+				console.log(error);
 			}
 			set_nonce((n): number => n + 1);
 		}
-	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL, provider]);
+	}, [safeChainID, chainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL, provider]);
 
 	useEffect((): void => {
 		if (!vault || !isActive || !provider || !address) {

@@ -9,6 +9,7 @@ import {ethers} from 'ethers';
 import ERC20ABI from 'utils/ABI/erc20.abi.json';
 import LENS_ABI from 'utils/ABI/lens.abi.json';
 import YVAULTABI from 'utils/ABI/yVault.abi.json';
+import YVAULTV3ABI from 'utils/ABI/yVaultv3.abi.json';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
@@ -17,6 +18,7 @@ import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3
 import type {BigNumber} from 'ethers';
 import type {ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
+import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
 	loaded: false,
@@ -52,28 +54,28 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			return;
 		}
 		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
-			providerToUse = getProvider(250);
-		}
 		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
 			providerToUse = getProvider(4);
-		}
-		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
-			providerToUse = getProvider(137);
-		}
-		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
-			providerToUse = getProvider(42161);
 		}
 		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
 			providerToUse = getProvider(100);
 		}
-
+		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
+			providerToUse = getProvider(137);
+		}
+		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
+			providerToUse = getProvider(250);
+		}
+		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
+			providerToUse = getProvider(42161);
+		}
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
 				'function apiVersion() public view returns (string)',
 				'function depositLimit() public view returns (uint256)',
 				'function totalAssets() public view returns (uint256)',
 				'function availableDepositLimit() public view returns (uint256)',
+				'function availableDepositLimit(address) public view returns (uint256)',
 				'function pricePerShare() public view returns (uint256)',
 				'function decimals() public view returns (uint256)',
 				'function balanceOf(address) public view returns (uint256)',
@@ -83,21 +85,31 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			providerToUse
 		);
 		const	ethcallProvider = await newEthCallProvider(providerToUse);
-
 		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
 		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI as never);
-		const	callResult = await ethcallProvider.all([
+		const	vaultV3ContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTV3ABI as never);
+		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
+		const	allowanceSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
+		const	calls = [
 			vaultContractMultiCall.apiVersion(),
-			vaultContractMultiCall.depositLimit(),
 			vaultContractMultiCall.totalAssets(),
-			vaultContractMultiCall.availableDepositLimit(),
 			vaultContractMultiCall.pricePerShare(),
 			vaultContractMultiCall.decimals(),
 			vaultContractMultiCall.balanceOf(address),
 			wantContractMultiCall.balanceOf(address),
-			wantContractMultiCall.allowance(address, vault.VAULT_ADDR)
-		]);
-		const	[apiVersion, depositLimit, totalAssets, availableDepositLimit, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance] = callResult as [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber];
+			wantContractMultiCall.allowance(address, allowanceSpender)
+		];
+		if (vault.VAULT_ABI === 'v3') {
+			calls.push(vaultV3ContractMultiCall.availableDepositLimit(address));
+			calls.push(vaultV3ContractMultiCall.availableDepositLimit(address));
+		} else {
+			calls.push(vaultContractMultiCall.depositLimit());
+			calls.push(vaultContractMultiCall.availableDepositLimit());
+		}
+		const	canFail = calls.map((): false => false);
+		const	callResult = await ethcallProvider.tryEach(calls, canFail) as [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber];
+
+		const	[apiVersion, totalAssets, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance, depositLimit, availableDepositLimit] = callResult;
 		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 		const	numberDecimals = Number(decimals);
@@ -117,6 +129,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			wantPrice: price,
 			totalAUM: formatToNormalizedValue(totalAssets, numberDecimals) * price,
 			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, numberDecimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, numberDecimals))) / Number(ethers.utils.formatUnits(depositLimit, numberDecimals)),
+			// progress: -1,
 			allowance: toNormalizedBN(wantAllowance, numberDecimals)
 		});
 
@@ -133,26 +146,27 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 	/**************************************************************************
 	** If we had some issues getting the prices ... Let's try again
 	**************************************************************************/
+	const	retrievePrices = useCallback(async (): Promise<void> => {
+		const	currentProvider = provider || getProvider(vault.CHAIN_ID || 1337);
+		const	ethcallProvider = await newEthCallProvider(currentProvider);
+		const	currentNetwork = networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1];
+
+		if (currentNetwork.lensOracleAddress) {
+			const	lensPriceContract = new Contract(currentNetwork.lensOracleAddress, LENS_ABI);
+			const	[price] = await ethcallProvider.tryAll([lensPriceContract.getPriceUsdcRecommended(vault.WANT_ADDR)]) as [BigNumber];
+			const normalizedPrice = Number(ethers.utils.formatUnits(price, 6));
+			set_vaultData((v): TVaultData => ({
+				...v,
+				wantPrice: normalizedPrice,
+				wantPriceError: false,
+				balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * normalizedPrice,
+				totalAUM: Number(v.totalAssets.normalized) * normalizedPrice
+			}));
+		}
+	}, [chainID, networks, provider, vault.CHAIN_ID, vault.WANT_ADDR]);
 	useEffect((): void => {
 		if (vault?.PRICE_SOURCE?.startsWith('Lens')) {
-			const	currentProvider = provider || getProvider(vault.CHAIN_ID || 1337);
-			newEthCallProvider(currentProvider).then((ethcallProvider): void => {
-				const	currentNetwork = networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1];
-				if (currentNetwork.lensOracleAddress) {
-					const	lensPriceContract = new Contract(currentNetwork.lensOracleAddress, LENS_ABI);
-					ethcallProvider.tryAll([lensPriceContract.getPriceUsdcRecommended(vault.WANT_ADDR)]).then(([price]): void => {
-						const normalizedPrice = Number(ethers.utils.formatUnits(price as BigNumber, 6));
-						set_vaultData((v): TVaultData => ({
-							...v,
-							wantPrice: normalizedPrice,
-							wantPriceError: false,
-							balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * normalizedPrice,
-							totalAUM: Number(v.totalAssets.normalized) * normalizedPrice
-						}));
-					});
-				}
-			});
-
+			retrievePrices();
 		} else {
 			const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 			set_vaultData((v): TVaultData => ({
@@ -163,7 +177,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 				totalAUM: Number(v.totalAssets.normalized) * price
 			}));
 		}
-	}, [chainID, networks, prices, provider, vault]);
+	}, [chainID, networks, prices, provider, vault, retrievePrices]);
 
 	return (
 		<div className={'mt-8 text-neutral-500'}>

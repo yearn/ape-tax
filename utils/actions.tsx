@@ -1,9 +1,11 @@
 // eslint-disable-next-line import/no-named-as-default
 import toast from 'react-hot-toast';
 import {ethers} from 'ethers';
+import {handleTx} from '@yearn-finance/web-lib/utils/web3/transaction';
 
-import type {BigNumberish} from 'ethers';
+import type {BigNumber, BigNumberish} from 'ethers';
 import type {TAddress} from '@yearn-finance/web-lib/types';
+import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TCallbackFunction} from './types';
 
 type TApproveToken = {
@@ -12,6 +14,75 @@ type TApproveToken = {
 	amount: BigNumberish;
 	from: TAddress;
 }
+
+export async function	approveERC20(
+	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider,
+	tokenAddress: string,
+	spender: string,
+	amount = ethers.constants.MaxUint256
+): Promise<TTxResponse> {
+	const signer = provider.getSigner();
+	const contract = new ethers.Contract(tokenAddress, ['function approve(address _spender, uint256 _value) external'], signer);
+
+	console.log(`Approving ${spender} to spend ${amount} of ${tokenAddress}`);
+	return await handleTx(contract.approve(spender, amount));
+}
+
+export async function	depositERC20(
+	provider: ethers.providers.JsonRpcProvider,
+	vaultAddress: TAddress,
+	spenderAddress: TAddress,
+	amount: BigNumber,
+	isLegacy: boolean
+): Promise<TTxResponse> {
+	const signer = provider.getSigner();
+	const contract = new ethers.Contract(vaultAddress, [
+		'function deposit(uint256) external returns (uint256)',
+		'function asset() public view returns (address)',
+		'function previewDeposit(uint256 amount) view returns (uint256 sharesOut)'
+	], signer);
+	if (isLegacy) {
+		return await handleTx(contract.deposit(amount));
+	}
+
+	const asset = await contract.asset();
+	const assetContract = new ethers.Contract(asset, ['function allowance(address owner, address spender) public view returns (uint256)'], signer);
+
+	const routerContract = new ethers.Contract(
+		spenderAddress, [
+			'function approve(address token, address to, uint256 amount) public',
+			'function depositToVault(address vault, uint256 amount, uint256 minSharesOut) public payable returns (uint256 sharesOut)'
+		],
+		signer
+	);
+	const	[routerAllowance, minOut] = await Promise.all([
+		assetContract.allowance(spenderAddress, vaultAddress),
+		contract.previewDeposit(amount)
+	]) as [BigNumber, BigNumber];
+
+	if (routerAllowance.lt(amount)) {
+		const	approveResult = await handleTx(routerContract.approve(asset, vaultAddress, ethers.constants.MaxUint256));
+		if (!approveResult.isSuccessful) {
+			throw new Error('Failed to approve');
+		}
+	}
+	console.log(vaultAddress, amount.toString(), minOut);
+
+	const tx = await routerContract.depositToVault(vaultAddress, amount, minOut);
+	const receipt = await tx.wait();
+	if (receipt.status === 0) {
+		console.error('Fail to perform transaction');
+		return {isSuccessful: false};
+	}
+	return {isSuccessful: true, receipt};
+
+	// const bla = await handleTx(routerContract.depositToVault(vaultAddress, amount, minOut));
+	// console.log(bla);
+	// return bla;
+}
+
+
+
 export async function	approveToken({provider, contractAddress, amount, from}: TApproveToken, callback: TCallbackFunction): Promise<void> {
 	const	_toast = toast.loading('Approving token...');
 	const	signer = provider.getSigner();
