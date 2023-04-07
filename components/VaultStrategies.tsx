@@ -201,6 +201,10 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 		});
 	}
 
+	if (Object.values(strategiesData).length === 0) {
+		return <Fragment />;
+	}
+
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
 			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'Strategies'}</h1>

@@ -80,6 +80,7 @@ export type TVaultData = {
 	balanceOf: TNormalizedBN;
 	wantBalance: TNormalizedBN;
 	allowance: TNormalizedBN;
+	allowanceYRouter: TNormalizedBN;
 	pricePerShare: TNormalizedBN;
 	apiVersion: string;
 	decimals: number;

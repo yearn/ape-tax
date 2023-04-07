@@ -3,15 +3,15 @@ import InfoMessage from 'components/InfoMessage';
 import VaultActions from 'components/VaultActions';
 import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
-import VaultWallet from 'components/VaultWallet';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import ERC20ABI from 'utils/ABI/erc20.abi.json';
 import LENS_ABI from 'utils/ABI/lens.abi.json';
-import YVAULTABI from 'utils/ABI/yVault.abi.json';
-import YVAULTV3ABI from 'utils/ABI/yVaultv3.abi.json';
+import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
+import {getChainIDOrTestProvider} from 'utils/utils';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import ERC20_ABI from '@yearn-finance/web-lib/utils/abi/erc20.abi';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
@@ -29,6 +29,7 @@ const		defaultVaultData: TVaultData = {
 	balanceOf: toNormalizedBN(0),
 	wantBalance: toNormalizedBN(0),
 	allowance: toNormalizedBN(0),
+	allowanceYRouter: toNormalizedBN(0),
 	allowanceZapOut: toNormalizedBN(0),
 	pricePerShare: toNormalizedBN(1),
 	decimals: 18,
@@ -49,26 +50,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 		if (!vault || !provider || !address || (chainID !== vault?.CHAIN_ID && !(chainID === 1337))) {
 			return;
 		}
-		const	network = await provider.getNetwork();
-		if (network.chainId !== vault.CHAIN_ID && !(network.chainId === 1337)) {
-			return;
-		}
-		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 4 && network.chainId !== 1337) {
-			providerToUse = getProvider(4);
-		}
-		if (vault.CHAIN_ID === 100 && network.chainId !== 1337) {
-			providerToUse = getProvider(100);
-		}
-		if (vault.CHAIN_ID === 137 && network.chainId !== 1337) {
-			providerToUse = getProvider(137);
-		}
-		if (vault.CHAIN_ID === 250 && network.chainId !== 1337) {
-			providerToUse = getProvider(250);
-		}
-		if (vault.CHAIN_ID === 42161 && network.chainId !== 1337) {
-			providerToUse = getProvider(42161);
-		}
+		const	providerToUse = await getChainIDOrTestProvider(provider, vault.CHAIN_ID);
 		const	vaultContract = new ethers.Contract(
 			vault.VAULT_ADDR, [
 				'function apiVersion() public view returns (string)',
@@ -85,31 +67,32 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			providerToUse
 		);
 		const	ethcallProvider = await newEthCallProvider(providerToUse);
-		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
-		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI as never);
-		const	vaultV3ContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTV3ABI as never);
+		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20_ABI);
+		const	vaultV2ContractMultiCall = new Contract(vault.VAULT_ADDR, VAULT_ABI);
+		const	vaultV3ContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULT_V3_BASE_ABI);
 		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
 		const	allowanceSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
 		const	calls = [
-			vaultContractMultiCall.apiVersion(),
-			vaultContractMultiCall.totalAssets(),
-			vaultContractMultiCall.pricePerShare(),
-			vaultContractMultiCall.decimals(),
-			vaultContractMultiCall.balanceOf(address),
+			vaultV2ContractMultiCall.apiVersion(),
+			vaultV2ContractMultiCall.totalAssets(),
+			vaultV2ContractMultiCall.pricePerShare(),
+			vaultV2ContractMultiCall.decimals(),
+			vaultV2ContractMultiCall.balanceOf(address),
 			wantContractMultiCall.balanceOf(address),
-			wantContractMultiCall.allowance(address, allowanceSpender)
+			wantContractMultiCall.allowance(address, allowanceSpender),
+			vaultV3ContractMultiCall.allowance(address, yearnRouterForChain)
 		];
 		if (vault.VAULT_ABI === 'v3') {
 			calls.push(vaultV3ContractMultiCall.availableDepositLimit(address));
 			calls.push(vaultV3ContractMultiCall.availableDepositLimit(address));
 		} else {
-			calls.push(vaultContractMultiCall.depositLimit());
-			calls.push(vaultContractMultiCall.availableDepositLimit());
+			calls.push(vaultV2ContractMultiCall.depositLimit());
+			calls.push(vaultV2ContractMultiCall.availableDepositLimit());
 		}
 		const	canFail = calls.map((): false => false);
-		const	callResult = await ethcallProvider.tryEach(calls, canFail) as [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber];
+		const	callResult = await ethcallProvider.tryEach(calls, canFail) as [string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber];
 
-		const	[apiVersion, totalAssets, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance, depositLimit, availableDepositLimit] = callResult;
+		const	[apiVersion, totalAssets, pricePerShare, decimals, balanceOf, wantBalance, wantAllowance, allowanceYRouter, depositLimit, availableDepositLimit] = callResult;
 		const	coinBalance = await providerToUse.getBalance(address);
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 		const	numberDecimals = Number(decimals);
@@ -129,8 +112,8 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			wantPrice: price,
 			totalAUM: formatToNormalizedValue(totalAssets, numberDecimals) * price,
 			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, numberDecimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, numberDecimals))) / Number(ethers.utils.formatUnits(depositLimit, numberDecimals)),
-			// progress: -1,
-			allowance: toNormalizedBN(wantAllowance, numberDecimals)
+			allowance: toNormalizedBN(wantAllowance, numberDecimals),
+			allowanceYRouter: toNormalizedBN(allowanceYRouter, numberDecimals)
 		});
 
 		if (vault.ZAP_ADDR) {
@@ -193,9 +176,9 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			<VaultStrategies
 				vault={vault}
 				onUpdateVaultData={set_vaultData} />
-			<VaultWallet
+			{/* <VaultWallet
 				vault={vault}
-				vaultData={vaultData} />
+				vaultData={vaultData} /> */}
 			<VaultActions
 				vault={vault}
 				vaultData={vaultData}
