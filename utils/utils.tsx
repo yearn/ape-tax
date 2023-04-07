@@ -70,7 +70,7 @@ export async function fetchCryptoPrice(from = '', to = 'usd'): Promise<any> {
 	return null;
 }
 
-export function getProvider(chain = 1): ethers.providers.BaseProvider {
+export function getProvider(chain = 1): ethers.providers.JsonRpcProvider {
 	if (chain === 1) {
 		if (process.env.ALCHEMY_KEY) {
 			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
@@ -124,6 +124,28 @@ export function getProviderURI(chain = 1): string {
 		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
 	}
 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
+}
+
+export async function getChainIDOrTestProvider(currentProvider: ethers.providers.JsonRpcProvider, chainID = 1): Promise<ethers.providers.JsonRpcProvider> {
+	const	network = await currentProvider.getNetwork();
+	let		providerToUse = currentProvider;
+
+	if (chainID === 4 && network.chainId !== 1337) {
+		providerToUse = getProvider(4);
+	}
+	if (chainID === 100 && network.chainId !== 1337) {
+		providerToUse = getProvider(100);
+	}
+	if (chainID === 137 && network.chainId !== 1337) {
+		providerToUse = getProvider(137);
+	}
+	if (chainID === 250 && network.chainId !== 1337) {
+		providerToUse = getProvider(250);
+	}
+	if (chainID === 42161 && network.chainId !== 1337) {
+		providerToUse = getProvider(42161);
+	}
+	return providerToUse;
 }
 
 export async function asyncForEach<T>(array: T[], callback: (item: T, index: number, array: T[]) => void): Promise<void> {

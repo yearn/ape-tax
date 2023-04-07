@@ -3,11 +3,24 @@ import toast from 'react-hot-toast';
 import {ethers} from 'ethers';
 import {handleTx} from '@yearn-finance/web-lib/utils/web3/transaction';
 
+import ERC20_ABI from './ABI/erc20.abi';
+import YROUTER_ABI from './ABI/yRouter.abi';
+import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
+
 import type {BigNumber, BigNumberish} from 'ethers';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TCallbackFunction} from './types';
 
+const PERMIT_TYPE = {
+	Permit: [
+		{name: 'owner', type: 'address'},
+		{name: 'spender', type: 'address'},
+		{name: 'value', type: 'uint256'},
+		{name: 'nonce', type: 'uint256'},
+		{name: 'deadline', type: 'uint256'}
+	]
+};
 type TApproveToken = {
 	provider: ethers.providers.JsonRpcProvider;
 	contractAddress: TAddress;
@@ -28,6 +41,53 @@ export async function	approveERC20(
 	return await handleTx(contract.approve(spender, amount));
 }
 
+export async function	withdrawWithPermitERC20(
+	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider,
+	chainID: number,
+	vaultAddress: string,
+	routerAddress: string,
+	amount = ethers.constants.MaxUint256
+): Promise<TTxResponse> {
+	const multicalls = [];
+	const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
+
+	const signer = provider.getSigner();
+	const signerAddress = await signer.getAddress();
+	const vaultContract = new ethers.Contract(vaultAddress, YVAULT_V3_BASE_ABI, signer);
+	const routerContract = new ethers.Contract(routerAddress, YROUTER_ABI, signer);
+	const deadline = 0;
+	const [apiVersion, name, nonce, maxOut, currentAllowance] = await Promise.all([
+		vaultContract.apiVersion(),
+		vaultContract.name(),
+		vaultContract.nonces(signerAddress),
+		vaultContract.previewWithdraw(amount),
+		vaultContract.allowance(signerAddress, routerAddress)
+	]) as [string, string, BigNumber, BigNumber, BigNumber];
+
+	if (currentAllowance.lt(amount)) {
+		const domain = {
+			name: name,
+			version: apiVersion,
+			chainId: chainID,
+			verifyingContract: vaultAddress
+		};
+		const value = {
+			owner: signerAddress,
+			spender: routerAddress,
+			value: ethers.constants.MaxUint256,
+			nonce: nonce,
+			deadline: deadline
+		};
+		const signature = await signer._signTypedData(domain, PERMIT_TYPE, value);
+		const {v, r, s} = ethers.utils.splitSignature(signature);
+		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [vaultAddress, ethers.constants.MaxUint256, deadline, v, r, s]));
+	}
+
+	multicalls.push(routerIFace.encodeFunctionData('withdraw', [vaultAddress, amount, signerAddress, maxOut]));
+	return await handleTx(routerContract.multicall(multicalls));
+}
+
+
 export async function	depositERC20(
 	provider: ethers.providers.JsonRpcProvider,
 	vaultAddress: TAddress,
@@ -46,16 +106,9 @@ export async function	depositERC20(
 	}
 
 	const asset = await contract.asset();
-	const assetContract = new ethers.Contract(asset, ['function allowance(address owner, address spender) public view returns (uint256)'], signer);
-
-	const routerContract = new ethers.Contract(
-		spenderAddress, [
-			'function approve(address token, address to, uint256 amount) public',
-			'function depositToVault(address vault, uint256 amount, uint256 minSharesOut) public payable returns (uint256 sharesOut)'
-		],
-		signer
-	);
-	const	[routerAllowance, minOut] = await Promise.all([
+	const assetContract = new ethers.Contract(asset, ERC20_ABI, signer);
+	const routerContract = new ethers.Contract(spenderAddress, YROUTER_ABI, signer);
+	const [routerAllowance, minOut] = await Promise.all([
 		assetContract.allowance(spenderAddress, vaultAddress),
 		contract.previewDeposit(amount)
 	]) as [BigNumber, BigNumber];
@@ -66,21 +119,30 @@ export async function	depositERC20(
 			throw new Error('Failed to approve');
 		}
 	}
-	console.log(vaultAddress, amount.toString(), minOut);
-
-	const tx = await routerContract.depositToVault(vaultAddress, amount, minOut);
-	const receipt = await tx.wait();
-	if (receipt.status === 0) {
-		console.error('Fail to perform transaction');
-		return {isSuccessful: false};
-	}
-	return {isSuccessful: true, receipt};
-
-	// const bla = await handleTx(routerContract.depositToVault(vaultAddress, amount, minOut));
-	// console.log(bla);
-	// return bla;
+	return await handleTx(routerContract['depositToVault(address,uint256,uint256)'](vaultAddress, amount, minOut));
 }
 
+export async function	withdrawERC20(
+	provider: ethers.providers.JsonRpcProvider,
+	vaultAddress: TAddress,
+	spenderAddress: TAddress,
+	amount: BigNumber,
+	isLegacy: boolean
+): Promise<TTxResponse> {
+	const signer = provider.getSigner();
+	const signerAddress = await signer.getAddress();
+	const contract = new ethers.Contract(vaultAddress, [
+		'function withdraw(uint256) external returns (uint256)',
+		'function previewWithdraw(uint256 amount) view returns (uint256 sharesOut)'
+	], signer);
+	if (isLegacy) {
+		return await handleTx(contract.withdraw(amount));
+	}
+
+	const routerContract = new ethers.Contract(spenderAddress, YROUTER_ABI, signer);
+	const maxOut = await contract.previewWithdraw(amount) as [BigNumber];
+	return await handleTx(routerContract.withdraw(vaultAddress, amount, signerAddress, maxOut));
+}
 
 
 export async function	approveToken({provider, contractAddress, amount, from}: TApproveToken, callback: TCallbackFunction): Promise<void> {

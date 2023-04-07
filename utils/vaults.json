@@ -1160,7 +1160,7 @@
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0xCcFfF90a596fCC0B549a5f69a70DE0a9c5295352",
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-    "WANT_SYMBOL": "ysUSDC",
+    "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
