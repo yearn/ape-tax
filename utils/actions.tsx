@@ -1,15 +1,16 @@
 // eslint-disable-next-line import/no-named-as-default
 import toast from 'react-hot-toast';
-import {ethers} from 'ethers';
+import {BigNumber, ethers} from 'ethers';
 import {_TypedDataEncoder} from 'ethers/lib/utils';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
+import {Zero} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {handleTx} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import ERC20_ABI from './ABI/erc20.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
-import type {BigNumber, BigNumberish, TypedDataDomain, TypedDataField} from 'ethers';
+import type {BigNumberish, TypedDataDomain, TypedDataField} from 'ethers';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TCallbackFunction} from './types';
@@ -135,6 +136,7 @@ export async function	withdrawWithPermitERC20(
 		} else {
 			multicalls.push(routerIFace.encodeFunctionData('withdraw', [vaultAddress, amount, signerAddress, maxOut]));
 		}
+
 		return await handleTx(routerContract.multicall(multicalls));
 	}
 
@@ -143,7 +145,7 @@ export async function	withdrawWithPermitERC20(
 	** we want to withdraw. If this amount is equal to the vault's balance, we will redeem the vault
 	** otherwise we will withdraw the amount.
 	**********************************************************************************************/
-	if (shouldRedeem) {
+	if (BigNumber.from(amount).eq(Zero) || shouldRedeem) {
 		return await handleTx(routerContract['redeem(address)'](vaultAddress));
 	}
 	return await handleTx(routerContract.withdraw(vaultAddress, amount, signerAddress, maxOut));
