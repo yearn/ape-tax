@@ -1144,8 +1144,8 @@
 
 
   "ysUSDC": {
-    "TITLE": "CompoundV3-WETHLender-UniV3Swapper",
-    "LOGO": "🦄🦄",
+    "TITLE": "Salty USDC",
+    "LOGO": "🧂💰",
     "VAULT_ABI": "v3",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0xCcFfF90a596fCC0B549a5f69a70DE0a9c5295352",
@@ -1156,8 +1156,8 @@
     "CHAIN_ID": 137
   },
   "ysUSDC2": {
-    "TITLE": "CompoundV3-WETHLender-UniV3Swapper-2",
-    "LOGO": "🐿️👀",
+    "TITLE": "Sweety USDC",
+    "LOGO": "🍦💰",
     "VAULT_ABI": "v3",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0x5567B3a9d6b7DeF8a8E8D99678120c8aF9A65283",

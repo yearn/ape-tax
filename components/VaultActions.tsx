@@ -385,7 +385,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			<Button
 				variant={'outlined'}
 				isBusy={txStatusWithdraw.pending}
-				// isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || vaultData.balanceOf.raw.isZero() || amount.raw.isZero() || (shouldUseApproval ? vaultData.allowanceYRouter.raw.isZero() : false)}
+				isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || vaultData.balanceOf.raw.isZero() || amount.raw.isZero() || (shouldUseApproval ? vaultData.allowanceYRouter.raw.isZero() : false)}
 				onClick={onWithdraw}>
 				{'💸 Withdraw'}
 			</Button>
