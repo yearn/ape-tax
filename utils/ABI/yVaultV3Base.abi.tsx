@@ -295,6 +295,42 @@ const YVAULT_V3_BASE_ABI = [
 		'stateMutability': 'pure',
 		'type': 'function'
 	}, {
+		'inputs': [],
+		'name': 'version',
+		'outputs': [
+			{
+				'internalType': 'string',
+				'name': '',
+				'type': 'string'
+			}
+		],
+		'stateMutability': 'pure',
+		'type': 'function'
+	}, {
+		'inputs': [],
+		'name': 'EIP712_VERSION',
+		'outputs': [
+			{
+				'internalType': 'string',
+				'name': '',
+				'type': 'string'
+			}
+		],
+		'stateMutability': 'pure',
+		'type': 'function'
+	}, {
+		'inputs': [],
+		'name': 'DOMAIN_TYPEHASH',
+		'outputs': [
+			{
+				'internalType': 'string',
+				'name': '',
+				'type': 'string'
+			}
+		],
+		'stateMutability': 'pure',
+		'type': 'function'
+	}, {
 		'inputs': [
 			{
 				'internalType': 'address',
