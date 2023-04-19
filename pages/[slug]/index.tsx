@@ -147,7 +147,7 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-	const	slug = Object.keys(vaults).filter((key): boolean => key !== 'yvsteth').map((key): any => ({params: {slug: key}})) || [];
+	const	slug = Object.keys(vaults).map((key): any => ({params: {slug: key}})) || [];
 	return	{paths: slug, fallback: true};
 }
 

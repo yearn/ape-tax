@@ -1,13 +1,15 @@
 // eslint-disable-next-line import/no-named-as-default
 import toast from 'react-hot-toast';
 import {ethers} from 'ethers';
+import {_TypedDataEncoder} from 'ethers/lib/utils';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {handleTx} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import ERC20_ABI from './ABI/erc20.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
-import type {BigNumber, BigNumberish} from 'ethers';
+import type {BigNumber, BigNumberish, TypedDataDomain, TypedDataField} from 'ethers';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TCallbackFunction} from './types';
@@ -21,12 +23,6 @@ const PERMIT_TYPE = {
 		{name: 'deadline', type: 'uint256'}
 	]
 };
-type TApproveToken = {
-	provider: ethers.providers.JsonRpcProvider;
-	contractAddress: TAddress;
-	amount: BigNumberish;
-	from: TAddress;
-}
 
 export async function	approveERC20(
 	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider,
@@ -37,25 +33,63 @@ export async function	approveERC20(
 	const signer = provider.getSigner();
 	const contract = new ethers.Contract(tokenAddress, ['function approve(address _spender, uint256 _value) external'], signer);
 
-	console.log(`Approving ${spender} to spend ${amount} of ${tokenAddress}`);
 	return await handleTx(contract.approve(spender, amount));
 }
 
+type TWithdrawWithPermitERC20Args = {
+	vaultAddress: TAddress,
+	routerAddress: TAddress,
+	amount: BigNumberish,
+	isLegacy: boolean,
+	shouldRedeem: boolean
+}
 export async function	withdrawWithPermitERC20(
-	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider,
-	chainID: number,
-	vaultAddress: string,
-	routerAddress: string,
-	amount = ethers.constants.MaxUint256
+	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider, {
+		vaultAddress,
+		routerAddress,
+		amount = ethers.constants.MaxUint256,
+		isLegacy = false,
+		shouldRedeem = false
+	}: TWithdrawWithPermitERC20Args
 ): Promise<TTxResponse> {
+	/* 🔵 - Yearn Finance **************************************************************************
+	** First we will retrieve some contextual informations based on the provider and the signer:
+	** - The chainID, which will be used to eventually sign the permit
+	** - The signer address, which will be used to retrieve the nonce
+	**********************************************************************************************/
+	const signer = provider.getSigner();
+	const [{chainId}, signerAddress] = await Promise.all([
+		provider.getNetwork(),
+		signer.getAddress()
+	]) as [{chainId: number}, string];
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** If we are using a legacy vault, aka a vault prior to V3, we will use the legacy withdraw,
+	** aka directly withdrawing from the vault.
+	** This path should be less and less used as time goes by.
+	**********************************************************************************************/
+	if (isLegacy) {
+		const vaultV2Contract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
+		return await handleTx(vaultV2Contract.withdraw(amount));
+	}
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** Otherwise, we will go with the new V3 withdraw flow, which can be split in multiple
+	** sub-flows based on some conditions. The questions we need to answer are:
+	** - Is the allowance of the vault to the router sufficient?
+	** - Are we withdrawing a part of the vault or all of it?
+	**
+	** Before answering these questions, we will retrieve some contextual informations:
+	** - The vault API version, which will be used to sign the permit
+	** - The vault name, which will be used to sign the permit
+	** - The vault nonce, which will be used to sign the permit
+	** - The maxOut amount, which will be used to withdraw the amount
+	** - The current allowance of the signer to the router
+	**********************************************************************************************/
 	const multicalls = [];
 	const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
-
-	const signer = provider.getSigner();
-	const signerAddress = await signer.getAddress();
 	const vaultContract = new ethers.Contract(vaultAddress, YVAULT_V3_BASE_ABI, signer);
 	const routerContract = new ethers.Contract(routerAddress, YROUTER_ABI, signer);
-	const deadline = 0;
 	const [apiVersion, name, nonce, maxOut, currentAllowance] = await Promise.all([
 		vaultContract.apiVersion(),
 		vaultContract.name(),
@@ -64,27 +98,197 @@ export async function	withdrawWithPermitERC20(
 		vaultContract.allowance(signerAddress, routerAddress)
 	]) as [string, string, BigNumber, BigNumber, BigNumber];
 
+	/* 🔵 - Yearn Finance **************************************************************************
+	** If the allowance is not sufficient, we will sign a permit and call the router's selfPermit
+	** function, which will allow the router to spend the vault's tokens on behalf of the signer.
+	** with this flow we will use the multicall path, aka batching 2 actions in a single
+	** transaction: the permit and the withdraw/redeem.
+	** - The deadline is set to 24h from now.
+	** - The amount permitted is set to the amount we want to withdraw.
+	**********************************************************************************************/
 	if (currentAllowance.lt(amount)) {
+		const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
 		const domain = {
 			name: name,
 			version: apiVersion,
-			chainId: chainID,
+			chainId: chainId,
 			verifyingContract: vaultAddress
 		};
 		const value = {
 			owner: signerAddress,
 			spender: routerAddress,
-			value: ethers.constants.MaxUint256,
+			value: amount,
 			nonce: nonce,
 			deadline: deadline
 		};
 		const signature = await signer._signTypedData(domain, PERMIT_TYPE, value);
 		const {v, r, s} = ethers.utils.splitSignature(signature);
-		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [vaultAddress, ethers.constants.MaxUint256, deadline, v, r, s]));
+		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [vaultAddress, amount, deadline, v, r, s]));
+
+		/* 🔵 - Yearn Finance **********************************************************************
+		** To decide if we should use the withdraw or the redeem function, we will just check the
+		** amount we want to withdraw. If this amount is equal to the vault's balance, we will
+		** redeem the vault, otherwise we will withdraw the amount.
+		******************************************************************************************/
+		if (shouldRedeem) {
+			multicalls.push(routerIFace.encodeFunctionData('redeem(address)', [vaultAddress]));
+		} else {
+			multicalls.push(routerIFace.encodeFunctionData('withdraw', [vaultAddress, amount, signerAddress, maxOut]));
+		}
+		return await handleTx(routerContract.multicall(multicalls));
 	}
 
-	multicalls.push(routerIFace.encodeFunctionData('withdraw', [vaultAddress, amount, signerAddress, maxOut]));
-	return await handleTx(routerContract.multicall(multicalls));
+	/* 🔵 - Yearn Finance **************************************************************************
+	** To decide if we should use the withdraw or the redeem function, we will just check the amount
+	** we want to withdraw. If this amount is equal to the vault's balance, we will redeem the vault
+	** otherwise we will withdraw the amount.
+	**********************************************************************************************/
+	if (shouldRedeem) {
+		return await handleTx(routerContract['redeem(address)'](vaultAddress));
+	}
+	return await handleTx(routerContract.withdraw(vaultAddress, amount, signerAddress, maxOut));
+}
+
+
+type TDepositWithPermitERC20Args = {
+	tokenAddress: TAddress,
+	vaultAddress: TAddress,
+	routerAddress: TAddress,
+	amount: BigNumberish,
+	isLegacy: boolean,
+}
+
+async function _signTypedData(provider: ethers.providers.JsonRpcProvider, signer: string, domain: TypedDataDomain, types: { [key: string]: TypedDataField[] }, value: { [key: string]: any }): Promise<string> {
+	// Populate any ENS names (in-place)
+	const populated = await _TypedDataEncoder.resolveNames(domain, types, value, async (name: string) => {
+		return provider.resolveName(name);
+	});
+
+	console.warn('eth_signTypedData_v1');
+	console.log(populated);
+	console.log({
+		kek: ethers.utils.keccak256(ethers.utils.toUtf8Bytes('137')),
+		byte: ethers.utils.toUtf8Bytes('137')
+	});
+	const	payload = _TypedDataEncoder.getPayload(populated.domain, types, populated.value);
+	return await provider.send('eth_signTypedData_v4', [
+		signer.toLowerCase(),
+		JSON.stringify(payload)
+	]);
+}
+
+export async function	depositWithPermitERC20(
+	provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcProvider, {
+		tokenAddress,
+		vaultAddress,
+		routerAddress,
+		amount = ethers.constants.MaxUint256,
+		isLegacy = false
+	}: TDepositWithPermitERC20Args
+): Promise<TTxResponse> {
+	/* 🔵 - Yearn Finance **************************************************************************
+	** First we will retrieve some contextual informations based on the provider and the signer:
+	** - The chainID, which will be used to eventually sign the permit
+	** - The signer address, which will be used to retrieve the nonce
+	**********************************************************************************************/
+	const signer = provider.getSigner();
+	const [{chainId}, signerAddress] = await Promise.all([
+		provider.getNetwork(),
+		signer.getAddress()
+	]) as [{chainId: number}, string];
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** If we are using a legacy vault, aka a vault prior to V3, we will use the legacy deposit,
+	** aka directly depositing to the vault.
+	** This path should be less and less used as time goes by.
+	**********************************************************************************************/
+	if (isLegacy) {
+		const vaultV2Contract = new ethers.Contract(vaultAddress, VAULT_ABI, signer);
+		return await handleTx(vaultV2Contract.deposit(amount));
+	}
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** Otherwise, we will go with the new V3 deposit flow, which can be split in multiple
+	** sub-flows based on some conditions. The questions we need to answer are:
+	** - Is the allowance of the signer to the vault sufficient?
+	** - Is the allowance of the vault to the router sufficient?
+	**
+	** Before answering these questions, we will retrieve some contextual informations:
+	** - The vault API version, which will be used to sign the permit
+	** - The vault name, which will be used to sign the permit
+	** - The vault nonce, which will be used to sign the permit
+	** - The maxOut amount, which will be used to withdraw the amount
+	** - The current allowance of the signer to the router
+	**********************************************************************************************/
+	const multicalls = [];
+	const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
+	const tokenContract = new ethers.Contract(tokenAddress, YVAULT_V3_BASE_ABI, signer);
+	const vaultContract = new ethers.Contract(vaultAddress, YVAULT_V3_BASE_ABI, signer);
+	const routerContract = new ethers.Contract(routerAddress, YROUTER_ABI, signer);
+	const [apiVersionResult, nameResult, nonceResult, minOutResult, routerAllowanceResult, userAllowanceResult] = await Promise.allSettled([
+		tokenContract.apiVersion(),
+		tokenContract.name(),
+		tokenContract.nonces(signerAddress),
+		vaultContract.previewDeposit(amount),
+		tokenContract.allowance(routerAddress, vaultAddress),
+		tokenContract.allowance(signerAddress, routerAddress)
+	]);
+
+	const	apiVersion: string = apiVersionResult.status === 'rejected' ? '1' : apiVersionResult.value;
+	const	name: string = nameResult.status === 'rejected' ? 'Token' : nameResult.value;
+	const	nonce: BigNumber = nonceResult.status === 'rejected' ? ethers.constants.Zero : nonceResult.value;
+	const	minOut: BigNumber = minOutResult.status === 'rejected' ? ethers.constants.Zero : minOutResult.value;
+	const	routerAllowance: BigNumber = routerAllowanceResult.status === 'rejected' ? ethers.constants.Zero : routerAllowanceResult.value;
+	const	userAllowance: BigNumber = userAllowanceResult.status === 'rejected' ? ethers.constants.Zero : userAllowanceResult.value;
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** If the allowance is not sufficient, we will sign a permit and call the router's selfPermit
+	** function, which will allow the router to spend the vault's tokens on behalf of the signer.
+	** with this flow we will use the multicall path, aka batching 2 actions in a single
+	** transaction: the permit and the withdraw/redeem.
+	** - The deadline is set to 24h from now.
+	** - The amount permitted is set to the amount we want to withdraw.
+	**********************************************************************************************/
+	if (true || userAllowance.lt(amount)) {
+		console.log(chainId);
+		const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+		// convert chainId to bytes32
+		const chainIdBytes32 = ethers.utils.hexZeroPad(ethers.utils.hexlify(chainId), 32);
+		const domain = {
+			name: name,
+			version: apiVersion,
+			verifyingContract: tokenAddress,
+			salt: chainIdBytes32
+		};
+		const value = {
+			owner: signerAddress,
+			spender: routerAddress,
+			value: amount,
+			nonce: nonce,
+			deadline: deadline
+		};
+		const signature = await signer._signTypedData(domain, PERMIT_TYPE, value);
+
+
+		const {v, r, s} = ethers.utils.splitSignature(signature);
+
+
+		// const tokenIFace = new ethers.utils.Interface(ERC20_ABI);
+		// multicalls.push(tokenIFace.encodeFunctionData('permit', [signerAddress, routerAddress, amount, deadline, v, r, s]));
+		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [tokenAddress, amount, deadline, v, r, s]));
+		// multicalls.push(routerIFace.encodeFunctionData('approve', [tokenAddress, vaultAddress, amount]));
+
+	}
+	if (true || routerAllowance.lt(amount)) {
+		// multicalls.push(routerIFace.encodeFunctionData('approve', [tokenAddress, vaultAddress, amount]));
+	}
+
+	if (multicalls.length > 0) {
+		// multicalls.push(routerIFace.encodeFunctionData('depositToVault(address,uint256,uint256)', [vaultAddress, amount, minOut]));
+		return await handleTx(routerContract.multicall(multicalls));
+	}
+	return await handleTx(routerContract['depositToVault(address,uint256,uint256)'](vaultAddress, amount, minOut));
 }
 
 
@@ -120,141 +324,6 @@ export async function	depositERC20(
 		}
 	}
 	return await handleTx(routerContract['depositToVault(address,uint256,uint256)'](vaultAddress, amount, minOut));
-}
-
-export async function	withdrawERC20(
-	provider: ethers.providers.JsonRpcProvider,
-	vaultAddress: TAddress,
-	spenderAddress: TAddress,
-	amount: BigNumber,
-	isLegacy: boolean
-): Promise<TTxResponse> {
-	const signer = provider.getSigner();
-	const signerAddress = await signer.getAddress();
-	const contract = new ethers.Contract(vaultAddress, [
-		'function withdraw(uint256) external returns (uint256)',
-		'function previewWithdraw(uint256 amount) view returns (uint256 sharesOut)'
-	], signer);
-	if (isLegacy) {
-		return await handleTx(contract.withdraw(amount));
-	}
-
-	const routerContract = new ethers.Contract(spenderAddress, YROUTER_ABI, signer);
-	const maxOut = await contract.previewWithdraw(amount) as [BigNumber];
-	return await handleTx(routerContract.withdraw(vaultAddress, amount, signerAddress, maxOut));
-}
-
-
-export async function	approveToken({provider, contractAddress, amount, from}: TApproveToken, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('Approving token...');
-	const	signer = provider.getSigner();
-	const	erc20 = new ethers.Contract(
-		contractAddress,
-		['function approve(address spender, uint256 amount) public returns (bool)'],
-		signer
-	);
-
-	/**********************************************************************
-	**	In order to avoid dumb error, let's first check if the TX would
-	**	be successful with a static call
-	**********************************************************************/
-	try {
-		await erc20.callStatic.approve(from, amount);
-	} catch (error) {
-		callback({error: true, data: undefined});
-		toast.dismiss(_toast);
-		toast.error('Impossible to approve token');
-		return;
-	}
-
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await erc20.approve(from, amount);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: amount});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Approve failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Approve failed');
-		callback({error: true, data: undefined});
-	}
-}
-
-type TDepositToken = {
-	provider: ethers.providers.JsonRpcProvider;
-	contractAddress: TAddress;
-	amount: BigNumberish;
-}
-export async function	depositToken({provider, contractAddress, amount}: TDepositToken, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('Deposit token...');
-	const	abi = ['function deposit(uint256 amount)'];
-	const	signer = provider.getSigner();
-	const	contract = new ethers.Contract(contractAddress, abi, signer);
-
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await contract.deposit(amount);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: undefined});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		console.error(error);
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		callback({error: true, data: undefined});
-	}
-}
-
-type TWithdrawToken = {
-	provider: ethers.providers.JsonRpcProvider;
-	contractAddress: TAddress;
-	amount: BigNumberish;
-}
-export async function	withdrawToken({provider, contractAddress, amount}: TWithdrawToken, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('Withdraw token...');
-	const	abi = ['function withdraw(uint256 amount)'];
-	const	signer = provider.getSigner();
-	const	contract = new ethers.Contract(contractAddress, abi, signer);
-
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await contract.withdraw(amount);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: undefined});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		console.error(error);
-		callback({error: true, data: undefined});
-	}
 }
 
 type TApeInVault = {

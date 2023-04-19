@@ -2,7 +2,7 @@ import React, {Fragment, useCallback, useMemo, useState} from 'react';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
-import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawERC20, withdrawWithPermitERC20} from 'utils/actions';
+import {apeInVault, apeOutVault, approveERC20, depositWithPermitERC20, withdrawWithPermitERC20} from 'utils/actions';
 import {getChainIDOrTestProvider} from 'utils/utils';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -190,16 +190,24 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 		new Transaction(provider, approveERC20, set_txStatusApproval).populate(
 			toAddress(vault.WANT_ADDR), //token
 			vaultSpender,
-			ethers.constants.MaxUint256 //amount
+			0//ethers.constants.MaxUint256 //amount
 		).onSuccess(fetchApproval).perform();
 	}
 	async function	onDeposit(): Promise<void> {
-		new Transaction(provider, depositERC20, set_txStatusDeposit).populate(
-			toAddress(vault.VAULT_ADDR), //vault
-			vaultSpender, //spender (vault or router)
-			amount.raw, //amount
-			vault.VAULT_ABI !== 'v3' //isLegacy
-		).onSuccess(onProceed).perform();
+		new Transaction(provider, depositWithPermitERC20, set_txStatusDeposit).populate({
+			tokenAddress: toAddress(vault.WANT_ADDR),
+			vaultAddress: toAddress(vault.VAULT_ADDR),
+			routerAddress: toAddress(yearnRouterForChain),
+			amount: amount.raw,
+			isLegacy: vault.VAULT_ABI !== 'v3'
+		}).onSuccess(onProceed).perform();
+
+		// new Transaction(provider, depositERC20, set_txStatusDeposit).populate(
+		// 	toAddress(vault.VAULT_ADDR), //vault
+		// 	vaultSpender, //spender (vault or router)
+		// 	amount.raw, //amount
+		// 	vault.VAULT_ABI !== 'v3' //isLegacy
+		// ).onSuccess(onProceed).perform();
 	}
 
 	return (
@@ -256,7 +264,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			<Button
 				variant={'outlined'}
 				isBusy={txStatusDeposit.pending}
-				isDisabled={txStatusDeposit.error || txStatusDeposit.pending || vaultData.allowance.raw.isZero() || amount.raw.isZero()}
+				// isDisabled={txStatusDeposit.error || txStatusDeposit.pending || vaultData.allowance.raw.isZero() || amount.raw.isZero()}
 				onClick={onDeposit}>
 				{'💰 Deposit'}
 			</Button>
@@ -311,21 +319,13 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		).onSuccess(fetchApproval).perform();
 	}
 	async function	onWithdraw(): Promise<void> {
-		if (process.env.SHOULD_USE_PERMIT) {
-			new Transaction(provider, withdrawWithPermitERC20, set_txStatusWithdraw).populate(
-				vault.CHAIN_ID,
-				vault.VAULT_ADDR,
-				yearnRouterForChain,
-				amount.raw
-			).onSuccess(onProceed).perform();
-		} else {
-			new Transaction(provider, withdrawERC20, set_txStatusWithdraw).populate(
-				vault.VAULT_ADDR, //vault
-				vaultSpender, //spender (vault or router)
-				amount.raw, //amount
-				vault.VAULT_ABI !== 'v3' //isLegacy
-			).onSuccess(onProceed).perform();
-		}
+		new Transaction(provider, withdrawWithPermitERC20, set_txStatusWithdraw).populate({
+			vaultAddress: vault.VAULT_ADDR,
+			routerAddress: yearnRouterForChain,
+			amount: amount.raw,
+			isLegacy: vault.VAULT_ABI !== 'v3',
+			shouldRedeem: amount.raw.eq(vaultData.balanceOf.raw)
+		}).onSuccess(onProceed).perform();
 	}
 
 	return (
