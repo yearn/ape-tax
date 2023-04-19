@@ -2,7 +2,7 @@ import React, {Fragment, useCallback, useMemo, useState} from 'react';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
-import {apeInVault, apeOutVault, approveERC20, depositWithPermitERC20, withdrawWithPermitERC20} from 'utils/actions';
+import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
 import {getChainIDOrTestProvider} from 'utils/utils';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -190,24 +190,24 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 		new Transaction(provider, approveERC20, set_txStatusApproval).populate(
 			toAddress(vault.WANT_ADDR), //token
 			vaultSpender,
-			0//ethers.constants.MaxUint256 //amount
+			ethers.constants.MaxUint256 //amount
 		).onSuccess(fetchApproval).perform();
 	}
 	async function	onDeposit(): Promise<void> {
-		new Transaction(provider, depositWithPermitERC20, set_txStatusDeposit).populate({
-			tokenAddress: toAddress(vault.WANT_ADDR),
-			vaultAddress: toAddress(vault.VAULT_ADDR),
-			routerAddress: toAddress(yearnRouterForChain),
-			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI !== 'v3'
-		}).onSuccess(onProceed).perform();
+		// new Transaction(provider, depositWithPermitERC20, set_txStatusDeposit).populate({
+		// 	tokenAddress: toAddress(vault.WANT_ADDR),
+		// 	vaultAddress: toAddress(vault.VAULT_ADDR),
+		// 	routerAddress: toAddress(yearnRouterForChain),
+		// 	amount: amount.raw,
+		// 	isLegacy: vault.VAULT_ABI !== 'v3'
+		// }).onSuccess(onProceed).perform();
 
-		// new Transaction(provider, depositERC20, set_txStatusDeposit).populate(
-		// 	toAddress(vault.VAULT_ADDR), //vault
-		// 	vaultSpender, //spender (vault or router)
-		// 	amount.raw, //amount
-		// 	vault.VAULT_ABI !== 'v3' //isLegacy
-		// ).onSuccess(onProceed).perform();
+		new Transaction(provider, depositERC20, set_txStatusDeposit).populate(
+			toAddress(vault.VAULT_ADDR), //vault
+			vaultSpender, //spender (vault or router)
+			amount.raw, //amount
+			vault.VAULT_ABI !== 'v3' //isLegacy
+		).onSuccess(onProceed).perform();
 	}
 
 	return (
