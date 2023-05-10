@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {Fragment, useCallback, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
@@ -14,7 +14,7 @@ import type {ReactElement} from 'react';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
-function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement | null {
+function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement {
 	const	{provider, isActive, address, chainID, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
@@ -57,7 +57,7 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 	}, [vault, communityVaults]);
 
 	if (!currentVault) {
-		return null;
+		return <Fragment />;
 	}
 
 	/* 🔵 - Yearn Finance ******************************************************

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import {ethers} from 'ethers';
@@ -21,7 +21,7 @@ function sortBy<T>(arr: T[], k: keyof T): T[] {
 	return arr.concat().sort((a, b): number => (a[k] > b[k]) ? 1 : ((a[k] < b[k]) ? -1 : 0));
 }
 
-function Tag({status}: {status: string}): ReactElement | null {
+function Tag({status}: {status: string}): ReactElement {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
 			<>
@@ -65,12 +65,12 @@ function Tag({status}: {status: string}): ReactElement | null {
 			</span>
 		);
 	}
-	return null;
+	return <Fragment />;
 }
 
-function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElement | null {
+function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElement {
 	if (vaultsInactive.length === 0) {
-		return null;
+		return <Fragment />;
 	}
 	return (
 		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 font-mono text-sm font-normal text-[#485570]'}>
