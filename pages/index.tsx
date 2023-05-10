@@ -25,7 +25,7 @@ function Tag({status}: {status: string}): ReactElement {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
 			<>
-				<span className={'ml-2 hidden rounded-md bg-accent-500 px-2 py-1 font-mono text-xxs text-white lg:inline'}>
+				<span className={'ml-2 hidden rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:inline'}>
 					<a
 						href={'https://yearn.finance/vaults'}
 						target={'_blank'}
@@ -33,7 +33,7 @@ function Tag({status}: {status: string}): ReactElement {
 						{'Use Production'}
 					</a>
 				</span>
-				<span className={'ml-2 inline rounded-md bg-accent-500 px-2 py-1 font-mono text-xxs text-white lg:hidden'}>
+				<span className={'ml-2 inline rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:hidden'}>
 					<a
 						href={'https://yearn.finance/vaults'}
 						target={'_blank'}
