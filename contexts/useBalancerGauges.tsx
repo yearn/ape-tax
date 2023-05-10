@@ -67,7 +67,6 @@ export const BalancerGaugeContextApp = ({children}: {children: ReactElement}): R
 
 		const	gaugeListDetailsCalls = [];
 		const	auraPoolsCall = [];
-
 		const	gaugeList = listOfGauges.gauges.filter((e): boolean => e.type.name === 'Ethereum');
 		let		currentProvider = provider || getProvider(safeChainID);
 		if (currentProvider?.network?.chainId !== 1) {
