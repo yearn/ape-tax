@@ -12,7 +12,7 @@ import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 
-	const	{data: vaultAPYSWR} = useSWR(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true}) as {data: Maybe<TSpecificAPIResult>};
+	const	{data: vaultAPYSWR, isLoading} = useSWR<Maybe<TSpecificAPIResult>>(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
 
 	const	[vaultAPY, set_vaultAPY] = useState<Maybe<TSpecificAPIResult>>(null);
 
@@ -76,7 +76,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last week): '}</p>
 					<p className={'inline text-neutral-700'}>
-						<Suspense wait={!vaultAPY}>
+						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.week || '-'}`}
 						</Suspense>
 					</p>
@@ -84,7 +84,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last month): '}</p>
 					<p className={'inline text-neutral-700'}>
-						<Suspense wait={!vaultAPY}>
+						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.month || '-'}`}
 						</Suspense>
 					</p>
@@ -92,7 +92,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (inception): '}</p>
 					<p className={'inline text-neutral-700'}>
-						<Suspense wait={!vaultAPY}>
+						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.inception || '-'}`}
 						</Suspense>
 					</p>

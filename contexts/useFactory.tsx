@@ -3,6 +3,7 @@ import {Contract} from 'ethcall';
 import FACTORY_ABI from 'utils/ABI/factory.abi.json';
 import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
 import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
@@ -26,7 +27,8 @@ const	FactoryContext = createContext<TFactoryContext>({
 });
 
 export const FactoryContextApp = ({children}: {children: ReactElement}): ReactElement => {
-	const	{provider, chainID} = useWeb3();
+	const	{provider} = useWeb3();
+	const	{safeChainID} = useChainID();
 	const	[communityVaults, set_communityVaults] = useState<TVault[]>([]);
 	const	[nonce, set_nonce] = useState(0);
 
@@ -34,14 +36,17 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 	**	getCommunityVaults will fetch the currently deployed community vaults
 	***************************************************************************/
 	const getCommunityVaults = useCallback(async (): Promise<void> => {
-		if (chainID !== 1 && chainID !== 1337) {
+		if (safeChainID !== 1) {
 			performBatchedUpdates((): void => {
 				set_communityVaults([]);
 				set_nonce((n): number => n + 1);
 			});
 			return;
 		}
-		const	currentProvider = provider || getProvider(chainID || 1337);
+		let		currentProvider = provider || getProvider(safeChainID);
+		if (currentProvider?.network?.chainId !== 1) {
+			currentProvider = getProvider(safeChainID);
+		}
 		const	ethcallProvider = await newEthCallProvider(currentProvider);
 
 		const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS as string, FACTORY_ABI as never);
@@ -88,12 +93,11 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			set_communityVaults(vaults);
 			set_nonce((n): number => n + 1);
 		});
-	}, [provider, chainID]);
+	}, [provider, safeChainID]);
 
 	useEffect((): void => {
 		getCommunityVaults();
 	}, [getCommunityVaults]);
-
 
 	/* 🔵 - Yearn Finance ******************************************************
 	**	Setup and render the Context provider to use in the app.
