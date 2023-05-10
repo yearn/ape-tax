@@ -171,7 +171,7 @@ function	Index(): ReactElement {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Loading Ex'}<sup>{'2'}</sup>{' 🧪...'}</h1>
+				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Not connected to Ex'}<sup>{'2'}</sup>{' 🧪'}</h1>
 			</section>
 		);
 	}
