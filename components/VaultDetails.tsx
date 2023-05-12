@@ -22,11 +22,11 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 	return (
 		<section aria-label={'DETAILS'}>
-			<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
+			<div className={'mb-4 font-mono text-sm font-medium'}>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Vault: '}</p>
+					<p className={'inline text-neutral-700'}>{'Vault: '}</p>
 					<a
-						className={'dashed-underline-gray text-neutral-700'}
+						className={'dashed-underline-gray text-neutral-500'}
 						href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`}
 						target={'_blank'}
 						rel={'noreferrer'}>
@@ -34,64 +34,64 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</a>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Version: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Version: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>{vaultData.apiVersion}</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Deposit Limit: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Deposit Limit: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${vaultData.depositLimit.raw.isZero() ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Total Assets: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Total Assets: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${formatAmount(vaultData?.totalAssets.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Total AUM: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Total AUM: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.totalAUM === 0 ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
 						</Suspense>
 					</p>
 				</div>
 			</div>
-			<div className={`mb-4 font-mono text-sm font-medium text-neutral-700 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+			<div className={`mb-4 font-mono text-sm font-medium ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Gross APR (last week): '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Gross APR (last week): '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.week || '-'}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Gross APR (last month): '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Gross APR (last month): '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.month || '-'}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Gross APR (inception): '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Gross APR (inception): '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!!vaultAPY && !isLoading}>
 							{`${vaultAPY?.inception || '-'}`}
 						</Suspense>
@@ -100,16 +100,16 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 			</div>
 			<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Price Per Share: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Price Per Share: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${vaultData.pricePerShare.normalized}`}
 						</Suspense>
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{'Available limit: '}</p>
-					<p className={'inline text-neutral-700'}>
+					<p className={'inline text-neutral-700'}>{'Available limit: '}</p>
+					<p className={'inline text-neutral-500'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${formatAmount(vaultData.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>

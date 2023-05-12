@@ -207,24 +207,24 @@ function	Index(): ReactElement {
 
 					<div>
 						<div className={'mb-6 mt-12 flex flex-col space-y-2'}>
-							<label className={'-mb-1 text-xs font-semibold text-neutral-700/60'}>{'Gauge Address'}</label>
+							<label className={'-mb-1 text-xs font-semibold text-neutral-500'}>{'Gauge Address'}</label>
 							<ComboBox selectedGauge={selectedGauge} set_selectedGauge={set_selectedGauge} />
 						</div>
 						<div className={'mb-12 flex flex-col space-y-3'}>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Name'}</label>
+								<label className={'text-xs font-semibold text-neutral-500'}>{'Vault Name'}</label>
 								<p className={'font-mono text-neutral-500'}>
 									{gaugeInfo.exists ? `Balancer ${gaugeInfo.symbol} Auto-Compounding yVault` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Symbol'}</label>
+								<label className={'text-xs font-semibold text-neutral-500'}>{'Vault Symbol'}</label>
 								<p className={'font-mono text-neutral-500'}>
 									{gaugeInfo.exists ? `yvBlp${gaugeInfo.symbol}` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700/60'}>{'Vault Address'}</label>
+								<label className={'text-xs font-semibold text-neutral-500'}>{'Vault Address'}</label>
 								{gaugeInfo.deployed ? <AddressWithActions
 									explorer={'https://etherscan.io'}
 									className={'font-mono font-normal text-neutral-500'}
@@ -236,7 +236,7 @@ function	Index(): ReactElement {
 						<button
 							onClick={onCreateVault}
 							disabled={!selectedGauge || isZeroAddress(selectedGauge.address) || !!error || txStatusCreateVault.pending}
-							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || !!error ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 w-full border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold text-neutral-900 transition-colors`}>
+							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || !!error ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 w-full border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold text-neutral-700 transition-colors`}>
 							{error ? '❌ A vault already exists for this gauge' : '🤯 Create your own Vault'}
 						</button>
 					</div>

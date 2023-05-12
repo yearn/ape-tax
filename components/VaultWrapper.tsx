@@ -168,7 +168,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 	return (
 		<div className={'mt-8 text-neutral-500'}>
 			<div>
-				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-700'}>{vault.LOGO}</h1>
+				<h1 className={'font-mono text-7xl font-semibold leading-120px'}>{vault.LOGO}</h1>
 				<h1 className={'font-mono text-3xl font-semibold text-neutral-700'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage

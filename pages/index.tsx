@@ -223,7 +223,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Endorsed:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-500'}>
 								{` $${formatAmount(tvl?.tvlEndorsed, 2)}`}
 							</span>
 						</div>
@@ -231,7 +231,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Experimental:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-500'}>
 								{` $${formatAmount(tvl?.tvlExperimental, 2)}`}
 							</span>
 						</div>
@@ -239,7 +239,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Deprecated:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-mono font-normal text-neutral-500'}>
 								{` $${formatAmount(tvl?.tvlDeprecated, 2)}`}
 							</span>
 						</div>
