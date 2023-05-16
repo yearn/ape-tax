@@ -196,10 +196,10 @@ function	Index(): ReactElement {
 		<main className={'max-w-5xl'}>
 			<div>
 				<div className={'hidden md:block'}>
-					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-700'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-700'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
@@ -210,7 +210,7 @@ function	Index(): ReactElement {
 			<section aria-label={'TVL & new Vault'} className={'my-8 grid grid-cols-2'}>
 				<div>
 					<div>
-						<span className={'font-mono text-base font-semibold text-neutral-700'}>
+						<span className={'font-mono text-base font-semibold text-neutral-900'}>
 							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
@@ -223,7 +223,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Endorsed:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-500'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlEndorsed, 2)}`}
 							</span>
 						</div>
@@ -231,7 +231,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Experimental:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-500'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlExperimental, 2)}`}
 							</span>
 						</div>
@@ -239,7 +239,7 @@ function	Index(): ReactElement {
 							<span className={'font-mono font-semibold text-neutral-700'}>
 								{'Deprecated:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-500'}>
+							<span className={'font-mono font-normal text-neutral-700'}>
 								{` $${formatAmount(tvl?.tvlDeprecated, 2)}`}
 							</span>
 						</div>
@@ -256,7 +256,7 @@ function	Index(): ReactElement {
 
 			<div className={'grid max-w-5xl grid-cols-2 gap-2'}>
 				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🚀 Experimental'}</h2>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault): ReactElement => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -269,7 +269,7 @@ function	Index(): ReactElement {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
@@ -281,7 +281,7 @@ function	Index(): ReactElement {
 				</div>
 
 				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🧠 Weird'}</h2>
+					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault): ReactElement => (
 							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
@@ -294,7 +294,7 @@ function	Index(): ReactElement {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
 										<Tag status={vault.VAULT_STATUS} />
@@ -304,7 +304,7 @@ function	Index(): ReactElement {
 						))}
 					</ul>
 
-					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-700'}>{'🦍 Community'}</h2>
+					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-900'}>{'🦍 Community'}</h2>
 					<ul>
 						{(communityVaults || [])?.map((vault: TVault): ReactElement => (
 							<li key={vault.VAULT_ADDR} className={'cursor-pointer'}>
@@ -313,7 +313,7 @@ function	Index(): ReactElement {
 										<span className={'flex flex-row items-center'}>
 											{'🦍🦍'}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.SYMBOL || ''}
 										</span>
 									</div>
