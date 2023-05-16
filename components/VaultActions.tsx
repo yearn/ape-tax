@@ -265,9 +265,9 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 
 	return (
 		<section aria-label={'ACTIONS'} className={'my-4 mt-8'}>
-			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-700'}>{'APE-IN/OUT'}</h1>
+			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'APE-IN/OUT'}</h1>
 			<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-				<p className={'font-mono text-sm font-medium text-neutral-500'}>{'Deposit closed.'}</p>
+				<p className={'font-mono text-sm font-medium text-neutral-700'}>{'Deposit closed.'}</p>
 			</div>
 
 			{vault.ZAP_ADDR ? (
@@ -275,14 +275,14 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 					<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
 						<div className={'mb-2 mr-2 flex flex-row items-center'} style={{height: '33px'}}>
 							<input
-								className={'border-neutral-400 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
+								className={'border-neutral-700 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-700'}
 								style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 								type={'text'}
 								value={zapAmount?.normalized}
 								onChange={(e: ChangeEvent<HTMLInputElement>): void => set_zapAmount(
 									handleInputChangeEventValue(e.target.value, vaultData.decimals)
 								)} />
-							<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-400 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
+							<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-500 px-2 py-1.5 font-mono text-xs text-neutral-700'} style={{height: '33px'}}>
 								{chainCoin}&nbsp;
 							</div>
 						</div>
@@ -320,14 +320,14 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 				<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
 					<div className={'mb-2 mr-2 flex flex-row items-center'} style={{height: '33px'}}>
 						<input
-							className={'border-neutral-400 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
+							className={'border-neutral-500 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-700'}
 							style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
 							type={'text'}
 							value={amount?.normalized}
 							onChange={(e: ChangeEvent<HTMLInputElement>): void => set_amount(
 								handleInputChangeEventValue(e.target.value, vaultData.decimals)
 							)} />
-						<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-400 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
+						<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-500 px-2 py-1.5 font-mono text-xs text-neutral-700'} style={{height: '33px'}}>
 							{vault.WANT_SYMBOL}
 						</div>
 					</div>

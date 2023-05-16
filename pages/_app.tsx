@@ -34,7 +34,7 @@ function App(props: AppProps): ReactElement {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-500'}>
+				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-700'}>
 					<a
 						href={'https://twitter.com/ape_tax'}
 						target={'_blank'}
