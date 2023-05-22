@@ -22,7 +22,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 	return (
 		<section aria-label={'DETAILS'}>
-			<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
+			<div className={'mb-4 font-mono text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Vault: '}</p>
 					<a
@@ -72,7 +72,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</p>
 				</div>
 			</div>
-			<div className={`mb-4 font-mono text-sm font-medium text-neutral-700 ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+			<div className={`mb-4 font-mono text-sm font-medium ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last week): '}</p>
 					<p className={'inline text-neutral-700'}>
@@ -116,14 +116,14 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</p>
 				</div>
 				<div className={'progress-bar'}>
-					<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-900 md:inline'}>
+					<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
 							&nbsp;{'['}&nbsp;
 						<ProgressChart
 							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
 							width={50} />
 							&nbsp;{']'}&nbsp;
 					</span>
-					<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-900 md:hidden'}>
+					<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
 							&nbsp;{'['}&nbsp;
 						<ProgressChart
 							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}

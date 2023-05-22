@@ -13,6 +13,18 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 module.exports = withTM(withBundleAnalyzer(withPWA({
+	async rewrites() {
+		return [
+			{
+				source: '/js/script.js',
+				destination: 'https://plausible.io/js/script.js'
+			},
+			{
+				source: '/api/event',
+				destination: 'https://plausible.io/api/event'
+			}
+		];
+	},
 	env: {
 		/* 🔵 - Yearn Finance **************************************************
 		** Stuff used for the SEO or some related elements, like the title, the
