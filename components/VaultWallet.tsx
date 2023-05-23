@@ -17,23 +17,23 @@ function	VaultWallet({vault, vaultData}: {vault: TVault, vaultData: TVaultData})
 			<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your Account: '}</p>
-					<p className={'inline text-neutral-700'}>{ens || `${truncateHex(toAddress(address), 5)}`}</p>
+					<p className={'ml-3 inline text-neutral-700'}>{ens || `${truncateHex(toAddress(address), 5)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your vault shares: '}</p>
-					<p className={'inline text-neutral-700'}>{`${formatAmount(vaultData?.balanceOf.normalized, 2)}`}</p>
+					<p className={'ml-3 inline text-neutral-700'}>{`${formatAmount(vaultData?.balanceOf.normalized, 2)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{'Your shares value: '}</p>
-					<p className={'inline text-neutral-700'}>{`${vaultData.balanceOfValue === 0 ? '-' : formatAmount(vaultData?.balanceOfValue, 2)}`}</p>
+					<p className={'ml-3 inline text-neutral-700'}>{`${vaultData.balanceOfValue === 0 ? '-' : formatAmount(vaultData?.balanceOfValue, 2)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-					<p className={'inline text-neutral-700'}>{`${formatAmount(vaultData?.wantBalance.normalized, 2)}`}</p>
+					<p className={'ml-3 inline text-neutral-700'}>{`${formatAmount(vaultData?.wantBalance.normalized, 2)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-700'}>{`Your ${chainCoin} Balance: `}</p>
-					<p className={'inline text-neutral-700'}>{`${formatAmount(vaultData?.coinBalance.normalized, 2)}`}</p>
+					<p className={'ml-3 inline text-neutral-700'}>{`${formatAmount(vaultData?.coinBalance.normalized, 2)}`}</p>
 				</div>
 			</div>
 		</section>
