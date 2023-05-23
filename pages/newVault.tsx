@@ -207,24 +207,24 @@ function	Index(): ReactElement {
 
 					<div>
 						<div className={'mb-6 mt-12 flex flex-col space-y-2'}>
-							<label className={'-mb-1 text-xs font-semibold text-neutral-700'}>{'Gauge Address'}</label>
+							<label className={'-mb-1 text-xs font-semibold text-neutral-700'}>{'Gauge Address:'}</label>
 							<ComboBox selectedGauge={selectedGauge} set_selectedGauge={set_selectedGauge} />
 						</div>
 						<div className={'mb-12 flex flex-col space-y-3'}>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Name'}</label>
+								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Name:'}</label>
 								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `Balancer ${gaugeInfo.symbol} Auto-Compounding yVault` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Symbol'}</label>
+								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Symbol:'}</label>
 								<p className={'font-mono text-neutral-700'}>
 									{gaugeInfo.exists ? `yvBlp${gaugeInfo.symbol}` : '-'}
 								</p>
 							</div>
 							<div>
-								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Address'}</label>
+								<label className={'text-xs font-semibold text-neutral-700'}>{'Vault Address:'}</label>
 								{gaugeInfo.deployed ? <AddressWithActions
 									explorer={'https://etherscan.io'}
 									className={'font-mono font-normal text-neutral-700'}
