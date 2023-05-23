@@ -1151,5 +1151,17 @@
     "COINGECKO_SYMBOL": "weth",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "dai-ape": {
+    "TITLE": "DAI Ape",
+    "LOGO": "☠️🦍",
+    "VAULT_ABI": "yVaultV2",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x780210e8826064b94e71f5b7bbb73d92637c48d6",
+    "WANT_ADDR": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 10
   }
 }
