@@ -259,9 +259,9 @@ function	Index(): ReactElement {
 					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault): ReactElement => (
-							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
+							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
 								<Link href={`/${vault.VAULT_SLUG}`}>
-									<div className={'my-4 flex flex-row items-center'}>
+									<div className={'mb-4 flex flex-row items-center'}>
 										<span className={'flex flex-row items-center'}>
 											{
 												(vault.LOGO_ARR || []).map((letter, index): ReactElement => (
@@ -272,9 +272,9 @@ function	Index(): ReactElement {
 										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
-										<Tag status={vault.VAULT_STATUS} />
 									</div>
 								</Link>
+								<Tag status={vault.VAULT_STATUS} />
 							</li>
 						))}
 					</ul>
@@ -284,9 +284,9 @@ function	Index(): ReactElement {
 					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault): ReactElement => (
-							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
+							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
 								<Link href={`/${vault.VAULT_SLUG}`}>
-									<div className={'my-4 flex flex-row items-center'}>
+									<div className={'mb-4 flex flex-row items-center'}>
 										<span className={'flex flex-row items-center'}>
 											{
 												(vault.LOGO_ARR || []).map((letter, index): ReactElement => (
@@ -297,9 +297,9 @@ function	Index(): ReactElement {
 										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
-										<Tag status={vault.VAULT_STATUS} />
 									</div>
 								</Link>
+								<Tag status={vault.VAULT_STATUS} />
 							</li>
 						))}
 					</ul>
