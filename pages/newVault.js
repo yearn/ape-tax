@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import {AddressWithActions} from 'components/AddressWithAction';
 import useBalancerGauge from 'contexts/useBalancerGauges';
 import useFactory from 'contexts/useFactory';
@@ -33,7 +33,7 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 			<div className={'relative'}>
 				<div className={'w-full'}>
 					<Combobox.Input
-						className={'w-full border-neutral-400 bg-white/0 py-1.5 px-2 font-mono text-neutral-700 focus:border-neutral-700 focus:ring-0 active:ring-0'}
+						className={'w-full border-neutral-400 bg-white/0 px-2 py-1.5 font-mono text-neutral-700 focus:border-neutral-700 focus:ring-0 active:ring-0'}
 						displayValue={(gauge) => gauge?.address}
 						onChange={(event) => setQuery(event.target.value)}
 					/>
@@ -61,7 +61,7 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 				>
 					<Combobox.Options className={'absolute mt-1 max-h-60 w-full overflow-auto border border-neutral-400 bg-neutral-0 py-1 text-base focus:outline-none'}>
 						{!filteredGauges || (filteredGauges || [])?.length === 0 && query !== '' ? (
-							<div className={'relative cursor-default select-none py-2 px-4 text-neutral-700'}>
+							<div className={'relative cursor-default select-none px-4 py-2 text-neutral-700'}>
 								{'Nothing found.'}
 							</div>
 						) : (
@@ -92,10 +92,10 @@ function ComboBox({selectedGauge, set_selectedGauge}) {
 function	Index() {
 	const	{getCommunityVaults} = useFactory();
 	const	{provider, isActive} = useWeb3();
-	const	[selectedGauge, set_selectedGauge] = React.useState();
-	const	[gaugeInfo, set_gaugeInfo] = React.useState({exists: false, name: '', symbol: '', deployed: false, vaultAddress: ''});
-	const	[error, set_error] = React.useState(undefined);
-	const	[txStatusCreateVault, set_txStatusCreateVault] = React.useState(defaultTxStatus);
+	const	[selectedGauge, set_selectedGauge] = useState();
+	const	[gaugeInfo, set_gaugeInfo] = useState({exists: false, name: '', symbol: '', deployed: false, vaultAddress: ''});
+	const	[error, set_error] = useState(undefined);
+	const	[txStatusCreateVault, set_txStatusCreateVault] = useState(defaultTxStatus);
 	
 	/* 🔵 - Yearn Finance ******************************************************
 	** The checkGauge callback will, for a given gauge address, check if the
@@ -103,7 +103,7 @@ function	Index() {
 	** the gauge. If the gauge has already been deployed as a vault, an error
 	** will be thrown indicating that the vault already exists.
 	**************************************************************************/
-	const	checkGauge = React.useCallback(async () => {
+	const	checkGauge = useCallback(async () => {
 		const	ethcallProvider = await newEthCallProvider(provider);
 		const	balancerGlobalContract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS, [{'stateMutability':'view', 'type':'function', 'name':'alreadyExistsFromGauge', 'inputs':[{'name':'address', 'type':'address'}], 'outputs':[{'name':'', 'type':'address'}]}]);
 		const	gaugeContract = new Contract(selectedGauge?.address, [{'stateMutability':'view', 'type':'function', 'name':'name', 'inputs':[], 'outputs':[{'name':'', 'type':'string'}]}, {'stateMutability':'view', 'type':'function', 'name':'symbol', 'inputs':[], 'outputs':[{'name':'', 'type':'string'}]}]);
@@ -126,7 +126,7 @@ function	Index() {
 			});
 		}
 	}, [provider, selectedGauge?.address]);
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!isZeroAddress(selectedGauge?.address)) {
 			checkGauge();
 		} else {
@@ -181,7 +181,7 @@ function	Index() {
 					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
@@ -204,7 +204,7 @@ function	Index() {
 					</div>
 
 					<div>
-						<div className={'mt-12 mb-6 flex flex-col space-y-2'}>
+						<div className={'mb-6 mt-12 flex flex-col space-y-2'}>
 							<label className={'-mb-1 text-xs font-semibold text-neutral-900/60'}>{'Gauge Address'}</label>
 							<ComboBox selectedGauge={selectedGauge} set_selectedGauge={set_selectedGauge} />
 						</div>
@@ -234,7 +234,7 @@ function	Index() {
 						<button
 							onClick={onCreateVault}
 							disabled={!selectedGauge || isZeroAddress(selectedGauge.address) || error || txStatusCreateVault.pending}
-							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || error ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mr-2 mb-2 w-full border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold text-neutral-900 transition-colors`}>
+							className={`${!selectedGauge || isZeroAddress(selectedGauge.address) || error ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 w-full border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold text-neutral-900 transition-colors`}>
 							{error ? '❌ A vault already exists for this gauge' : '🤯 Create your own Vault'}
 						</button>
 					</div>

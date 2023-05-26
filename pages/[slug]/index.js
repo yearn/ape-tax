@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultDetails from 'components/VaultWrapper';
 import useFactory from 'contexts/useFactory';
@@ -13,7 +13,7 @@ import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 function Wrapper({vault, slug, prices}) {
 	const	{provider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
 	const	{communityVaults} = useFactory();
-	const	[currentVault, set_currentVault] = React.useState(vault);
+	const	[currentVault, set_currentVault] = useState(vault);
 	const	windowInFocus = useWindowInFocus();
 
 	/* 🔵 - Yearn Finance ******************************************************

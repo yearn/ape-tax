@@ -1,5 +1,5 @@
 
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import {parseMarkdown} from 'utils';

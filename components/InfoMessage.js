@@ -1,4 +1,3 @@
-import	React	from	'react';
 
 function	InfoMessage({status}) {
 	if (status === 'use_production' || status === 'endorsed') {

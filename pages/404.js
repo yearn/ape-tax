@@ -1,5 +1,3 @@
-import	React	from	'react';
-
 function	Index() {
 	return (
 		<section aria-label={'404'}>

@@ -1,4 +1,3 @@
-import React from 'react';
 import {Toaster} from 'react-hot-toast';
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';

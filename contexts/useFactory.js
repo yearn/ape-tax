@@ -1,4 +1,4 @@
-import React, {createContext, useContext} from 'react';
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import FACTORY_ABI from 'utils/ABI/factory.abi';
 import YVAULT_ABI from 'utils/ABI/yVault.abi';
@@ -14,13 +14,13 @@ import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3
 const	FactoryContext = createContext();
 export const FactoryContextApp = ({children}) => {
 	const	{provider, chainID} = useWeb3();
-	const	[communityVaults, set_communityVaults] = React.useState(undefined);
-	const	[nonce, set_nonce] = React.useState(0);
+	const	[communityVaults, set_communityVaults] = useState(undefined);
+	const	[nonce, set_nonce] = useState(0);
 
 	/* 🔵 - Yearn Finance ******************************************************
 	**	getCommunityVaults will fetch the currently deployed community vaults
 	***************************************************************************/
-	const getCommunityVaults = React.useCallback(async () => {
+	const getCommunityVaults = useCallback(async () => {
 		if (chainID !== 1 && chainID !== 1337) {
 			performBatchedUpdates(() => {
 				set_communityVaults(undefined);
@@ -77,7 +77,7 @@ export const FactoryContextApp = ({children}) => {
 		});
 	}, [provider, chainID]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		getCommunityVaults();
 	}, [getCommunityVaults]);
 

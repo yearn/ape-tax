@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 import chains from 'utils/chains.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import InfoMessage from 'components/InfoMessage';
 import VaultActions from 'components/VaultActions';
 import VaultDetails from 'components/VaultDetails';

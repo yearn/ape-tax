@@ -1,4 +1,3 @@
-import	React					from	'react';
 import	AnimatedWait			from	'components/AnimatedWait';
 
 function	Suspense({wait, children}) {

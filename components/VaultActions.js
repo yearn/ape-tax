@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {ethers} from 'ethers';
 import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
 import chains from 'utils/chains.json';

@@ -1,4 +1,3 @@
-import React from 'react';
 import {formatAmount} from 'utils';
 import chains from 'utils/chains.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';

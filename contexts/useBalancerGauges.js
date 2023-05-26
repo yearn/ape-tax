@@ -1,4 +1,4 @@
-import React, {createContext, useContext} from 'react';
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import {request} from 'graphql-request';
 import AURA_BOOSTER_ABI from 'utils/ABI/auraBooster.abi';
@@ -16,8 +16,8 @@ import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3
 const	BalancerGaugeContext = createContext();
 export const BalancerGaugeContextApp = ({children}) => {
 	const	{provider, chainID} = useWeb3();
-	const	[balancerGauges, set_balancerGauges] = React.useState(undefined);
-	const	[nonce, set_nonce] = React.useState(0);
+	const	[balancerGauges, set_balancerGauges] = useState(undefined);
+	const	[nonce, set_nonce] = useState(0);
 
 	/* 🔵 - Yearn Finance ******************************************************
 	**	getBalanceGauges will perform a graphQL query to the balancer subgraph
@@ -25,7 +25,7 @@ export const BalancerGaugeContextApp = ({children}) => {
 	**	asynchronously and followed by a multicall to get the name and symbols
 	**	of each of theses gauges.
 	***************************************************************************/
-	const getBalanceGauges = React.useCallback(async () => {
+	const getBalanceGauges = useCallback(async () => {
 		if (chainID !== 1 && chainID !== 1337) {
 			performBatchedUpdates(() => {
 				set_balancerGauges(undefined);
@@ -87,7 +87,7 @@ export const BalancerGaugeContextApp = ({children}) => {
 		});
 	}, [provider, chainID]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		getBalanceGauges();
 	}, [getBalanceGauges]);
 

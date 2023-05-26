@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {BigNumber, ethers} from 'ethers';
 import {formatAmount} from 'utils';
 import {approveToken, depositToken, withdrawToken} from 'utils/actions';
