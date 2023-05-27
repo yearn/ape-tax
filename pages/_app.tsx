@@ -1,4 +1,3 @@
-import React from 'react';
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';
 import {BalancerGaugeContextApp} from 'contexts/useBalancerGauges';

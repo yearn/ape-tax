@@ -1,4 +1,4 @@
-import React, {Fragment, useCallback, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import {AddressWithActions} from 'components/AddressWithAction';
 import {useBalancerGauge} from 'contexts/useBalancerGauges';
 import {useFactory} from 'contexts/useFactory';
