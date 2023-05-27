@@ -11,7 +11,7 @@ import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 function Wrapper({vault, slug, prices}) {
-	const	{provider, isActive, address, ens, chainID, openModalLogin} = useWeb3();
+	const	{provider, isActive, address, ens, chainID, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = React.useState(vault);
 	const	windowInFocus = useWindowInFocus();
@@ -75,7 +75,7 @@ function Wrapper({vault, slug, prices}) {
 					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌🔌'}</p>
 					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-900'}>{'Not connected'}</p>
 					<button
-						onClick={openModalLogin}
+						onClick={openLoginModal}
 						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔌 Connect wallet'}
 					</button>
