@@ -186,11 +186,11 @@ function	Index() {
 	return (
 		<main className={'max-w-5xl'}>
 			<div>
-				<div className={'hidden md:block'}>
+				<div className={'hidden lg:block'}>
 					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
-				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900'}>{'Ex'}<sup className={'mt-4 mr-2'}>{'2'}</sup>{' Registry'}</h1>
+				<div className={'flex lg:hidden'}>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900 md:text-3xl'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
