@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import {Fragment, useState} from 'react';
 import {ethers} from 'ethers';
 import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';

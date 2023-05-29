@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import {ethers} from 'ethers';

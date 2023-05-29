@@ -1,4 +1,4 @@
-import React, {Fragment, useCallback, useState} from 'react';
+import {Fragment, useCallback, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';

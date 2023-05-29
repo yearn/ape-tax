@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import FACTORY_ABI from 'utils/ABI/factory.abi.json';
 import YVAULT_ABI from 'utils/ABI/yVault.abi.json';

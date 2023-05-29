@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import {Fragment, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
