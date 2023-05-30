@@ -76,7 +76,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last week): '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
-						<Suspense wait={!!vaultAPY && !isLoading}>
+						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.week || '-'}`}
 						</Suspense>
 					</p>
@@ -84,7 +84,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last month): '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
-						<Suspense wait={!!vaultAPY && !isLoading}>
+						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.month || '-'}`}
 						</Suspense>
 					</p>
@@ -92,7 +92,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (inception): '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
-						<Suspense wait={!!vaultAPY && !isLoading}>
+						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.inception || '-'}`}
 						</Suspense>
 					</p>
