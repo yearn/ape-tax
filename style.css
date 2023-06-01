@@ -1,0 +1,174 @@
+@import "@yearn-finance/web-lib/style.css";
+
+* {@apply font-mono;}
+:root,
+:root body[data-theme="light"] {
+	--default-rounded: 0rem;
+	--color-yellow-900: 55 100% 67%;
+	--color-yellow-300: 55 100% 95%;
+	--color-yellow-200: 55 100% 90%;
+}
+
+:root,
+:root body[data-theme="dark"] {
+	--default-rounded: 0rem;
+	--color-yellow-900: 55 100% 67%;
+	--color-yellow-300: 55 100% 95%;
+	--color-yellow-200: 55 100% 90%;
+}
+
+.yearn--modal {
+	@apply sm:max-w-2xl;
+}
+
+::placeholder {
+	color: #C5C6C7 !important;
+}
+:-ms-input-placeholder,
+::-ms-input-placeholder {
+	color: #C5C6C7 !important;
+}
+
+.whitePlaceholder {
+	caret-color: #FFFFFF !important;
+}
+.whitePlaceholder::placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
+}
+.whitePlaceholder:-ms-input-placeholder,
+.whitePlaceholder::-ms-input-placeholder {
+	color: #FFFFFF !important;
+	opacity: 0.5;
+}
+
+/******************************************************************************
+**	Styled button style
+******************************************************************************/
+.button {
+	will-change: transform, opacity;
+	contain: content;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: fit-content;
+	transition: 0.1s;
+	outline: none;
+	cursor: pointer;
+	font-weight: 600;
+	border-radius: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 16px;
+	padding-right: 16px;
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+}
+
+/******************************************************************************
+**	TAILWIND CSS ++
+******************************************************************************/
+.text-xxs {
+	font-size: 10px;
+	line-height: 12px;
+}
+.text-ybase {
+	font-family: Roboto;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 16px;
+	letter-spacing: 0em;
+}
+.text-ylarge {
+	font-family: Roboto;
+	font-size: 24px;
+	font-style: normal;
+	line-height: 32px;
+	letter-spacing: 0em;
+	text-align: center;
+}
+.text-yerror {
+	font-family: SF Pro Display;
+	font-size: 14px;
+	font-style: normal;
+	line-height: 17px;
+	letter-spacing: 0em;
+}
+.dashed-underline-white {
+	border-bottom: 1px dashed transparent;
+}
+.dashed-underline-white:hover {
+	border-bottom: 1px dashed #FFFFFF;
+}
+
+.dashed-underline-gray {
+	border-bottom: 1px dashed transparent;
+}
+.dashed-underline-gray:hover {
+	border-bottom: 1px dashed #2c3e50;
+}
+.dark .dashed-underline-gray:hover {
+	border-bottom: 1px dashed #ced3dd;
+}
+.progress-bar {
+	display: inline-block;
+	white-space: pre-wrap;
+}
+.noBr {
+	border-radius: 0 !important;
+}
+.noShadow {
+	box-shadow: none !important;
+}
+.toaster {
+	height: 34px !important;
+	margin-top: -0.5rem !important;
+}
+
+/* -- ElementWithActions.tsx ------------------------------------------- */
+.yearn--elementWithActions-copy {
+	@apply cursor-copy px-1 md:px-2;
+}
+.yearn--elementWithActions-linkout {
+	@apply cursor-alias;
+	& > a {@apply cursor-alias;}
+}
+.yearn--elementWithActions-icon {
+	@apply w-4 h-4 transition-colors;
+	color: var(--elementWithActions-action-color);
+	&:hover {
+		color: var(--elementWithActions-action-color-hover);
+	}
+}
+.yearn--elementWithActions {
+	@apply font-mono font-bold text-left;
+	color: var(--elementWithActions-text-color);
+	& ~ button {
+		@apply flex justify-center items-center p-0 w-8 h-8;
+		border-radius: var(--default-rounded);
+	}
+}
+
+.yearn--elementWithActions-wrapper {
+	--elementWithActions-text-color: hsl(var(--color-neutral-700));
+	--elementWithActions-action-color: hsl(var(--color-primary-500));
+	--elementWithActions-action-color-hover: hsl(var(--color-primary-600));
+	@apply flex flex-row items-center;
+}
+
+.yearn--toast-options {
+	@apply !w-screen text-sm text-neutral-700 !px-4 !rounded-none !shadow-none !py-2 !max-w-full;
+}
+
+.yearn--toast-button {
+	@apply text-xs px-3 py-1 text-[#0657F9] bg-white;
+}
+
+.yearn--button {
+	@apply mb-2 border border-solid border-neutral-500 h-8 px-2 py-0 font-mono text-sm font-semibold transition-colors hover:bg-neutral-100;
+
+	&[aria-busy="true"] svg {
+		@apply text-neutral-900;
+	}
+}

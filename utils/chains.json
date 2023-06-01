@@ -94,9 +94,9 @@
   },
   "137": {
     "chainID": "137",
-    "name": "Matic Mainnet",
+    "name": "Polygon Mainnet",
     "displayName": "Polygon",
-    "coin": "MATIC",
+    "coin": "Matic",
     "block_explorer": "https://polygonscan.com",
     "chain_swap": {
       "chainId": "0x89",
