@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import {request} from 'graphql-request';
 import AURA_BOOSTER_ABI from 'utils/ABI/auraBooster.abi.json';

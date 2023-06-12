@@ -1,8 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import InfoMessage from 'components/InfoMessage';
 import VaultActions from 'components/VaultActions';
 import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
+import VaultWallet from 'components/VaultWallet';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import LENS_ABI from 'utils/ABI/lens.abi.json';
@@ -160,13 +161,13 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 				totalAUM: Number(v.totalAssets.normalized) * price
 			}));
 		}
-	}, [chainID, networks, prices, provider, vault, retrievePrices]);
+	}, [chainID, networks, prices, provider, vault]);
 
 	return (
-		<div className={'mt-8 text-neutral-500'}>
+		<div className={'mt-8 text-neutral-700'}>
 			<div>
-				<h1 className={'font-mono text-7xl font-semibold leading-120px text-neutral-700'}>{vault.LOGO}</h1>
-				<h1 className={'font-mono text-3xl font-semibold text-neutral-700'}>{vault.TITLE}</h1>
+				<h1 className={'font-mono text-7xl font-semibold leading-120px'}>{vault.LOGO}</h1>
+				<h1 className={'font-mono text-3xl font-semibold text-neutral-900'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage
 				status={vault.VAULT_STATUS} />
@@ -176,9 +177,9 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			<VaultStrategies
 				vault={vault}
 				onUpdateVaultData={set_vaultData} />
-			{/* <VaultWallet
+			<VaultWallet
 				vault={vault}
-				vaultData={vaultData} /> */}
+				vaultData={vaultData} />
 			<VaultActions
 				vault={vault}
 				vaultData={vaultData}

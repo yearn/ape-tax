@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import {ethers} from 'ethers';
@@ -195,11 +195,11 @@ function	Index(): ReactElement {
 	return (
 		<main className={'max-w-5xl'}>
 			<div>
-				<div className={'hidden md:block'}>
-					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-700'}>{'Experimental Experiments Registry'}</h1>
+				<div className={'hidden lg:block'}>
+					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
-				<div className={'flex md:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-700'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
+				<div className={'flex lg:hidden'}>
+					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900 md:text-3xl'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
@@ -210,7 +210,7 @@ function	Index(): ReactElement {
 			<section aria-label={'TVL & new Vault'} className={'my-8 grid grid-cols-2'}>
 				<div>
 					<div>
-						<span className={'font-mono text-base font-semibold text-neutral-700'}>
+						<span className={'font-mono text-base font-semibold text-neutral-900'}>
 							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
@@ -245,9 +245,12 @@ function	Index(): ReactElement {
 						</div>
 					</div>
 				</div>
-				<div className={'flex items-center'}>
+				<div className={'flex items-center max-sm:justify-center md:justify-start'}>
 					<Link href={'/newVault'}>
-						<span className={'cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0'}>
+						<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
+							{'🏦 Deploy vault'}
+						</span>
+						<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
 							{'🏦 Deploy your own vault'}
 						</span>
 					</Link>
@@ -259,9 +262,9 @@ function	Index(): ReactElement {
 					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault): ReactElement => (
-							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
+							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
 								<Link href={`/${vault.VAULT_SLUG}`}>
-									<div className={'my-4 flex flex-row items-center'}>
+									<div className={'mb-4 flex flex-row items-center'}>
 										<span className={'flex flex-row items-center'}>
 											{
 												(vault.LOGO_ARR || []).map((letter, index): ReactElement => (
@@ -272,9 +275,9 @@ function	Index(): ReactElement {
 										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.TITLE}
 										</span>
-										<Tag status={vault.VAULT_STATUS} />
 									</div>
 								</Link>
+								<Tag status={vault.VAULT_STATUS} />
 							</li>
 						))}
 					</ul>
@@ -284,9 +287,9 @@ function	Index(): ReactElement {
 					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-700'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault): ReactElement => (
-							<li key={vault.VAULT_SLUG} className={'cursor-pointer'}>
+							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
 								<Link href={`/${vault.VAULT_SLUG}`}>
-									<div className={'my-4 flex flex-row items-center'}>
+									<div className={'mb-4 flex flex-row items-center'}>
 										<span className={'flex flex-row items-center'}>
 											{
 												(vault.LOGO_ARR || []).map((letter, index): ReactElement => (
@@ -297,9 +300,9 @@ function	Index(): ReactElement {
 										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
 											{vault.TITLE}
 										</span>
-										<Tag status={vault.VAULT_STATUS} />
 									</div>
 								</Link>
+								<Tag status={vault.VAULT_STATUS} />
 							</li>
 						))}
 					</ul>
@@ -313,7 +316,7 @@ function	Index(): ReactElement {
 										<span className={'flex flex-row items-center'}>
 											{'🦍🦍'}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-500'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
 											{vault.SYMBOL || ''}
 										</span>
 									</div>

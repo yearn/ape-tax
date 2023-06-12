@@ -1,5 +1,4 @@
-
-import React, {Fragment, useCallback, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
