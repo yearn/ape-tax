@@ -1,7 +1,6 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -9,7 +8,7 @@ import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
-
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import type {ReactElement} from 'react';
 import type {TStrategyData, TVault, TVaultData} from 'utils/types';
 import type {TAddress, TDict} from '@yearn-finance/web-lib/types';
@@ -40,7 +39,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 
 		const	currentProvider = provider || getProvider(chainID || 1337);
 		const	ethcallProvider = await newEthCallProvider(currentProvider);
-		const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI as never);
+		const	contract = new Contract(vault.VAULT_ADDR,  as never);
 		let		shouldBreak = false;
 		for (let index = 0; index < 20; index++) {
 			if (shouldBreak) {
@@ -57,7 +56,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 				shouldBreak = true;
 				continue;
 			}
-			const	strategyContract = new Contract(strategyAddress, YVAULT_ABI as never);
+			const	strategyContract = new Contract(strategyAddress, VAULT_ABI as never);
 			const	[creditAvailable, name] = await ethcallProvider.tryAll([
 				contract.creditAvailable(strategyAddress),
 				strategyContract.name()

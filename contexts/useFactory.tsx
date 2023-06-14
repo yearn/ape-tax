@@ -1,7 +1,7 @@
 import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {Contract} from 'ethcall';
 import FACTORY_ABI from 'utils/ABI/factory.abi.json';
-import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -60,7 +60,7 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 
 		const	vaultDetailsCalls = [];
 		for (const vault of deployedVaults) {
-			const	vaultContract = new Contract(vault, YVAULT_ABI as never);
+			const	vaultContract = new Contract(vault, VAULT_ABI as never);
 			vaultDetailsCalls.push(vaultContract.name());
 			vaultDetailsCalls.push(vaultContract.symbol());
 			vaultDetailsCalls.push(vaultContract.token());

@@ -1,8 +1,8 @@
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';
-import {BalancerGaugeContextApp} from 'contexts/useBalancerGauges';
 import {FactoryContextApp} from 'contexts/useFactory';
 import vaults from 'utils/vaults.json';
+import config from 'utils/wagmiConfig';
 import useSWR from 'swr';
 import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
@@ -50,16 +50,15 @@ function App(props: AppProps): ReactElement {
 function	MyApp(props: AppProps): ReactElement {
 	return (
 		<WithYearn
+			configOverwrite={config}
 			options={{
 				web3: {supportedChainID: [1, 10, 137, 250, 42161, 1337]},
 				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
 				ui: {shouldUseThemes: false}
 			}}>
-			<BalancerGaugeContextApp>
-				<FactoryContextApp>
-					<App {...props} />
-				</FactoryContextApp>
-			</BalancerGaugeContextApp>
+			<FactoryContextApp>
+				<App {...props} />
+			</FactoryContextApp>
 		</WithYearn>
 	);
 }

@@ -1,8 +1,8 @@
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import yVaultABI from 'utils/ABI/yVault.abi.json';
 import {getProvider, performGet} from 'utils/utils';
 import vaults from 'utils/vaults.json';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {Call} from 'ethcall';
@@ -37,7 +37,7 @@ async function getTVL({network, rpc}: {network: number, rpc: string}): Promise<T
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI as never);
+		const	vaultContract = new Contract(v.VAULT_ADDR, VAULT_ABI as never);
 		_calls.push(...[
 			vaultContract.totalAssets(),
 			vaultContract.decimals()

@@ -6,11 +6,10 @@ import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import ERC20ABI from 'utils/ABI/erc20.abi.json';
-import LENS_ABI from 'utils/ABI/lens.abi.json';
-import YVAULTABI from 'utils/ABI/yVault.abi.json';
+import {erc20ABI} from 'wagmi';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
@@ -84,8 +83,8 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 		);
 		const	ethcallProvider = await newEthCallProvider(providerToUse);
 
-		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, ERC20ABI);
-		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, YVAULTABI as never);
+		const	wantContractMultiCall = new Contract(vault.WANT_ADDR, erc20ABI);
+		const	vaultContractMultiCall = new Contract(vault.VAULT_ADDR, VAULT_ABI as never);
 		const	callResult = await ethcallProvider.all([
 			vaultContractMultiCall.apiVersion(),
 			vaultContractMultiCall.depositLimit(),

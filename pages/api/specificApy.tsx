@@ -1,9 +1,9 @@
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import FACTORY_ABI from 'utils/ABI/factory.abi.json';
-import YVAULT_ABI from 'utils/ABI/yVault.abi.json';
 import {fetchBlockTimestamp, getProvider} from 'utils/utils';
 import vaults from 'utils/vaults.json';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {getProvider as getLibProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
@@ -28,7 +28,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 
 	const	currentProvider = getProvider(vault?.CHAIN_ID || 1);
 	const	ethcallProvider = await newEthCallProvider(currentProvider);
-	const	contract = new Contract(vault.VAULT_ADDR, YVAULT_ABI as never);
+	const	contract = new Contract(vault.VAULT_ADDR, VAULT_ABI as never);
 
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
@@ -86,7 +86,7 @@ async function getCommunityVaults(): Promise<TVault[]> {
 
 	const	vaultDetailsCalls = [];
 	for (const vault of deployedVaults) {
-		const	vaultContract = new Contract(vault, YVAULT_ABI as never);
+		const	vaultContract = new Contract(vault, VAULT_ABI as never);
 		vaultDetailsCalls.push(vaultContract.name());
 		vaultDetailsCalls.push(vaultContract.symbol());
 		vaultDetailsCalls.push(vaultContract.token());
@@ -124,7 +124,7 @@ async function getSpecificAPY({network, address, rpc}: {network: number, address
 		provider = new ethers.providers.JsonRpcProvider(rpc);
 	}
 	const	ethcallProvider = await newEthCallProvider(provider);
-	const	vaultContractMultiCall = new Contract(address, YVAULT_ABI as never);
+	const	vaultContractMultiCall = new Contract(address, VAULT_ABI as never);
 	let		vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 
 	const	callResult = await ethcallProvider.tryAll([
