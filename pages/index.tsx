@@ -246,14 +246,12 @@ function	Index(): ReactElement {
 					</div>
 				</div>
 				<div className={'flex items-center max-sm:justify-center md:justify-start'}>
-					<Link href={'/newVault'}>
-						<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
-							{'🏦 Deploy vault'}
-						</span>
-						<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
-							{'🏦 Deploy your own vault'}
-						</span>
-					</Link>
+					<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
+						{'🏦 Deploy vault'}
+					</span>
+					<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
+						{'🏦 Deploy your own vault'}
+					</span>
 				</div>
 			</section>
 

@@ -196,46 +196,6 @@ export async function	apeOutVault({provider, contractAddress, amount}: TApeOutVa
 	}
 }
 
-type TCreateNewVaultsAndStrategies = {
-	provider: ethers.providers.JsonRpcProvider;
-	gauge: TAddress;
-}
-export async function	createNewVaultsAndStrategies({provider, gauge}: TCreateNewVaultsAndStrategies, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('Creating new Vault...');
-	const	signer = provider.getSigner();
-	const	contract = new ethers.Contract(
-		process.env.YEARN_BALANCER_FACTORY_ADDRESS as string,
-		[
-			'function createNewVaultsAndStrategies(address _gauge) external returns (address vault, address auraStrategy)',
-			'function alreadyExistsFromGauge(address) public view returns (address)'
-		],
-		signer
-	);
-
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		console.log(`Creating vault for gauge ${gauge} ...`);
-		const	transaction = await contract.createNewVaultsAndStrategies(gauge);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			const	newVaultAddress = await contract.alreadyExistsFromGauge(gauge);
-			callback({error: false, data: newVaultAddress});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		callback({error, data: undefined});
-	}
-}
-
 type THarvestStrategy = {
 	provider: ethers.providers.JsonRpcProvider;
 	strategyAddress: TAddress;
