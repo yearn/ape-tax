@@ -43,7 +43,6 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 
 		const BALANCER_FACTORY_ADDRESS = toAddress(process.env.YEARN_BALANCER_FACTORY_ADDRESS);
 
-		// ok for return type to by big int?
 		const numVaults = await readContract({
 			address: BALANCER_FACTORY_ADDRESS,
 			abi: BALANCER_FACTORY_ABI,
@@ -51,7 +50,7 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 		});
 
 		const	vaultListCalls = [];
-		for (let i = 0; i < numVaults; i++) {
+		for (let i = 0; i < Number(numVaults); i++) {
 			const balancerFactoryContract = {address: BALANCER_FACTORY_ADDRESS, abi: BALANCER_FACTORY_ABI};
 			vaultListCalls.push({...balancerFactoryContract, functionName: 'deployedVaults', args: [i]});
 		}
