@@ -1,11 +1,12 @@
 import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import FACTORY_ABI from 'utils/ABI/factory.abi.json';
+import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
 import {fetchBlockTimestamp, getProvider} from 'utils/utils';
 import vaults from 'utils/vaults.json';
+import {multicall, readContract} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {getProvider as getLibProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
+import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {BigNumber} from 'ethers';
 import type {NextApiRequest, NextApiResponse} from 'next';
@@ -72,38 +73,44 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 }
 
 async function getCommunityVaults(): Promise<TVault[]> {
-	const	currentProvider = getLibProvider(1 || 1337);
-	const	ethcallProvider = await newEthCallProvider(currentProvider);
+	const BALANCER_FACTORY_ADDRESS = toAddress(process.env.YEARN_BALANCER_FACTORY_ADDRESS);
 
-	const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS as string, FACTORY_ABI);
-	const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]) as [BigNumber];
+	const numVaults = await readContract({
+		address: BALANCER_FACTORY_ADDRESS,
+		abi: BALANCER_FACTORY_ABI,
+		functionName: 'numVaults'
+	});
 
 	const	vaultListCalls = [];
 	for (let i = 0; i < Number(numVaults); i++) {
-		vaultListCalls.push(contract.deployedVaults(i));
+		const balancerFactoryContract = {address: BALANCER_FACTORY_ADDRESS, abi: BALANCER_FACTORY_ABI};
+		vaultListCalls.push({...balancerFactoryContract, functionName: 'deployedVaults', args: [i]});
 	}
-	const	deployedVaults = await ethcallProvider.tryAll(vaultListCalls) as string[];
+
+	const deployedVaults = await multicall({contracts: vaultListCalls, chainId: 1});
 
 	const	vaultDetailsCalls = [];
 	for (const vault of deployedVaults) {
-		const	vaultContract = new Contract(vault, VAULT_ABI as never);
-		vaultDetailsCalls.push(vaultContract.name());
-		vaultDetailsCalls.push(vaultContract.symbol());
-		vaultDetailsCalls.push(vaultContract.token());
+		const VAULT_ADDRESS = toAddress(vault.result as string);
+		const vaultContract = {address: VAULT_ADDRESS, abi: VAULT_ABI};
+		vaultDetailsCalls.push({...vaultContract, functionName: 'name'});
+		vaultDetailsCalls.push({...vaultContract, functionName: 'symbol'});
+		vaultDetailsCalls.push({...vaultContract, functionName: 'token'});
 	}
-	const	vaultDetails = await ethcallProvider.tryAll(vaultDetailsCalls) as string[];
+
+	const vaultDetails = await multicall({contracts: vaultDetailsCalls, chainId: 1});
 
 	const	vaults = [];
 	let		rIndex = 0;
 	for (let i = 0; i < Number(numVaults); i++) {
-		const	name = vaultDetails[rIndex++];
-		const	symbol = vaultDetails[rIndex++];
-		const	token = vaultDetails[rIndex++];
+		const	name = vaultDetails[rIndex++].result as string;
+		const	symbol = vaultDetails[rIndex++].result as string;
+		const	token = vaultDetails[rIndex++].result as string;
 		vaults.push({
 			LOGO: '🦍🦍',
 			VAULT_ABI: 'yVaultV2',
 			VAULT_TYPE: 'community',
-			VAULT_ADDR: toAddress(deployedVaults[i]),
+			VAULT_ADDR: toAddress(deployedVaults[i].result as string),
 			TITLE: name,
 			SYMBOL: symbol,
 			WANT_ADDR: toAddress(token),
