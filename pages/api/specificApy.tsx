@@ -1,12 +1,11 @@
-import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
 import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
-import {fetchBlockTimestamp, getProvider} from 'utils/utils';
+import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import {fetchBlockTimestamp} from 'utils/utils';
 import vaults from 'utils/vaults.json';
 import {multicall, readContract} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {BigNumber} from 'ethers';
 import type {NextApiRequest, NextApiResponse} from 'next';
@@ -27,16 +26,19 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	const	oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const	currentPrice = Number(ethers.utils.formatUnits(pricePerShare, decimals.toNumber()));
 
-	const	currentProvider = getProvider(vault?.CHAIN_ID || 1);
-	const	ethcallProvider = await newEthCallProvider(currentProvider);
-	const	contract = new Contract(vault.VAULT_ADDR, VAULT_ABI as never);
-
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
 		_grossAPRMonth = '-';
 	} else if (activationTimestamp > oneMonthAgo) {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
-		const	[_pastPricePerShareWeek] = await ethcallProvider.tryAll([contract.pricePerShare()], blockOneWeekAgo) as [string];
+
+		const calls = [];
+		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
+		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
+
+		const ppsData = await multicall({contracts: calls, chainId: vault?.CHAIN_ID || 1});
+		const _pastPricePerShareWeek = ppsData[0].result as string;
+		
 		const	pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
 
@@ -45,10 +47,15 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	} else {
 		const	blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
 		const	blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault?.CHAIN_ID || 1) || 0);
-		const [[_pastPricePerShareWeek], [_pastPricePerShareMonth]] = await Promise.all([
-			ethcallProvider.tryAll([contract.pricePerShare()], blockOneWeekAgo),
-			ethcallProvider.tryAll([contract.pricePerShare()], blockOneMonthAgo)
-		]) as [[string], [string]];
+
+		const calls = [];
+		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
+		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
+		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
+
+		const ppsData = await multicall({contracts: calls, chainId: vault?.CHAIN_ID || 1});
+		const _pastPricePerShareWeek = ppsData[0].result as string;
+		const _pastPricePerShareMonth = ppsData[0].result as string;
 
 		const	pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
 		const	pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber()));
@@ -125,21 +132,19 @@ async function getCommunityVaults(): Promise<TVault[]> {
 	return vaults;
 }
 
-async function getSpecificAPY({network, address, rpc}: {network: number, address: string, rpc: string}): Promise<TSpecificAPIResult> {
-	let		provider = getProvider(network);
-	if (rpc !== undefined) {
-		provider = new ethers.providers.JsonRpcProvider(rpc);
-	}
-	const	ethcallProvider = await newEthCallProvider(provider);
-	const	vaultContractMultiCall = new Contract(address, VAULT_ABI as never);
-	let		vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
+async function getSpecificAPY({network, address}: {network: number, address: string}): Promise<TSpecificAPIResult> {
+	const	apyCalls = [];
+	const vaultContract = {address: toAddress(address), abi: VAULT_ABI};
+	apyCalls.push({...vaultContract, functionName: 'pricePerShare'});
+	apyCalls.push({...vaultContract, functionName: 'decimals'});
+	apyCalls.push({...vaultContract, functionName: 'activation'});
 
-	const	callResult = await ethcallProvider.tryAll([
-		vaultContractMultiCall.pricePerShare(),
-		vaultContractMultiCall.decimals(),
-		vaultContractMultiCall.activation()
-	]);
-	const	[pricePerShare, decimals, activation] = callResult as [BigNumber, BigNumber, BigNumber];
+	const callResult = await multicall({contracts: apyCalls, chainId: network || 1});
+	const pricePerShare = callResult[0].result as BigNumber;
+	const decimals = callResult[1].result as BigNumber;
+	const activation = callResult[2].result as BigNumber;
+
+	let vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 
 	if (!vaultToUse) {
 		const	communityVaults = await getCommunityVaults();
@@ -159,7 +164,7 @@ const	specificApyMapping: TDict<TSpecificAPIResult> = {};
 const	specificApyMappingAccess: TDict<number> = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<TSpecificAPIResult>): Promise<void> {
-	const	{address, network, rpc, revalidate} = req.query;
+	const	{address, network, revalidate} = req.query;
 
 	const	networkNumber = Number(network);
 	const	addressLowercase = (address as string).toLowerCase();
@@ -167,7 +172,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const	now = new Date().getTime();
 	const	lastAccess = specificApyMappingAccess[addressLowercase] || 0;
 	if (lastAccess === 0 || ((now - lastAccess) > 10 * 60 * 1000) || revalidate === 'true' || !specificApyMapping[addressLowercase]) {
-		const	result = await getSpecificAPY({network: networkNumber, address: addressLowercase, rpc: rpc as string});
+		const	result = await getSpecificAPY({network: networkNumber, address: addressLowercase});
 		specificApyMapping[addressLowercase] = result;
 		specificApyMappingAccess[addressLowercase] = now;
 	}
