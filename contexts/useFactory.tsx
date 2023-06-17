@@ -1,12 +1,10 @@
 import {createContext, useCallback, useContext, useEffect, useState} from 'react';
-import {Contract} from 'ethcall';
-import VAULT_FACTORY_ABI from 'utils/ABI/vaultFactory.abi';
-import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
+import {multicall, readContract} from '@wagmi/core';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
-import {getProvider, newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {ReactElement} from 'react';
 import type {TVault} from 'utils/types';
@@ -27,7 +25,6 @@ const	FactoryContext = createContext<TFactoryContext>({
 });
 
 export const FactoryContextApp = ({children}: {children: ReactElement}): ReactElement => {
-	const	{provider} = useWeb3();
 	const	{safeChainID} = useChainID();
 	const	[communityVaults, set_communityVaults] = useState<TVault[]>([]);
 	const	[nonce, set_nonce] = useState(0);
@@ -43,41 +40,46 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			});
 			return;
 		}
-		let		currentProvider = provider || getProvider(safeChainID);
-		if (currentProvider?.network?.chainId !== 1) {
-			currentProvider = getProvider(safeChainID);
-		}
-		const	ethcallProvider = await newEthCallProvider(currentProvider);
 
-		const	contract = new Contract(process.env.YEARN_BALANCER_FACTORY_ADDRESS as string, VAULT_FACTORY_ABI as never);
-		const	[numVaults] = await ethcallProvider.tryAll([contract.numVaults()]) as [number];
+		const BALANCER_FACTORY_ADDRESS = toAddress(process.env.YEARN_BALANCER_FACTORY_ADDRESS);
+
+		// ok for return type to by big int?
+		const numVaults = await readContract({
+			address: BALANCER_FACTORY_ADDRESS,
+			abi: BALANCER_FACTORY_ABI,
+			functionName: 'numVaults'
+		});
 
 		const	vaultListCalls = [];
 		for (let i = 0; i < numVaults; i++) {
-			vaultListCalls.push(contract.deployedVaults(i));
+			const balancerFactoryContract = {address: BALANCER_FACTORY_ADDRESS, abi: BALANCER_FACTORY_ABI};
+			vaultListCalls.push({...balancerFactoryContract, functionName: 'deployedVaults', args: [i]});
 		}
-		const	deployedVaults = await ethcallProvider.tryAll(vaultListCalls) as string[];
+
+		const deployedVaults = await multicall({contracts: vaultListCalls, chainId: safeChainID});
 
 		const	vaultDetailsCalls = [];
 		for (const vault of deployedVaults) {
-			const	vaultContract = new Contract(vault, VAULT_ABI as never);
-			vaultDetailsCalls.push(vaultContract.name());
-			vaultDetailsCalls.push(vaultContract.symbol());
-			vaultDetailsCalls.push(vaultContract.token());
+			const VAULT_ADDRESS = toAddress(vault.result as string);
+			const vaultContract = {address: VAULT_ADDRESS, abi: VAULT_ABI};
+			vaultDetailsCalls.push({...vaultContract, functionName: 'name'});
+			vaultDetailsCalls.push({...vaultContract, functionName: 'symbol'});
+			vaultDetailsCalls.push({...vaultContract, functionName: 'token'});
 		}
-		const	vaultDetails = await ethcallProvider.tryAll(vaultDetailsCalls);
+		
+		const vaultDetails = await multicall({contracts: vaultDetailsCalls, chainId: safeChainID});
 
 		const	vaults: TVault[] = [];
 		let		rIndex = 0;
 		for (let i = 0; i < numVaults; i++) {
-			const	name = vaultDetails[rIndex++] as string;
-			const	symbol = vaultDetails[rIndex++] as string;
-			const	token = vaultDetails[rIndex++] as string;
+			const	name = vaultDetails[rIndex++].result as string;
+			const	symbol = vaultDetails[rIndex++].result as string;
+			const	token = vaultDetails[rIndex++].result as string;
 			vaults.push({
 				LOGO: '🦍🦍',
 				VAULT_ABI: 'yVaultV2',
 				VAULT_TYPE: 'community',
-				VAULT_ADDR: toAddress(deployedVaults[i]),
+				VAULT_ADDR: toAddress(deployedVaults[i].result as string),
 				TITLE: name,
 				SYMBOL: symbol,
 				WANT_ADDR: toAddress(token),
@@ -93,7 +95,7 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			set_communityVaults(vaults);
 			set_nonce((n): number => n + 1);
 		});
-	}, [provider, safeChainID]);
+	}, [safeChainID]);
 
 	useEffect((): void => {
 		getCommunityVaults();
