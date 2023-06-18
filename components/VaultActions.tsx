@@ -1,4 +1,4 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useCallback, useState} from 'react';
 import {ethers} from 'ethers';
 import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
 import {multicall, readContract} from '@wagmi/core';
@@ -133,22 +133,18 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	/**************************************************************************
 	** We need to perform some specific actions
 	**************************************************************************/
-	async function	onZapIn(): Promise<void> {
-		if (isDepositing || isZero(zapAmount.raw)) {
-			return;
-		}
-		set_isDepositing(true);
-		apeInVault({
+	const onZapIn = useCallback(async (): Promise<void> => {
+		const result = await apeInVault({
+			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: zapAmount.raw
-		}, ({error}): void => {
-			set_isDepositing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
-		});
-	}
+		}); 
+
+		if(result.isSuccessful){
+			alert('It worked!');
+		}
+	}, [provider, vault.ZAP_ADDR, zapAmount.raw]);
+
 	async function	onZapOutAllowance(): Promise<void> {
 		if (isZapOutApproving) {
 			return;

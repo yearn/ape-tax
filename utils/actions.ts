@@ -2,8 +2,13 @@
 import toast from 'react-hot-toast';
 import {ethers} from 'ethers';
 
+import {assert} from '../utils/assert';
+import {assertAddress, handleTx} from './toWagmiProvider';
+
 import type {BigNumberish} from 'ethers';
 import type {TAddress} from '@yearn-finance/web-lib/types';
+import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
+import type {TWriteTransaction} from './toWagmiProvider';
 import type {TCallbackFunction} from './types';
 
 type TApproveToken = {
@@ -124,40 +129,24 @@ export async function	withdrawToken({provider, contractAddress, amount}: TWithdr
 	}
 }
 
-type TApeInVault = {
-	provider: ethers.providers.JsonRpcProvider;
-	contractAddress: TAddress;
-	amount: BigNumberish;
-}
-export async function	apeInVault({provider, contractAddress, amount}: TApeInVault, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('APE in vault...');
-	const	signer = provider.getSigner();
-	const	zap = new ethers.Contract(
-		contractAddress,
-		['function deposit() public payable'],
-		signer
-	);
+type TApeInVault = TWriteTransaction & {
+	contractAddress: TAddress | undefined;
+	amount: bigint;
+};
+export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
+	assertAddress(props.contractAddress, 'contractAddress');
+	assert(props.amount > 0n, 'Amount must be greater than 0');
 
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await zap.deposit({value: amount});
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: undefined});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		callback({error, data: undefined});
-	}
+	const signerAddress = await props.connector.getAccount();
+	assertAddress(signerAddress, 'signerAddress');
+	
+	return await handleTx(props, {
+		address: props.contractAddress,
+		abi: ['function deposit() public payable'],
+		functionName: 'deposit',
+		args: [signerAddress, props.amount]
+	});
 }
 
 type TApeOutVault = {
