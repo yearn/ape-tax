@@ -6,8 +6,8 @@ import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
-import {BIG_ZERO} from '@yearn-finance/web-lib/utils/constants';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
@@ -156,7 +156,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
 			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
 			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice),
-			progress: depositLimit === BIG_ZERO ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
+			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
 		}));
 	}
 
@@ -200,10 +200,10 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 						{vault.VAULT_TYPE === 'community' ? (
 							<div>
 								<button
-									disabled={isHarvesting || !isActive || !provider || strategy.creditAvailable.raw === BIG_ZERO}
+									disabled={isHarvesting || !isActive || !provider || isZero(strategy.creditAvailable.raw)}
 									onClick={(): void => onHarvestStrategy(strategy.address)}
 									className={'dashed-underline-gray text-xs'}>
-									{strategy?.creditAvailable?.raw === BIG_ZERO ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${strategy.creditAvailable.normalized} ${vault.WANT_SYMBOL}`}
+									{isZero(strategy?.creditAvailable?.raw) ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${strategy.creditAvailable.normalized} ${vault.WANT_SYMBOL}`}
 								</button>
 							</div>
 						) : <Fragment />}

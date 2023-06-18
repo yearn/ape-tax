@@ -2,9 +2,9 @@ import {useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import useSWR from 'swr';
-import {BIG_ZERO} from '@yearn-finance/web-lib/utils/constants';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
+import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
@@ -52,7 +52,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Deposit Limit: '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${vaultData.depositLimit.raw === BIG_ZERO ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
+							{`${isZero(vaultData.depositLimit.raw) ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
 				</div>
