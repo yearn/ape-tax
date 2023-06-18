@@ -1,12 +1,15 @@
 import {Fragment, useState} from 'react';
 import {ethers} from 'ethers';
 import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
+import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {BIG_ZERO} from '@yearn-finance/web-lib/utils/constants';
+import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
+import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
-import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
@@ -19,7 +22,8 @@ type TVaultAction = {
 function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): ReactElement {
 	const	{
 		provider,
-		address, chainID
+		address, 
+		chainID
 	} = useWeb3();
 	const	chainCoin = CHAINS[vault?.CHAIN_ID]?.coin || 'ETH';
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
@@ -36,69 +40,70 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		if (!vault || !provider || !address) {
 			return;
 		}
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, ['function allowance(address, address) public view returns (uint256)'], provider
-		);
-		const	allowance = await wantContract.allowance(address, vault.VAULT_ADDR);
+		const allowance = await readContract({
+			abi: VAULT_ABI,
+			address: toAddress(vault.VAULT_ADDR),
+			functionName: 'allowance',
+			args: [address, toAddress(vault.VAULT_ADDR)]
+		});
 		onUpdateVaultData((v): TVaultData => ({...v, allowance: toNormalizedBN(allowance, v.decimals)}));
 	}
 	async function	fetchZapOutApproval(): Promise<void> {
 		if (!vault || !provider || !address) {
 			return;
 		}
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, ['function allowance(address, address) public view returns (uint256)'], provider
-		);
-		const	allowance = await wantContract.allowance(address, vault.ZAP_ADDR);
+		const allowance = await readContract({
+			abi: VAULT_ABI,
+			address: toAddress(vault.WANT_ADDR),
+			functionName: 'allowance',
+			args: [address, toAddress(vault.ZAP_ADDR)]
+		});
 		onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
 	}
 	async function	fetchPostDepositOrWithdraw(): Promise<void> {
 		if (!vault || !provider || !address) {
 			return;
 		}
-		let		providerToUse = provider;
-		if (vault.CHAIN_ID === 250 && chainID !== 1337) {
-			providerToUse = getProvider(250);
-		}
-		if (vault.CHAIN_ID === 4 && chainID !== 1337) {
-			providerToUse = getProvider(4);
-		}
-		if (vault.CHAIN_ID === 137 && chainID !== 1337) {
-			providerToUse = getProvider(137);
-		}
-		if (vault.CHAIN_ID === 42161 && chainID !== 1337) {
-			providerToUse = getProvider(42161);
-		}
-		if (vault.CHAIN_ID === 100 && chainID !== 100) {
-			providerToUse = getProvider(100);
-		}
 
-		const	wantContract = new ethers.Contract(
-			vault.WANT_ADDR, [
+		const calls = [];
+		const wantContract = {
+			address: toAddress(vault.WANT_ADDR),
+			abi: [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)'
-			], providerToUse
-		);
-		const	vaultContract = new ethers.Contract(
-			vault.VAULT_ADDR, [
+			]
+		};
+		const vaultContract = {
+			address: toAddress(vault.VAULT_ADDR),
+			abi: [
 				'function balanceOf(address) public view returns (uint256)',
 				'function allowance(address, address) public view returns (uint256)',
 				'function depositLimit() public view returns (uint256)',
 				'function totalAssets() public view returns (uint256)',
 				'function availableDepositLimit() public view returns (uint256)',
 				'function pricePerShare() public view returns (uint256)'
-			], providerToUse);
+			]
+		};
 
-		const	[wantAllowance, wantBalance, vaultBalance, coinBalance, depositLimit, totalAssets, availableDepositLimit, pricePerShare] = await Promise.all([
-			wantContract.allowance(address, vault.VAULT_ADDR),
-			wantContract.balanceOf(address),
-			vaultContract.balanceOf(address),
-			providerToUse.getBalance(address),
-			vaultContract.depositLimit(),
-			vaultContract.totalAssets(),
-			vaultContract.availableDepositLimit(),
-			vaultContract.pricePerShare()
-		]);
+		calls.push({...wantContract, functionName: 'allowance', args: [address, vault.VAULT_ADDR]});
+		calls.push({...wantContract, functionName: 'balanceOf', args: [address]});
+		calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
+		calls.push({...vaultContract, functionName: 'getBalance', args: [address]});
+		calls.push({...vaultContract, functionName: 'depositLimit'});
+		calls.push({...vaultContract, functionName: 'totalAssets'});
+		calls.push({...vaultContract, functionName: 'availableDepositLimit'});
+		calls.push({...vaultContract, functionName: 'pricePerShare'});
+	
+		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
+		const wantAllowance = callResult[0].result as string;
+		const wantBalance = callResult[1].result as string;
+		const vaultBalance = toBigInt(callResult[2].result as string);
+		const coinBalance = callResult[3].result as string;
+		const depositLimit = toBigInt(callResult[4].result as string);
+		const totalAssets = callResult[5].result as string;
+		const availableDepositLimit = callResult[6].result as string;
+		const pricePerShare = callResult[7].result as string;
+
 
 		onUpdateVaultData((v): TVaultData => ({
 			...v,
@@ -112,12 +117,17 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
 			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
 			totalAUM: Number((Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice)),
-			progress: depositLimit.isZero() ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
+			progress: depositLimit === BIG_ZERO ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
 		}));
 
 		if (vault.ZAP_ADDR) {
-			const	allowantZapOut = await vaultContract.allowance(address, vault.ZAP_ADDR);
-			onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowantZapOut, v.decimals)}));
+			const allowance = await readContract({
+				abi: VAULT_ABI,
+				address: toAddress(vault.VAULT_ADDR),
+				functionName: 'allowance',
+				args: [address, toAddress(vault.ZAP_ADDR)]
+			});
+			onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
 		}
 	}
 
@@ -125,12 +135,11 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	** We need to perform some specific actions
 	**************************************************************************/
 	async function	onZapIn(): Promise<void> {
-		if (isDepositing || zapAmount.raw.isZero()) {
+		if (isDepositing || isZero(zapAmount.raw)) {
 			return;
 		}
 		set_isDepositing(true);
 		apeInVault({
-			provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: zapAmount.raw
 		}, ({error}): void => {
@@ -147,7 +156,6 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 		set_isZapOutApproving(true);
 		approveToken({
-			provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: ethers.constants.MaxUint256,
 			from: toAddress(vault.ZAP_ADDR)
@@ -160,14 +168,13 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		});
 	}
 	async function	onZapOut(): Promise<void> {
-		if (isWithdrawing || vaultData.balanceOf.raw.isZero() || vaultData.allowanceZapOut?.raw.isZero()) {
+		if (isWithdrawing || isZero(vaultData.balanceOf.raw) || isZero(vaultData.allowanceZapOut?.raw)) {
 			return;
 		}
 		set_isWithdrawing(true);
 		apeOutVault({
-			provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
-			amount: !zapAmount.raw.isZero() ? zapAmount.raw : vaultData.balanceOf.raw
+			amount: !isZero(zapAmount.raw) ? zapAmount.raw : vaultData.balanceOf.raw
 		}, ({error}): void => {
 			set_isWithdrawing(false);
 			if (error) {
@@ -182,7 +189,6 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 		set_isApproving(true);
 		approveToken({
-			provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			amount: ethers.constants.MaxUint256,
 			from: toAddress(vault.VAULT_ADDR)
@@ -195,12 +201,11 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		});
 	}
 	async function	onDeposit(): Promise<void> {
-		if (isDepositing || (vaultData.allowance.raw.lt(amount.raw) || amount.raw.isZero()) || isDepositing) {
+		if (isDepositing || (vaultData.allowance.raw < amount.raw || isZero(amount.raw)) || isDepositing) {
 			return;
 		}
 		set_isDepositing(true);
 		depositToken({
-			provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
 		}, ({error}): void => {
@@ -212,12 +217,11 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		});
 	}
 	async function	onDepositAll(): Promise<void> {
-		if (isDepositing || (vaultData.allowance.raw.lt(amount.raw)) || isDepositing || vaultData.wantBalance.raw.isZero()) {
+		if (isDepositing || (vaultData.allowance.raw < amount.raw) || isDepositing || isZero(vaultData.wantBalance.raw)) {
 			return;
 		}
 		set_isDepositing(true);
 		depositToken({
-			provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: vaultData.wantBalance.raw
 		}, ({error}): void => {
@@ -229,12 +233,11 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		});
 	}
 	async function	onWithdraw(): Promise<void> {
-		if (isWithdrawing || vaultData.balanceOf.raw.isZero()) {
+		if (isWithdrawing || isZero(vaultData.balanceOf.raw)) {
 			return;
 		}
 		set_isWithdrawing(true);
 		withdrawToken({
-			provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
 		}, ({error}): void => {
@@ -246,12 +249,11 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		});
 	}
 	async function	onWithdrawAll(): Promise<void> {
-		if (isWithdrawing || vaultData.balanceOf.raw.isZero()) {
+		if (isWithdrawing || isZero(vaultData.balanceOf.raw)) {
 			return;
 		}
 		set_isWithdrawing(true);
 		withdrawToken({
-			provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: ethers.constants.MaxUint256
 		}, ({error}): void => {
@@ -289,26 +291,26 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 					</div>
 					<div>
 						{
-							vaultData.depositLimit.raw.gt(0) && vault.VAULT_STATUS !== 'withdraw' ?
+							vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ?
 								<>
 									<button
 										onClick={onZapIn}
-										disabled={isDepositing || zapAmount.raw.isZero()}
-										className={`${isDepositing || zapAmount.raw.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+										disabled={isDepositing || isZero(zapAmount.raw)}
+										className={`${isDepositing || isZero(zapAmount.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 										{'💰 Zap in'}
 									</button>
 								</> : <Fragment />
 						}
 						<button
 							onClick={onZapOutAllowance}
-							disabled={vaultData?.allowanceZapOut?.raw.gt(0) || isZapOutApproving}
-							className={`${vaultData?.allowanceZapOut?.raw.gt(0) || isZapOutApproving ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
-							{vaultData?.allowanceZapOut?.raw.gt(0) ? '✅ Approved' : '🚀 Approve Zap Out'}
+							disabled={toBigInt(vaultData?.allowanceZapOut?.raw) > 0n || isZapOutApproving}
+							className={`${toBigInt(vaultData?.allowanceZapOut?.raw) > 0n || isZapOutApproving ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+							{toBigInt(vaultData?.allowanceZapOut?.raw) > 0n ? '✅ Approved' : '🚀 Approve Zap Out'}
 						</button>
 						<button
 							onClick={onZapOut}
-							disabled={vaultData.balanceOf.raw.isZero() || vaultData?.allowanceZapOut?.raw?.isZero()}
-							className={`${vaultData.balanceOf.raw.isZero() || vaultData?.allowanceZapOut?.raw?.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+							disabled={isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw)}
+							className={`${isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 							{'💸 Zap out'}
 						</button>
 					</div>
@@ -333,23 +335,23 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 					</div>
 				</div>
 				<div>
-					{vaultData.depositLimit.raw.gt(0) && vault.VAULT_STATUS !== 'withdraw' ? (
+					{vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ? (
 						<>
 							<button
 								onClick={onApprove}
-								className={`${vaultData.allowance.raw.gt(0) || isApproving ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
-								{vaultData.allowance.raw.gt(0) ? '✅ Approved' : '🚀 Approve Vault'}
+								className={`${vaultData.allowance.raw > 0n || isApproving ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+								{vaultData.allowance.raw > 0n ? '✅ Approved' : '🚀 Approve Vault'}
 							</button>
 							<button
 								onClick={onDeposit}
-								disabled={vaultData.allowance.raw.isZero() || amount.raw.isZero() || isDepositing}
-								className={`${vaultData.allowance.raw.isZero() || amount.raw.isZero() || isDepositing ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+								disabled={isZero(vaultData.allowance.raw) || isZero(amount.raw) || isDepositing}
+								className={`${isZero(vaultData.allowance.raw) || isZero(amount.raw) || isDepositing ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 								{'💰 Deposit'}
 							</button>
 							<button
 								onClick={onDepositAll}
-								disabled={vaultData.allowance.raw.isZero() || isDepositing || vaultData?.wantBalance?.raw?.isZero()}
-								className={`${vaultData.allowance.raw.isZero() || isDepositing || vaultData?.wantBalance?.raw?.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+								disabled={isZero(vaultData.allowance.raw) || isDepositing || isZero(vaultData?.wantBalance?.raw)}
+								className={`${isZero(vaultData.allowance.raw) || isDepositing || isZero(vaultData?.wantBalance?.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 								{'💰 Deposit All'}
 							</button>
 						</>
