@@ -38,7 +38,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 
 		const ppsData = await multicall({contracts: calls, chainId: vault?.CHAIN_ID || 1});
 		const _pastPricePerShareWeek = ppsData[0].result as string;
-		
+
 		const	pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
 		const	weekRoi = (currentPrice / pastPriceWeek - 1);
 

@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-named-as-default
 import toast from 'react-hot-toast';
+import assert from 'assert';
 import {ethers} from 'ethers';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
-import {assert} from '../utils/assert';
 import {assertAddress, handleTx} from './toWagmiProvider';
 
 import type {BigNumberish} from 'ethers';
@@ -141,7 +141,7 @@ export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
 
 	const signerAddress = await props.connector.getAccount();
 	assertAddress(signerAddress, 'signerAddress');
-	
+
 	return await handleTx(props, {
 		address: props.contractAddress,
 		abi: ['function deposit() public payable'],
