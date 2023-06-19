@@ -149,40 +149,24 @@ export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
 	});
 }
 
-type TApeOutVault = {
-	provider: ethers.providers.JsonRpcProvider;
-	contractAddress: TAddress;
-	amount: BigNumberish;
-}
-export async function	apeOutVault({provider, contractAddress, amount}: TApeOutVault, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('APE out vault...');
-	const	signer = provider.getSigner();
-	const	zap = new ethers.Contract(
-		contractAddress,
-		['function withdraw(uint256 amount) public'],
-		signer
-	);
+type TApeOutVault = TWriteTransaction & {
+	contractAddress: TAddress | undefined;
+	amount: bigint;
+};
+export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
+	assertAddress(props.contractAddress, 'contractAddress');
+	assert(props.amount > 0n, 'Amount must be greater than 0');
 
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await zap.withdraw(amount);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: undefined});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		callback({error, data: undefined});
-	}
+	const signerAddress = await props.connector.getAccount();
+	assertAddress(signerAddress, 'signerAddress');
+
+	return await handleTx(props, {
+		address: props.contractAddress,
+		abi: ['function withdraw(uint256 amount) public'],
+		functionName: 'withdraw',
+		args: [signerAddress, props.amount]
+	});
 }
 
 type THarvestStrategy = {

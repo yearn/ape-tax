@@ -141,7 +141,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}); 
 
 		if(result.isSuccessful){
-			alert('It worked!');
+			alert('onZapIn worked!');
 		}
 	}, [provider, vault.ZAP_ADDR, zapAmount.raw]);
 
@@ -162,22 +162,19 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			fetchZapOutApproval();
 		});
 	}
-	async function	onZapOut(): Promise<void> {
-		if (isWithdrawing || isZero(vaultData.balanceOf.raw) || isZero(vaultData.allowanceZapOut?.raw)) {
-			return;
-		}
-		set_isWithdrawing(true);
-		apeOutVault({
+
+	const onZapOut = useCallback(async (): Promise<void> => {
+		const result = await apeOutVault({
+			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
-			amount: !isZero(zapAmount.raw) ? zapAmount.raw : vaultData.balanceOf.raw
-		}, ({error}): void => {
-			set_isWithdrawing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
-		});
-	}
+			amount: zapAmount.raw
+		}); 
+
+		if(result.isSuccessful){
+			alert('onZapOut worked!');
+		}
+	}, [provider, vault.ZAP_ADDR, zapAmount.raw]);
+
 	async function	onApprove(): Promise<void> {
 		if (isApproving) {
 			return;
