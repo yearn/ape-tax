@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
 import toast from 'react-hot-toast';
 import {ethers} from 'ethers';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import {assert} from '../utils/assert';
 import {assertAddress, handleTx} from './toWagmiProvider';
@@ -169,37 +170,20 @@ export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
 	});
 }
 
-type THarvestStrategy = {
-	provider: ethers.providers.JsonRpcProvider;
-	strategyAddress: TAddress;
-}
-export async function	harvestStrategy({provider, strategyAddress}: THarvestStrategy, callback: TCallbackFunction): Promise<void> {
-	const	_toast = toast.loading('Harvesting strategy...');
-	const	signer = provider.getSigner();
-	const	contract = new ethers.Contract(
-		process.env.YEARN_FACTORY_KEEPER_WRAPPER as string,
-		['function harvestStrategy(address) public'],
-		signer
-	);
+type THarvestStrategy = TWriteTransaction & {
+	contractAddress: TAddress | undefined;
+};
+export async function	harvestStrategy(props: THarvestStrategy): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
+	assertAddress(props.contractAddress, 'strategyAddress');
 
-	/**********************************************************************
-	**	If the call is successful, try to perform the actual TX
-	**********************************************************************/
-	try {
-		const	transaction = await contract.harvestStrategy(strategyAddress);
-		const	transactionResult = await transaction.wait();
-		if (transactionResult.status === 1) {
-			toast.dismiss(_toast);
-			toast.success('Transaction successful');
-			callback({error: false, data: undefined});
-		} else {
-			toast.dismiss(_toast);
-			toast.error('Transaction failed');
-			callback({error: true, data: undefined});
-		}
-	} catch (error) {
-		toast.dismiss(_toast);
-		toast.error('Transaction failed');
-		callback({error, data: undefined});
-	}
+	const signerAddress = await props.connector.getAccount();
+	assertAddress(signerAddress, 'signerAddress');
+
+	return await handleTx(props, {
+		address: toAddress(process.env.YEARN_FACTORY_KEEPER_WRAPPER),
+		abi: ['function harvestStrategy(address) public'],
+		functionName: 'harvestStrategy',
+		args: [signerAddress]
+	});
 }

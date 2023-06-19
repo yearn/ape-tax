@@ -1,24 +1,23 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
-import {ethers} from 'ethers';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
-import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
-import type {TStrategyData, TVault, TVaultData} from 'utils/types';
+import type {TStrategyData, TVault} from 'utils/types';
 import type {TAddress, TDict} from '@yearn-finance/web-lib/types';
 
 type TStrategies = {
 	vault: TVault;
-	onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
+	// onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
 }
-function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
+function	Strategies({vault}: TStrategies): ReactElement {
 	const	{provider, isActive, address, chainID} = useWeb3();
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
@@ -118,62 +117,20 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	}, [vault, isActive, provider, address, prepreStrategiesData]);
 
 
-	async function	fetchPostDepositOrWithdraw(): Promise<void> {
-		if (!vault || !provider || !address) {
-			return;
-		}
-		const calls = [];
-		const wantContract = {address: toAddress(vault.WANT_ADDR), abi: VAULT_ABI};
-		const vaultContract = {address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI};
-		calls.push({...wantContract, functionName: 'allowance', args: [address, vault.VAULT_ADDR]});
-		calls.push({...wantContract, functionName: 'balanceOf', args: [address]});
-		calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
-		calls.push({...vaultContract, functionName: 'getBalance', args: [address]});
-		calls.push({...vaultContract, functionName: 'depositLimit'});
-		calls.push({...vaultContract, functionName: 'totalAssets'});
-		calls.push({...vaultContract, functionName: 'availableDepositLimit'});
-		calls.push({...vaultContract, functionName: 'pricePerShare'});
-	
-		const callResult = await multicall({contracts: calls, chainId: chainID});
-		const wantAllowance = callResult[0].result as string;
-		const wantBalance = callResult[1].result as string;
-		const vaultBalance = toBigInt(callResult[2].result as string);
-		const coinBalance = callResult[3].result as string;
-		const depositLimit = toBigInt(callResult[4].result as string);
-		const totalAssets = callResult[5].result as string;
-		const availableDepositLimit = callResult[6].result as string;
-		const pricePerShare = callResult[7].result as string;
-
-		onUpdateVaultData((v): TVaultData => ({
-			...v,
-			allowance: toNormalizedBN(wantAllowance, v.decimals),
-			wantBalance: toNormalizedBN(wantBalance, v.decimals),
-			balanceOf: toNormalizedBN(vaultBalance, v.decimals),
-			balanceOfValue: formatToNormalizedValue(vaultBalance, v.decimals) * Number(v.pricePerShare.normalized) * v.wantPrice,
-			coinBalance: toNormalizedBN(coinBalance, 18),
-			depositLimit: toNormalizedBN(depositLimit, v.decimals),
-			totalAssets: toNormalizedBN(totalAssets, v.decimals),
-			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
-			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
-			totalAUM: (Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice),
-			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
-		}));
-	}
-
-	function onHarvestStrategy(strategyAddress: TAddress): void {
-		if (isHarvesting) {
-			return;
-		}
+	const onHarvestStrategy = useCallback(async (strategyAddress: TAddress): Promise<void> => {
 		set_isHarvesting(true);
-		harvestStrategy({provider, strategyAddress}, ({error}): void => {
-			set_isHarvesting(false);
-			if (error) {
-				return;
-			}
-			prepreStrategiesData();
-			fetchPostDepositOrWithdraw();
-		});
-	}
+
+		const result = await harvestStrategy({
+			connector: provider,
+			contractAddress: strategyAddress
+		}); 
+
+		set_isHarvesting(false);
+		
+		if(result.isSuccessful){
+			alert('onHarvestStrategy worked!');
+		}
+	}, [provider]);
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
@@ -201,7 +158,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 							<div>
 								<button
 									disabled={isHarvesting || !isActive || !provider || isZero(strategy.creditAvailable.raw)}
-									onClick={(): void => onHarvestStrategy(strategy.address)}
+									onClick={async (): Promise<void> => onHarvestStrategy(strategy.address)}
 									className={'dashed-underline-gray text-xs'}>
 									{isZero(strategy?.creditAvailable?.raw) ? '🌱 All funds deployed' : `🚜 Harvest to deploy ${strategy.creditAvailable.normalized} ${vault.WANT_SYMBOL}`}
 								</button>
