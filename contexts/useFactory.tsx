@@ -18,16 +18,16 @@ type TFactoryContext = {
 ** The Factory Context is used to retrieve the list of community vaults
 ** deployed via the Balancer Factory contract.
 ******************************************************************************/
-const	FactoryContext = createContext<TFactoryContext>({
+const FactoryContext = createContext<TFactoryContext>({
 	communityVaults: [],
 	getCommunityVaults: async (): Promise<void> => undefined,
 	useFactoryNonce: 0
 });
 
 export const FactoryContextApp = ({children}: {children: ReactElement}): ReactElement => {
-	const	{safeChainID} = useChainID();
-	const	[communityVaults, set_communityVaults] = useState<TVault[]>([]);
-	const	[nonce, set_nonce] = useState(0);
+	const {safeChainID} = useChainID();
+	const [communityVaults, set_communityVaults] = useState<TVault[]>([]);
+	const [nonce, set_nonce] = useState(0);
 
 	/* 🔵 - Yearn Finance ******************************************************
 	**	getCommunityVaults will fetch the currently deployed community vaults
@@ -49,15 +49,14 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			functionName: 'numVaults'
 		});
 
-		const	vaultListCalls = [];
+		const vaultListCalls = [];
 		for (let i = 0; i < Number(numVaults); i++) {
 			const balancerFactoryContract = {address: BALANCER_FACTORY_ADDRESS, abi: BALANCER_FACTORY_ABI};
 			vaultListCalls.push({...balancerFactoryContract, functionName: 'deployedVaults', args: [i]});
 		}
 
 		const deployedVaults = await multicall({contracts: vaultListCalls, chainId: safeChainID});
-
-		const	vaultDetailsCalls = [];
+		const vaultDetailsCalls = [];
 		for (const vault of deployedVaults) {
 			const VAULT_ADDRESS = toAddress(vault.result as string);
 			const vaultContract = {address: VAULT_ADDRESS, abi: VAULT_ABI};
@@ -65,15 +64,14 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			vaultDetailsCalls.push({...vaultContract, functionName: 'symbol'});
 			vaultDetailsCalls.push({...vaultContract, functionName: 'token'});
 		}
-		
-		const vaultDetails = await multicall({contracts: vaultDetailsCalls, chainId: safeChainID});
 
-		const	vaults: TVault[] = [];
+		const vaultDetails = await multicall({contracts: vaultDetailsCalls, chainId: safeChainID});
+		const vaults: TVault[] = [];
 		let		rIndex = 0;
 		for (let i = 0; i < numVaults; i++) {
-			const	name = vaultDetails[rIndex++].result as string;
-			const	symbol = vaultDetails[rIndex++].result as string;
-			const	token = vaultDetails[rIndex++].result as string;
+			const name = vaultDetails[rIndex++].result as string;
+			const symbol = vaultDetails[rIndex++].result as string;
+			const token = vaultDetails[rIndex++].result as string;
 			vaults.push({
 				LOGO: '🦍🦍',
 				VAULT_ABI: 'yVaultV2',

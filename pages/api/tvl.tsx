@@ -1,7 +1,7 @@
 import {ethers} from 'ethers';
 import {performGet} from 'utils/utils';
 import vaults from 'utils/vaults.json';
-import {multicall} from '@wagmi/core';
+import config from 'utils/wagmiConfig';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
@@ -21,11 +21,12 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 }
 
 async function getTVL({network}: {network: number}): Promise<TTVL> {
-	const	 tvlCalls: any[] = [];
-	const	_cgIDS: string[] = [];
-	let		_tvlEndorsed = 0;
-	let		_tvlExperimental = 0;
-	let		_tvlDeprecated = 0;
+	const multicallInstance = config.getPublicClient({chainId: network || 1}).multicall;
+	const tvlCalls: any[] = [];
+	const _cgIDS: string[] = [];
+	let _tvlEndorsed = 0;
+	let _tvlExperimental = 0;
+	let _tvlDeprecated = 0;
 
 	Object.values(vaults).forEach((v): void => {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
@@ -38,20 +39,19 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});
 
-	const callResult = await multicall({contracts: tvlCalls, chainId: network || 1});
-
-	const	chunkedCallResult = chunk(callResult, 2);
-	const	prices = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${_cgIDS}&vs_currencies=usd`);
-	let		index = 0;
+	const callResult = await multicallInstance({contracts: tvlCalls});
+	const chunkedCallResult = chunk(callResult, 2);
+	const prices = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${_cgIDS}&vs_currencies=usd`);
+	let index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([, v]): Promise<void> => {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	totalAssets = chunkedCallResult[index][0].result as BigNumber;
-		const	decimals = chunkedCallResult[index][1].result as BigNumber;
-		const	price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
-		const	dec = Number(decimals);
+		const totalAssets = chunkedCallResult[index][0].result as BigNumber;
+		const decimals = chunkedCallResult[index][1].result as BigNumber;
+		const price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
+		const dec = Number(decimals);
 		index++;
 
 		if (v.VAULT_STATUS === 'endorsed') {
@@ -74,13 +74,13 @@ const tvlMapping: TNDict<TTVL> = {};
 const tvlMappingAccess: TNDict<number> = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<TNDict<TTVL>>): Promise<void> {
-	const	{network, revalidate} = req.query;
-	const	networkNumber = Number(network);
+	const {network, revalidate} = req.query;
+	const networkNumber = Number(network);
 
-	const	now = new Date().getTime();
-	const	lastAccess = tvlMappingAccess[networkNumber] || 0;
+	const now = new Date().getTime();
+	const lastAccess = tvlMappingAccess[networkNumber] || 0;
 	if (lastAccess === 0 || ((now - lastAccess) > 5 * 60 * 1000) || revalidate === 'true' || !tvlMapping[networkNumber]) {
-		const	result = await getTVL({network: networkNumber});
+		const result = await getTVL({network: networkNumber});
 		tvlMapping[networkNumber] = result;
 		tvlMappingAccess[networkNumber] = now;
 	}
