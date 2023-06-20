@@ -6,16 +6,16 @@ import vaults from 'utils/vaults.json';
 import config from 'utils/wagmiConfig';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 
-import type {BigNumber} from 'ethers';
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {TSpecificAPIResult, TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	vault: TVault;
-	pricePerShare: BigNumber;
-	decimals: BigNumber;
+	pricePerShare: bigint;
+	decimals: bigint;
 	activation: number;
 }): Promise<TSpecificAPIResult> {
 	let	_grossAPRWeek = '-';
@@ -24,7 +24,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	const activationTimestamp = Number(activation);
 	const oneWeekAgo = Number((new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
-	const currentPrice = Number(ethers.utils.formatUnits(pricePerShare, decimals.toNumber()));
+	const currentPrice = Number(ethers.utils.formatUnits(pricePerShare, Number(decimals)));
 	const multicallInstance = config.getPublicClient({chainId: vault?.CHAIN_ID || 1}).multicall;
 
 	if (activationTimestamp > oneWeekAgo) {
@@ -39,7 +39,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 
 		const ppsData = await multicallInstance({contracts: calls});
 		const _pastPricePerShareWeek = ppsData[0].result as string;
-		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
+		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
 		const weekRoi = (currentPrice / pastPriceWeek - 1);
 
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
@@ -57,8 +57,8 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		const _pastPricePerShareWeek = ppsData[0].result as string;
 		const _pastPricePerShareMonth = ppsData[0].result as string;
 
-		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, decimals.toNumber()));
-		const pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, decimals.toNumber()));
+		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
+		const pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, Number(decimals)));
 		const weekRoi = (currentPrice / pastPriceWeek - 1);
 		const monthRoi = (currentPrice / pastPriceMonth - 1);
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
@@ -141,9 +141,9 @@ async function getSpecificAPY({network, address}: {network: number, address: str
 	apyCalls.push({...vaultContract, functionName: 'activation'});
 
 	const callResult = await multicallInstance({contracts: apyCalls});
-	const pricePerShare = callResult[0].result as BigNumber;
-	const decimals = callResult[1].result as BigNumber;
-	const activation = callResult[2].result as BigNumber;
+	const pricePerShare = decodeAsBigInt(callResult[0]);
+	const decimals = decodeAsBigInt(callResult[1]);
+	const activation = decodeAsBigInt(callResult[2]);
 
 	let vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 	if (!vaultToUse) {

@@ -7,8 +7,8 @@ import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
-import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
@@ -186,7 +186,7 @@ function	Index(): ReactElement {
 		const userBalances = await multicall({contracts: calls, chainId: safeChainID});
 		
 		userBalances.forEach((balance, idx): void => {
-			if(!isZero(toBigInt(balance.result as bigint))){
+			if(!isZero(decodeAsBigInt(balance))){
 				needToWidthdraw.push(vaultsInactive[idx]);
 			}
 		});

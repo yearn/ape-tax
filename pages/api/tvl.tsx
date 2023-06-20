@@ -4,8 +4,8 @@ import vaults from 'utils/vaults.json';
 import config from 'utils/wagmiConfig';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 
-import type {BigNumber} from 'ethers';
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {TTVL} from 'utils/types';
 import type {TNDict} from '@yearn-finance/web-lib/types';
@@ -48,8 +48,8 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const totalAssets = chunkedCallResult[index][0].result as BigNumber;
-		const decimals = chunkedCallResult[index][1].result as BigNumber;
+		const totalAssets = decodeAsBigInt(chunkedCallResult[index][0]);
+		const decimals = decodeAsBigInt(chunkedCallResult[index][1]);
 		const price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
 		const dec = Number(decimals);
 		index++;
