@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import GraphemeSplitter from 'grapheme-splitter';
@@ -7,9 +7,10 @@ import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
-import {BIG_ZERO} from '@yearn-finance/web-lib/utils/constants';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
+import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
+import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
@@ -169,30 +170,29 @@ function	Index(): ReactElement {
 		set_nonce((n): number => n + 1);
 	}, [safeChainID, isActive]);
 
-	useEffect((): void => {
-		async function findInactiveDeposits(calls: any[]): Promise<void>{
-			const needToWidthdraw: TVault[] = [];
-			const userBalances = await multicall({contracts: calls, chainId: safeChainID});
-			
-			userBalances.forEach((balance, idx): void => {
-				if(balance.result !== BIG_ZERO){
-					needToWidthdraw.push(vaultsInactive[idx]);
-				}
-			});
-			
-			set_vaultsInactiveForUser(needToWidthdraw);
+
+	useCallback(async (): Promise<void> => {
+		if (!isActive) {
+			return;
 		}
+		
+		const calls: any[] = [];
+		vaultsInactive.forEach(({VAULT_ADDR}): void => {
+			const vaultContract = {address: VAULT_ADDR, abi: erc20ABI};
+			calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
+		});
 
-		if (isActive) {
-			const calls: any[] = [];
-
-			vaultsInactive.forEach(({VAULT_ADDR}): void => {
-				const vaultContract = {address: VAULT_ADDR, abi: erc20ABI};
-				calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
-			});
-
-			findInactiveDeposits(calls);
-		}
+		const needToWidthdraw: TVault[] = [];
+		const userBalances = await multicall({contracts: calls, chainId: safeChainID});
+		
+		userBalances.forEach((balance, idx): void => {
+			if(!isZero(toBigInt(balance.result as bigint))){
+				needToWidthdraw.push(vaultsInactive[idx]);
+			}
+		});
+		
+		set_vaultsInactiveForUser(needToWidthdraw);
+		
 	}, [vaultsInactive, isActive, address, safeChainID]);
 
 	if (!isActive) {
