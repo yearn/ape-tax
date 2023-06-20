@@ -51,11 +51,10 @@ function	Strategies({vault}: TStrategies): ReactElement {
 				shouldBreak = true;
 				continue;
 			}
-			const strategyCalls = [];
-			const strategyContract = {address: strategyAddress, abi: VAULT_ABI};
-			strategyCalls.push({...vaultContract, functionName: 'creditAvailable', args: [strategyAddress]});
-			strategyCalls.push({...strategyContract, functionName: 'name'});
-			const callResult = await multicall({contracts: strategyCalls, chainId: chainID || 1});
+			const callResult = await multicall({contracts: [
+				{address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI, functionName: 'creditAvailable', args: [strategyAddress]},
+				{address: strategyAddress, abi: VAULT_ABI, functionName: 'name'}
+			], chainId: chainID || 1});
 			const creditAvailable = toBigInt(callResult[0].result as string);
 			const name = callResult[1].result as string;
 
