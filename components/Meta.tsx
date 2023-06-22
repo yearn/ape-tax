@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Script from 'next/script';
 import {DefaultSeo} from 'next-seo';
 import meta from 'public/manifest.json';
 
@@ -32,16 +33,17 @@ function Meta(): ReactElement {
 					color={meta.theme_color} />
 
 				<link rel={'icon'} href={'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>'} />
-
-				<script
-					defer
-					data-domain={'ape.tax'}
-					src={'/js/script.js'}/>
 					
 				<meta name={'robots'} content={'index,nofollow'} />
 				<meta name={'googlebot'} content={'index,nofollow'} />
 				<meta charSet={'utf-8'} />
 			</Head>
+			
+			<Script
+				defer
+				data-domain={'ape.tax'}
+				src={'/js/script.js'}/>
+
 			<DefaultSeo
 				title={meta.name}
 				defaultTitle={meta.name}
