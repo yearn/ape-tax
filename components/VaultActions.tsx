@@ -5,6 +5,7 @@ import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
@@ -35,7 +36,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	/**************************************************************************
 	** We need to update the status when some events occurs
 	**************************************************************************/
-	async function	fetchApproval(): Promise<void> {
+	const fetchApproval = useCallback(async (): Promise<void> => {
 		if (!vault || !provider || !address) {
 			return;
 		}
@@ -46,8 +47,9 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			args: [address, toAddress(vault.VAULT_ADDR)]
 		});
 		onUpdateVaultData((v): TVaultData => ({...v, allowance: toNormalizedBN(allowance, v.decimals)}));
-	}
-	async function	fetchZapOutApproval(): Promise<void> {
+	}, [address, onUpdateVaultData, provider, vault]);
+
+	const fetchZapOutApproval = useCallback(async (): Promise<void> => {
 		if (!vault || !provider || !address) {
 			return;
 		}
@@ -58,7 +60,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			args: [address, toAddress(vault.ZAP_ADDR)]
 		});
 		onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
-	}
+	}, [address, onUpdateVaultData, provider, vault]);
+
 	async function	fetchPostDepositOrWithdraw(): Promise<void> {
 		if (!vault || !provider || !address) {
 			return;
@@ -145,23 +148,23 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 	}, [provider, vault.ZAP_ADDR, zapAmount.raw]);
 
-	async function	onZapOutAllowance(): Promise<void> {
+	const onZapOutAllowance = useCallback(async (): Promise<void> => {
 		if (isZapOutApproving) {
 			return;
 		}
 		set_isZapOutApproving(true);
-		approveToken({
+		const result = await approveToken({
+			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
-			amount: ethers.constants.MaxUint256,
-			from: toAddress(vault.ZAP_ADDR)
-		}, ({error}): void => {
-			set_isZapOutApproving(false);
-			if (error) {
-				return;
-			}
-			fetchZapOutApproval();
+			spenderAddress: toAddress(vault.ZAP_ADDR),
+			amount: MAX_UINT_256
 		});
-	}
+		set_isZapOutApproving(false);
+
+		if(result.isSuccessful){
+			fetchZapOutApproval();
+		}
+	}, [fetchZapOutApproval, isZapOutApproving, provider, vault.VAULT_ADDR, vault.ZAP_ADDR]);
 
 	const onZapOut = useCallback(async (): Promise<void> => {
 		const result = await apeOutVault({
@@ -175,86 +178,95 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 	}, [provider, vault.ZAP_ADDR, zapAmount.raw]);
 
-	async function	onApprove(): Promise<void> {
+	const onApprove = useCallback(async (): Promise<void> => {
 		if (isApproving) {
 			return;
 		}
+
 		set_isApproving(true);
-		approveToken({
+		const result = await approveToken({
+			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
-			amount: ethers.constants.MaxUint256,
-			from: toAddress(vault.VAULT_ADDR)
-		}, ({error}): void => {
-			set_isApproving(false);
-			if (error) {
-				return;
-			}
-			fetchApproval();
+			spenderAddress: toAddress(vault.VAULT_ADDR),
+			amount: MAX_UINT_256
 		});
-	}
+		set_isApproving(false);
+
+		if(result.isSuccessful){
+			fetchApproval();
+		}
+
+	}, [fetchApproval, isApproving, provider, vault.VAULT_ADDR, vault.WANT_ADDR]);
+
+
 	async function	onDeposit(): Promise<void> {
 		if (isDepositing || (vaultData.allowance.raw < amount.raw || isZero(amount.raw)) || isDepositing) {
 			return;
 		}
 		set_isDepositing(true);
-		depositToken({
+		const result = await depositToken({
+			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
-		}, ({error}): void => {
-			set_isDepositing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
 		});
+		set_isDepositing(false);
+
+		if(result.isSuccessful){
+			fetchPostDepositOrWithdraw();
+		}
 	}
+
 	async function	onDepositAll(): Promise<void> {
 		if (isDepositing || (vaultData.allowance.raw < amount.raw) || isDepositing || isZero(vaultData.wantBalance.raw)) {
 			return;
 		}
+
 		set_isDepositing(true);
-		depositToken({
+		const result = await depositToken({
+			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: vaultData.wantBalance.raw
-		}, ({error}): void => {
-			set_isDepositing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
 		});
+		set_isDepositing(false);
+
+		if(result.isSuccessful){
+			fetchPostDepositOrWithdraw();
+		}
 	}
+
 	async function	onWithdraw(): Promise<void> {
 		if (isWithdrawing || isZero(vaultData.balanceOf.raw)) {
 			return;
 		}
+
 		set_isWithdrawing(true);
-		withdrawToken({
+		const result = await withdrawToken({
+			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
-		}, ({error}): void => {
-			set_isWithdrawing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
 		});
+		set_isWithdrawing(false);
+
+		if(result.isSuccessful){
+			fetchPostDepositOrWithdraw();
+		}
 	}
 	async function	onWithdrawAll(): Promise<void> {
 		if (isWithdrawing || isZero(vaultData.balanceOf.raw)) {
 			return;
 		}
+
 		set_isWithdrawing(true);
-		withdrawToken({
+		const result = await withdrawToken({
+			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
-			amount: ethers.constants.MaxUint256
-		}, ({error}): void => {
-			set_isWithdrawing(false);
-			if (error) {
-				return;
-			}
-			fetchPostDepositOrWithdraw();
+			amount: MAX_UINT_256
 		});
+		set_isWithdrawing(false);
+
+		if(result.isSuccessful){
+			fetchPostDepositOrWithdraw();
+		}
 	}
 
 	return (
