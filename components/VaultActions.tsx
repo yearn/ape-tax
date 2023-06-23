@@ -1,11 +1,11 @@
 import {Fragment, useCallback, useState} from 'react';
-import {ethers} from 'ethers';
 import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
 import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
@@ -97,14 +97,14 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultContract, functionName: 'pricePerShare'});
 	
 		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
-		const wantAllowance = callResult[0].result as string;
-		const wantBalance = callResult[1].result as string;
-		const vaultBalance = toBigInt(callResult[2].result as string);
-		const coinBalance = callResult[3].result as string;
-		const depositLimit = toBigInt(callResult[4].result as string);
-		const totalAssets = callResult[5].result as string;
-		const availableDepositLimit = callResult[6].result as string;
-		const pricePerShare = callResult[7].result as string;
+		const wantAllowance = decodeAsBigInt(callResult[0]);
+		const wantBalance = decodeAsBigInt(callResult[1]);
+		const vaultBalance = decodeAsBigInt(callResult[2]);
+		const coinBalance = decodeAsBigInt(callResult[3]);
+		const depositLimit = decodeAsBigInt(callResult[4]);
+		const totalAssets = decodeAsBigInt(callResult[5]);
+		const availableDepositLimit = decodeAsBigInt(callResult[6]);
+		const pricePerShare = decodeAsBigInt(callResult[7]);
 
 
 		onUpdateVaultData((v): TVaultData => ({
@@ -118,8 +118,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			totalAssets: toNormalizedBN(totalAssets, v.decimals),
 			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
 			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
-			totalAUM: Number((Number(ethers.utils.formatUnits(totalAssets, v.decimals)) * v.wantPrice)),
-			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
+			totalAUM: formatToNormalizedValue(totalAssets, v.decimals) * v.wantPrice,
+			progress: isZero(depositLimit) ? 1 : (formatToNormalizedValue(depositLimit, v.decimals) - formatToNormalizedValue(availableDepositLimit, v.decimals)) / formatToNormalizedValue(depositLimit, v.decimals)
 		}));
 
 		if (vault.ZAP_ADDR) {

@@ -6,19 +6,19 @@ import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
-import {toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
-import type {TStrategyData, TVault} from 'utils/types';
+import type {TStrategyData, TVault, TVaultData} from 'utils/types';
 import type {TAddress, TDict} from '@yearn-finance/web-lib/types';
 
 type TStrategies = {
 	vault: TVault;
-	// onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
+	onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
 }
-function	Strategies({vault}: TStrategies): ReactElement {
+function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	const	{provider, isActive, address, chainID} = useWeb3();
 	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
@@ -120,6 +120,67 @@ function	Strategies({vault}: TStrategies): ReactElement {
 	}, [vault, isActive, provider, address, prepreStrategiesData]);
 
 
+	const fetchPostDepositOrWithdraw = useCallback(async (): Promise<void> => {
+		if (!vault || !provider || !address) {
+			return;
+		}
+
+		const calls = [];
+		const wantContract = {
+			address: toAddress(vault.WANT_ADDR),
+			abi: [
+				'function balanceOf(address) public view returns (uint256)',
+				'function allowance(address, address) public view returns (uint256)'
+			]
+		};
+		const vaultContract = {
+			address: toAddress(vault.VAULT_ADDR),
+			abi: [
+				'function balanceOf(address) public view returns (uint256)',
+				'function allowance(address, address) public view returns (uint256)',
+				'function depositLimit() public view returns (uint256)',
+				'function totalAssets() public view returns (uint256)',
+				'function availableDepositLimit() public view returns (uint256)',
+				'function pricePerShare() public view returns (uint256)'
+			]
+		};
+
+		calls.push({...wantContract, functionName: 'allowance', args: [address, vault.VAULT_ADDR]});
+		calls.push({...wantContract, functionName: 'balanceOf', args: [address]});
+		calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
+		calls.push({...vaultContract, functionName: 'getBalance', args: [address]});
+		calls.push({...vaultContract, functionName: 'depositLimit'});
+		calls.push({...vaultContract, functionName: 'totalAssets'});
+		calls.push({...vaultContract, functionName: 'availableDepositLimit'});
+		calls.push({...vaultContract, functionName: 'pricePerShare'});
+	
+		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
+		const wantAllowance = decodeAsBigInt(callResult[0]);
+		const wantBalance = decodeAsBigInt(callResult[1]);
+		const vaultBalance = decodeAsBigInt(callResult[2]);
+		const coinBalance = decodeAsBigInt(callResult[3]);
+		const depositLimit = decodeAsBigInt(callResult[4]);
+		const totalAssets = decodeAsBigInt(callResult[5]);
+		const availableDepositLimit = decodeAsBigInt(callResult[6]);
+		const pricePerShare = decodeAsBigInt(callResult[7]);
+
+
+		onUpdateVaultData((v): TVaultData => ({
+			...v,
+			allowance: toNormalizedBN(wantAllowance, v.decimals),
+			wantBalance: toNormalizedBN(wantBalance, v.decimals),
+			balanceOf: toNormalizedBN(vaultBalance, v.decimals),
+			balanceOfValue: formatToNormalizedValue(vaultBalance, v.decimals) * Number(v.pricePerShare.normalized) * v.wantPrice,
+			coinBalance: toNormalizedBN(coinBalance, 18),
+			depositLimit: toNormalizedBN(depositLimit, v.decimals),
+			totalAssets: toNormalizedBN(totalAssets, v.decimals),
+			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
+			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
+			totalAUM: formatToNormalizedValue(totalAssets, v.decimals) * v.wantPrice,
+			progress: isZero(depositLimit) ? 1 : (formatToNormalizedValue(depositLimit, v.decimals) - formatToNormalizedValue(availableDepositLimit, v.decimals)) / formatToNormalizedValue(depositLimit, v.decimals)
+		}));
+	}, [address, chainID, onUpdateVaultData, provider, vault]);
+
 	const onHarvestStrategy = useCallback(async (strategyAddress: TAddress): Promise<void> => {
 		set_isHarvesting(true);
 
@@ -131,9 +192,10 @@ function	Strategies({vault}: TStrategies): ReactElement {
 		set_isHarvesting(false);
 		
 		if(result.isSuccessful){
-			alert('onHarvestStrategy worked!');
+			prepreStrategiesData();
+			fetchPostDepositOrWithdraw();
 		}
-	}, [provider]);
+	}, [fetchPostDepositOrWithdraw, prepreStrategiesData, provider]);
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
