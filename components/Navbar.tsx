@@ -88,7 +88,7 @@ function	Navbar(): ReactElement {
 						<select
 							value={chainID}
 							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-700 md:flex'}
-							onChange={(e): void => onSwitchChain(Number(e.target.value), true)}>
+							onChange={(e): void => onSwitchChain(Number(e.target.value))}>
 							{Object.values(CHAINS).map((chain, index): ReactElement => (
 								<option key={index} value={chain.chainID}>{chain.name}</option>
 							))}
