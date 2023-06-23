@@ -5,6 +5,7 @@ import {multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
@@ -51,11 +52,14 @@ function	Strategies({vault}: TStrategies): ReactElement {
 				shouldBreak = true;
 				continue;
 			}
-			const callResult = await multicall({contracts: [
-				{address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI, functionName: 'creditAvailable', args: [strategyAddress]},
-				{address: strategyAddress, abi: VAULT_ABI, functionName: 'name'}
-			], chainId: chainID || 1});
-			const creditAvailable = toBigInt(callResult[0].result as string);
+			const callResult = await multicall({
+				contracts: [
+					{address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI, functionName: 'creditAvailable', args: [strategyAddress]},
+					{address: strategyAddress, abi: VAULT_ABI, functionName: 'name'}
+				],
+				chainId: chainID || 1
+			});
+			const creditAvailable = decodeAsBigInt(callResult[0]);
 			const name = callResult[1].result as string;
 
 			if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
