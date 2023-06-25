@@ -14,7 +14,6 @@ type TApproveToken = TWriteTransaction & {
 	amount: bigint;
 };
 export async function	approveToken(props: TApproveToken): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'contractAddress');
 	assertAddress(props.spenderAddress, 'spenderAddress');
 
@@ -30,7 +29,6 @@ type TDepositToken = TWriteTransaction & {
 	amount: bigint;
 };
 export async function	depositToken(props: TDepositToken): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'contractAddress');
 	assert(props.amount > 0n, 'Amount must be greater than 0');
 
@@ -46,7 +44,6 @@ type TWithdrawToken = TWriteTransaction & {
 	amount: bigint;
 };
 export async function	withdrawToken(props: TWithdrawToken): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'contractAddress');
 	assert(props.amount > 0n, 'Amount must be greater than 0');
 
@@ -62,7 +59,6 @@ type TApeInVault = TWriteTransaction & {
 	amount: bigint;
 };
 export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'contractAddress');
 	assert(props.amount > 0n, 'Amount must be greater than 0');
 
@@ -78,7 +74,6 @@ type TApeOutVault = TWriteTransaction & {
 	amount: bigint;
 };
 export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'contractAddress');
 	assert(props.amount > 0n, 'Amount must be greater than 0');
 
@@ -91,7 +86,6 @@ export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
 }
 
 export async function	harvestStrategy(props: TWriteTransaction): Promise<TTxResponse> {
-	assert(props.connector, 'No connector');
 	assertAddress(props.contractAddress, 'strategyAddress');
 
 	return await handleTx(props, {
