@@ -7,6 +7,7 @@ import config from 'utils/wagmiConfig';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
+import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNumber';
 
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {TSpecificAPIResult, TVault} from 'utils/types';
@@ -24,7 +25,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	const activationTimestamp = Number(activation);
 	const oneWeekAgo = Number((new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
-	const currentPrice = Number(ethers.utils.formatUnits(pricePerShare, Number(decimals)));
+	const currentPrice = formatToNormalizedValue(pricePerShare, Number(decimals));
 	const multicallInstance = config.getPublicClient({chainId: vault?.CHAIN_ID || 1}).multicall;
 
 	if (activationTimestamp > oneWeekAgo) {
@@ -38,8 +39,8 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 
 		const ppsData = await multicallInstance({contracts: calls});
-		const _pastPricePerShareWeek = ppsData[0].result as string;
-		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
+		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
+		const pastPriceWeek = formatToNormalizedValue(_pastPricePerShareWeek, Number(decimals));
 		const weekRoi = (currentPrice / pastPriceWeek - 1);
 
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
@@ -54,8 +55,8 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
 
 		const ppsData = await multicallInstance({contracts: calls});
-		const _pastPricePerShareWeek = ppsData[0].result as string;
-		const _pastPricePerShareMonth = ppsData[0].result as string;
+		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
+		const _pastPricePerShareMonth = decodeAsBigInt(ppsData[1]);
 
 		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
 		const pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, Number(decimals)));
