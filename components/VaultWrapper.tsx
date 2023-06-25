@@ -6,7 +6,7 @@ import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
 import LENS_ABI from 'utils/ABI/lens.abi';
-import {fetchBalance, multicall, readContract} from '@wagmi/core';
+import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
@@ -51,10 +51,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 		const calls = [];
 		const wantContractMultiCall = {
 			address: toAddress(vault.WANT_ADDR),
-			abi: [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)'
-			]
+			abi: erc20ABI
 		};
 		const vaultContractMultiCall = {
 			address: toAddress(vault.VAULT_ADDR),

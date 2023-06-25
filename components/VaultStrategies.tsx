@@ -1,7 +1,7 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
-import {multicall, readContract} from '@wagmi/core';
+import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -128,21 +128,11 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 		const calls = [];
 		const wantContract = {
 			address: toAddress(vault.WANT_ADDR),
-			abi: [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)'
-			]
+			abi: erc20ABI
 		};
 		const vaultContract = {
 			address: toAddress(vault.VAULT_ADDR),
-			abi: [
-				'function balanceOf(address) public view returns (uint256)',
-				'function allowance(address, address) public view returns (uint256)',
-				'function depositLimit() public view returns (uint256)',
-				'function totalAssets() public view returns (uint256)',
-				'function availableDepositLimit() public view returns (uint256)',
-				'function pricePerShare() public view returns (uint256)'
-			]
+			abi:VAULT_ABI
 		};
 
 		calls.push({...wantContract, functionName: 'allowance', args: [address, vault.VAULT_ADDR]});

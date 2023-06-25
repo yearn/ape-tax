@@ -1,4 +1,6 @@
 import assert from 'assert';
+import {erc20ABI} from 'wagmi';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import {assertAddress, handleTx} from './toWagmiProvider';
@@ -18,7 +20,7 @@ export async function	approveToken(props: TApproveToken): Promise<TTxResponse> {
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: ['function approve(address spender, uint256 amount) public returns (bool)'],
+		abi: erc20ABI,
 		functionName: 'approve',
 		args: [props.spenderAddress, props.amount]
 	});
@@ -34,7 +36,7 @@ export async function	depositToken(props: TDepositToken): Promise<TTxResponse> {
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: ['function deposit(uint256 amount)'],
+		abi: VAULT_ABI,
 		functionName: 'deposit',
 		args: [props.amount]
 	});
@@ -50,7 +52,7 @@ export async function	withdrawToken(props: TWithdrawToken): Promise<TTxResponse>
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: ['function withdraw(uint256 amount)'],
+		abi: VAULT_ABI,
 		functionName: 'withdraw',
 		args: [props.amount]
 	});
@@ -66,7 +68,7 @@ export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: ['function deposit() public payable'],
+		abi: VAULT_ABI,
 		functionName: 'deposit',
 		args: [props.amount]
 	});
@@ -82,7 +84,7 @@ export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: ['function withdraw(uint256 amount) public'],
+		abi: VAULT_ABI,
 		functionName: 'withdraw',
 		args: [props.amount]
 	});
