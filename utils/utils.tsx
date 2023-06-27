@@ -1,4 +1,3 @@
-import {ethers} from 'ethers';
 import axios from 'axios';
 
 import type {AxiosError, AxiosResponse} from 'axios';
@@ -70,61 +69,61 @@ export async function fetchCryptoPrice(from = '', to = 'usd'): Promise<any> {
 	return null;
 }
 
-export function getProvider(chain = 1): ethers.providers.BaseProvider {
-	if (chain === 1) {
-		if (process.env.ALCHEMY_KEY) {
-			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
-		}
-		return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
-	}
-	if (chain === 56) {
-		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
-	}
-	if (chain === 100) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
-	}
-	if (chain === 137) {
-		if (process.env.ALCHEMY_KEY_POLYGON) {
-			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
-		}
-		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
-	}
-	if (chain === 250) {
-		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
-	}
-	if (chain === 1337) {
-		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
-	}
-	if (chain === 42161) {
-		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	}
-	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
-}
+// export function getProvider(chain = 1): ethers.providers.BaseProvider {
+// 	if (chain === 1) {
+// 		if (process.env.ALCHEMY_KEY) {
+// 			return new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY);
+// 		}
+// 		return new ethers.providers.InfuraProvider('homestead', '9aa3d95b3bc440fa88ea12eaa4456161');
+// 	}
+// 	if (chain === 56) {
+// 		return new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
+// 	}
+// 	if (chain === 100) {
+// 		return new ethers.providers.JsonRpcProvider('https://rpc.gnosischain.com/');
+// 	}
+// 	if (chain === 137) {
+// 		if (process.env.ALCHEMY_KEY_POLYGON) {
+// 			return new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
+// 		}
+// 		return new ethers.providers.JsonRpcProvider('https://rpc-mainnet.matic.network');
+// 	}
+// 	if (chain === 250) {
+// 		return new ethers.providers.JsonRpcProvider('https://rpc.ftm.tools');
+// 	}
+// 	if (chain === 1337) {
+// 		return new ethers.providers.JsonRpcProvider('http://localhost:8545');
+// 	}
+// 	if (chain === 42161) {
+// 		return new ethers.providers.JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+// 	}
+// 	return (new ethers.providers.AlchemyProvider('homestead', process.env.ALCHEMY_KEY));
+// }
 
-export function getProviderURI(chain = 1): string {
-	if (chain === 1) {
-		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
-	}
-	if (chain === 56) {
-		return ('https://bsc-dataseed1.defibit.io/');
-	}
-	if (chain === 100) {
-		return ('https://rpc.gnosischain.com/');
-	}
-	if (chain === 137) {
-		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
-	}
-	if (chain === 250) {
-		return ('https://rpc.ftm.tools');
-	}
-	if (chain === 1337) {
-		return ('http://localhost:8545');
-	}
-	if (chain === 42161) {
-		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
-	}
-	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
-}
+// export function getProviderURI(chain = 1): string {
+// 	if (chain === 1) {
+// 		return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
+// 	}
+// 	if (chain === 56) {
+// 		return ('https://bsc-dataseed1.defibit.io/');
+// 	}
+// 	if (chain === 100) {
+// 		return ('https://rpc.gnosischain.com/');
+// 	}
+// 	if (chain === 137) {
+// 		return (`https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY_POLYGON}`);
+// 	}
+// 	if (chain === 250) {
+// 		return ('https://rpc.ftm.tools');
+// 	}
+// 	if (chain === 1337) {
+// 		return ('http://localhost:8545');
+// 	}
+// 	if (chain === 42161) {
+// 		return (`https://speedy-nodes-nyc.moralis.io/${process.env.MORALIS_ARBITRUM_KEY}/arbitrum/mainnet`);
+// 	}
+// 	return (`https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`);
+// }
 
 export async function asyncForEach<T>(array: T[], callback: (item: T, index: number, array: T[]) => void): Promise<void> {
 	for (let index = 0; index < array.length; index++) {
