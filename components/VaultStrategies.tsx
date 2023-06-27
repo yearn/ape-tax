@@ -113,6 +113,12 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL]);
 
 	useEffect((): void => {
+		//
+		console.log(vault);
+		console.log(isActive);
+		console.log(provider);
+		console.log(address);
+		
 		if (!vault || !isActive || !provider || !address) {
 			return;
 		}

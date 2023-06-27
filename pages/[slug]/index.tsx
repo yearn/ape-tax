@@ -7,7 +7,6 @@ import vaults from 'utils/vaults.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {GetStaticPathsResult} from 'next';
 import type {ReactElement} from 'react';
@@ -15,7 +14,7 @@ import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement {
-	const	{provider, isActive, address, chainID, openLoginModal} = useWeb3();
+	const	{provider, isActive, chainID, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
 	const	isWindowInFocus = useWindowInFocus();
@@ -32,11 +31,13 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 			return;
 		}
 		if (Number(newChainID) === 1) {
-			provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error: string): void => console.error(error));
+			console.log('TODO, switch chain to chainID 1');
+			// provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error: string): void => console.error(error));
 		} else {
-			provider.send('wallet_addEthereumChain', [CHAINS[newChainID]?.chain_swap, address]).catch((error: string): void => console.error(error));
+			console.log('TODO switch chain id to correct chain ID');
+			// provider.send('wallet_addEthereumChain', [CHAINS[newChainID]?.chain_swap, address]).catch((error: string): void => console.error(error));
 		}
-	}, [isActive, address, chainID, provider]);
+	}, [isActive, chainID, provider]);
 
 	useClientEffect((): void => {
 		if (!vault) {
