@@ -4,6 +4,7 @@ import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import {assertAddress, handleTx} from './toWagmiProvider';
+import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
 
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
@@ -90,7 +91,7 @@ export async function	harvestStrategy(props: TWriteTransaction): Promise<TTxResp
 
 	return await handleTx(props, {
 		address: toAddress(process.env.YEARN_FACTORY_KEEPER_WRAPPER),
-		abi: ['function harvestStrategy(address) public'],
+		abi: FACTORY_KEEPER_ABI,
 		functionName: 'harvestStrategy',
 		args: [props.contractAddress]
 	});
