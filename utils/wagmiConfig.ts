@@ -103,13 +103,13 @@ const optimismOverride = {
 const {chains, publicClient, webSocketPublicClient} = configureChains(
 	[mainnet, optimismOverride, polygonOverride, gnosis, fantom, arbitrum, localhost],
 	[
-		publicProvider(),
-		alchemyProvider({apiKey: process.env.ALCHEMY_KEY || ''})
+		alchemyProvider({apiKey: process.env.ALCHEMY_KEY || ''}),
+		publicProvider()
 	]
 );
 
 const config = createConfig({
-	autoConnect: true,
+	autoConnect: false,
 	publicClient,
 	webSocketPublicClient,
 	connectors: [
