@@ -1,9 +1,10 @@
 import Meta from 'components/Meta';
-import Navbar from 'components/Navbar';
 import {FactoryContextApp} from 'contexts/useFactory';
+import LogoYearn from 'icons/LogoYearn';
 import vaults from 'utils/vaults.json';
 import config from 'utils/wagmiConfig';
 import useSWR from 'swr';
+import Header from '@yearn-finance/web-lib/components/Header';
 import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 
@@ -25,7 +26,13 @@ function App(props: AppProps): ReactElement {
 				className={'relative p-4'}
 				style={{minHeight: '100vh'}}>
 				<div className={'pointer-events-auto absolute inset-x-0 top-0 z-30 px-4'}>
-					<Navbar />
+					<Header
+						logo={<LogoYearn/>}
+						nav={[]}
+						currentPathName={''}
+						onOpenMenuMobile={function (): void {
+							throw new Error('Function not implemented.');
+						} } />
 				</div>
 				<div className={'mb-8'}>
 					<Component
