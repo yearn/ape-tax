@@ -22,10 +22,8 @@ function stringToColour(str: string): string {
 }
 
 function	WalletButton(): ReactElement {
-	const	{isActive, ens, lensProtocolHandle, address, walletType, onDesactivate, openLoginModal} = useWeb3();
+	const	{isActive, ens, lensProtocolHandle, address, onDesactivate, openLoginModal} = useWeb3();
 
-	console.log(walletType);
-	
 	if (!isActive) {
 		return (
 			<button
