@@ -52,7 +52,6 @@ function	MyApp(props: AppProps): ReactElement {
 		<WithYearn
 			configOverwrite={config}
 			options={{
-				web3: {supportedChainID: [1, 10, 137, 250, 42161, 1337]},
 				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
 				ui: {shouldUseThemes: false}
 			}}>
