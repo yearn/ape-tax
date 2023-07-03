@@ -109,7 +109,7 @@ const {chains, publicClient, webSocketPublicClient} = configureChains(
 );
 
 const config = createConfig({
-	autoConnect: false,
+	autoConnect: true,
 	publicClient,
 	webSocketPublicClient,
 	connectors: [
@@ -117,9 +117,12 @@ const config = createConfig({
 		new IFrameEthereumConnector({chains, options: {}}),
 		new InjectedConnector({chains}),
 		new MetaMaskConnector(),
-		new LedgerConnector({chains}),
-		new WalletConnectLegacyConnector({options: {qrcode: true}}),
+		new LedgerConnector({chains, options: {}}),
+		new WalletConnectLegacyConnector({
+			chains, options: {}
+		}),
 		new CoinbaseWalletConnector({
+			chains,
 			options: {
 				jsonRpcUrl: getRPC(1),
 				appName: process.env.WEBSITE_TITLE as string

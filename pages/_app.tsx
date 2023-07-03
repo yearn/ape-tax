@@ -50,7 +50,7 @@ function App(props: AppProps): ReactElement {
 function	MyApp(props: AppProps): ReactElement {
 	return (
 		<WithYearn
-			configOverwrite={config}
+			config={config}
 			options={{
 				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
 				ui: {shouldUseThemes: false}
