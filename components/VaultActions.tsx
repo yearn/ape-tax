@@ -352,14 +352,14 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 					) : (<Fragment />)}
 					<button
 						onClick={onWithdraw}
-						disabled={Number(vaultData.balanceOf) === 0}
-						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+						disabled={isZero(vaultData.balanceOf.raw)}
+						className={`${isZero(vaultData.balanceOf.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{'💸 Withdraw'}
 					</button>
 					<button
 						onClick={onWithdrawAll}
-						disabled={Number(vaultData.balanceOf) === 0}
-						className={`${Number(vaultData.balanceOf) === 0 ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+						disabled={isZero(vaultData.balanceOf.raw)}
+						className={`${isZero(vaultData.balanceOf.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
 						{'💸 Withdraw All'}
 					</button>
 				</div>
