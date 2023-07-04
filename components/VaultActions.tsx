@@ -250,7 +250,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const result = await withdrawToken({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
-			amount: MAX_UINT_256
+			amount: vaultData.balanceOf.raw
 		});
 		set_isWithdrawing(false);
 
