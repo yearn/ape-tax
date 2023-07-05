@@ -1,4 +1,4 @@
-import {Fragment, useCallback, useState} from 'react';
+import {Fragment, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
@@ -14,30 +14,10 @@ import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement {
-	const	{provider, isActive, chainID, openLoginModal} = useWeb3();
+	const	{isActive, chainID, onSwitchChain, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
 	const	isWindowInFocus = useWindowInFocus();
-
-	/* 🔵 - Yearn Finance ******************************************************
-	** Trigger a suggestion to switch chain if the user is on the wrong chain
-	**************************************************************************/
-	const onSwitchChain = useCallback((newChainID: number): void => {
-		if (newChainID === chainID) {
-			return;
-		}
-		if (!provider || !isActive) {
-			console.error('Not initialized');
-			return;
-		}
-		if (Number(newChainID) === 1) {
-			console.log('TODO, switch chain to chainID 1');
-			// provider.send('wallet_switchEthereumChain', [{chainId: '0x1'}]).catch((error: string): void => console.error(error));
-		} else {
-			console.log('TODO switch chain id to correct chain ID');
-			// provider.send('wallet_addEthereumChain', [CHAINS[newChainID]?.chain_swap, address]).catch((error: string): void => console.error(error));
-		}
-	}, [isActive, chainID, provider]);
 
 	useClientEffect((): void => {
 		if (!vault) {
