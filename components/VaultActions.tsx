@@ -1,5 +1,5 @@
 import {Fragment, useCallback, useState} from 'react';
-import {apeInVault, apeOutVault, approveToken, depositToken, withdrawToken} from 'utils/actions';
+import {approveERC20, deposit, withdrawShares} from 'utils/actions';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
@@ -127,7 +127,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	** We need to perform some specific actions
 	**************************************************************************/
 	const onZapIn = useCallback(async (): Promise<void> => {
-		const result = await apeInVault({
+		const result = await deposit({
 			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: zapAmount.raw
@@ -143,7 +143,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			return;
 		}
 		set_isZapOutApproving(true);
-		const result = await approveToken({
+		const result = await approveERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vault.ZAP_ADDR),
@@ -157,7 +157,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	}, [fetchZapOutApproval, isZapOutApproving, provider, vault.VAULT_ADDR, vault.ZAP_ADDR]);
 
 	const onZapOut = useCallback(async (): Promise<void> => {
-		const result = await apeOutVault({
+		const result = await withdrawShares({
 			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: zapAmount.raw
@@ -174,7 +174,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 
 		set_isApproving(true);
-		const result = await approveToken({
+		const result = await approveERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			spenderAddress: toAddress(vault.VAULT_ADDR),
@@ -194,7 +194,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			return;
 		}
 		set_isDepositing(true);
-		const result = await depositToken({
+		const result = await deposit({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
@@ -207,12 +207,12 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 	}
 
 	async function	onDepositAll(): Promise<void> {
-		if (isDepositing || (vaultData.allowance.raw < amount.raw) || isDepositing || isZero(vaultData.wantBalance.raw)) {
+		if (isDepositing || (vaultData.allowance.raw < amount.raw) || isZero(vaultData.wantBalance.raw)) {
 			return;
 		}
 
 		set_isDepositing(true);
-		const result = await depositToken({
+		const result = await deposit({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: vaultData.wantBalance.raw
@@ -230,7 +230,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 
 		set_isWithdrawing(true);
-		const result = await withdrawToken({
+		const result = await withdrawShares({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: amount.raw
@@ -247,7 +247,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 
 		set_isWithdrawing(true);
-		const result = await withdrawToken({
+		const result = await withdrawShares({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			amount: vaultData.balanceOf.raw
