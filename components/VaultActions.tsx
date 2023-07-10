@@ -42,7 +42,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		}
 		const allowance = await readContract({
 			abi: VAULT_ABI,
-			address: toAddress(vault.VAULT_ADDR),
+			address: toAddress(vault.WANT_ADDR),
 			functionName: 'allowance',
 			args: [address, toAddress(vault.VAULT_ADDR)]
 		});
