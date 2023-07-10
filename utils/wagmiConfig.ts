@@ -1,4 +1,4 @@
-import {arbitrum, fantom, gnosis, optimism, polygon, avalanche} from 'viem/chains';
+import {arbitrum, avalanche, fantom, gnosis, optimism, polygon} from 'viem/chains';
 import {configureChains, createConfig, mainnet} from 'wagmi';
 import {CoinbaseWalletConnector} from 'wagmi/connectors/coinbaseWallet';
 import {LedgerConnector} from 'wagmi/connectors/ledger';
