@@ -1,12 +1,13 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useChain} from '@yearn-finance/web-lib/hooks/useChain';
 import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
+import type {TChain} from '@yearn-finance/web-lib/utils/web3/chains';
 
 function stringToColour(str: string): string {
 	let hash = 0;
@@ -55,6 +56,7 @@ function	WalletButton(): ReactElement {
 
 function	Navbar(): ReactElement {
 	const	{address, chainID, openLoginModal, onSwitchChain} = useWeb3();
+	const chains = useChain();
 	const	router = useRouter();
 	const	[hasInitialPopup, set_hasInitialPopup] = useState(false);
 
@@ -71,6 +73,13 @@ function	Navbar(): ReactElement {
 		}, 1000);
 		return (): void => clearTimeout(timeout);
 	}, [address]);
+
+	const supportedNetworks = useMemo((): TChain[] => {
+		const _networks = Object.values(chains.getAll());
+		const supported = [1, 10, 137, 250, 42161, 43114];
+
+		return _networks.filter((network: TChain): boolean => supported.includes(Number(network.chainID)));
+	}, [chains]);
 
 	return (
 		<div className={'flex h-12 w-full flex-row justify-center'}>
@@ -90,7 +99,7 @@ function	Navbar(): ReactElement {
 							value={chainID}
 							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-700 md:flex'}
 							onChange={(e): void => onSwitchChain(Number(e.target.value))}>
-							{Object.values(CHAINS).map((chain, index): ReactElement => (
+							{supportedNetworks.map((chain, index): ReactElement => (
 								<option key={index} value={chain.chainID}>{chain.name}</option>
 							))}
 						</select>
