@@ -1,4 +1,4 @@
-import {arbitrum, fantom, gnosis, optimism, polygon} from 'viem/chains';
+import {arbitrum, fantom, gnosis, optimism, polygon, avalanche} from 'viem/chains';
 import {configureChains, createConfig, mainnet} from 'wagmi';
 import {CoinbaseWalletConnector} from 'wagmi/connectors/coinbaseWallet';
 import {LedgerConnector} from 'wagmi/connectors/ledger';
@@ -62,6 +62,24 @@ const polygonOverride = {
 
 };
 
+const avalancheOverride = {
+	...avalanche,
+	rpcUrls: {
+		default: {
+			http: [
+				...avalanche.rpcUrls.default.http,
+				process.env.RPC_URL_AVALANCHE_INFURA || 'https://1rpc.io/avax/c'
+			]
+		},
+		public: {
+			http: [
+				...avalanche.rpcUrls.default.http,
+				process.env.RPC_URL_AVALANCHE_INFURA || 'https://1rpc.io/avax/c'
+			]
+		}
+	}
+};
+
 const optimismOverride = {
 	...optimism,
 	rpcUrls: {
@@ -101,7 +119,16 @@ const optimismOverride = {
 };
 
 const {chains, publicClient, webSocketPublicClient} = configureChains(
-	[mainnet, optimismOverride, polygonOverride, gnosis, fantom, arbitrum, localhost],
+	[
+		mainnet,
+		avalancheOverride,
+		optimismOverride,
+		polygonOverride,
+		gnosis,
+		fantom,
+		arbitrum,
+		localhost
+	],
 	[
 		alchemyProvider({apiKey: process.env.ALCHEMY_KEY || ''}),
 		publicProvider()
