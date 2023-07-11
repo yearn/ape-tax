@@ -7,6 +7,7 @@ import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 import type {ReactElement} from 'react';
+import type {Chain} from 'wagmi';
 
 function stringToColour(str: string): string {
 	let hash = 0;
@@ -81,7 +82,7 @@ function	Navbar(): ReactElement {
 		}
 		const chainsForInjected = injectedConnector.chains;
 		const noTestnet = chainsForInjected.filter(({id}): boolean => id !== 1337);
-		return noTestnet.map((network: any): TNetwork => (
+		return noTestnet.map((network: Chain): TNetwork => (
 			{value: network.id, label: network.name}
 		));
 	}, [connectors]);
