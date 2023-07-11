@@ -26,7 +26,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		chainID
 	} = useWeb3();
 	const chain = useChain();
-	const	chainCoin = chain.getCurrent()?.coin|| 'ETH';
+	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
 	const	[zapAmount, set_zapAmount] = useState(toNormalizedBN(0));
 	const	[isApproving, set_isApproving] = useState(false);
