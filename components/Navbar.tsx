@@ -1,13 +1,12 @@
-import {Fragment, useMemo, useState} from 'react';
+import {Fragment, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
-import {useConnect} from 'wagmi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 import type {ReactElement} from 'react';
-import type {Chain} from 'wagmi';
+import type {TNetwork} from 'utils/types';
 
 function stringToColour(str: string): string {
 	let hash = 0;
@@ -54,12 +53,11 @@ function	WalletButton(): ReactElement {
 	);
 }
 
-type TNetwork = {value: number, label: string};
+type TNavbar = { supportedNetworks: TNetwork[] }
 
-function	Navbar(): ReactElement {
+function	Navbar({supportedNetworks}: TNavbar): ReactElement {
 	const	{address, chainID, openLoginModal, onSwitchChain} = useWeb3();
 	const	router = useRouter();
-	const {connectors} = useConnect();
 	const	[hasInitialPopup, set_hasInitialPopup] = useState(false);
 	useClientEffect((): VoidFunction => {
 		const	timeout = setTimeout((): void => {
@@ -74,18 +72,6 @@ function	Navbar(): ReactElement {
 		}, 1000);
 		return (): void => clearTimeout(timeout);
 	}, [address]);
-
-	const supportedNetworks = useMemo((): TNetwork[] => {
-		const injectedConnector = connectors.find((e): boolean => e.id.toLowerCase() === 'injected');
-		if (!injectedConnector) {
-			return [];
-		}
-		const chainsForInjected = injectedConnector.chains;
-		const noTestnet = chainsForInjected.filter(({id}): boolean => id !== 1337);
-		return noTestnet.map((network: Chain): TNetwork => (
-			{value: network.id, label: network.name}
-		));
-	}, [connectors]);
 
 	return (
 		<div className={'flex h-12 w-full flex-row justify-center'}>

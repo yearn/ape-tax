@@ -113,3 +113,10 @@ export type TGauge = {
 	exists: boolean,
 	isAuraOK: boolean,
 }
+
+export type TNetwork = {
+	value: number,
+	label: string,
+	currencySymbol: string,
+	blockExplorer: string
+}
