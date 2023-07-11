@@ -1,4 +1,5 @@
 import {Fragment, useCallback, useState} from 'react';
+import {useChain} from 'hook/useChain';
 import {approveERC20, deposit, withdrawShares} from 'utils/actions';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -9,7 +10,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
@@ -25,7 +25,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		address, 
 		chainID
 	} = useWeb3();
-	const	chainCoin = CHAINS[vault?.CHAIN_ID]?.coin || 'ETH';
+	const chain = useChain();
+	const	chainCoin = chain.getCurrent()?.coin|| 'ETH';
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
 	const	[zapAmount, set_zapAmount] = useState(toNormalizedBN(0));
 	const	[isApproving, set_isApproving] = useState(false);
