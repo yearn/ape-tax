@@ -1,17 +1,18 @@
 import {useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
+import {useChain} from 'hook/useChain';
 import useSWR from 'swr';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
 import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
-	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
+	const chain = useChain();
+	const	chainExplorer = chain.getCurrent()?.block_explorer || 'https://etherscan.io';
 
 	const	{data: vaultAPYSWR, isLoading} = useSWR<Maybe<TSpecificAPIResult>>(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
 

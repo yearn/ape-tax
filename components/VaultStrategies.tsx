@@ -1,4 +1,5 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
+import {useChain} from 'hook/useChain';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
@@ -8,7 +9,6 @@ import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
 import type {TStrategyData, TVault, TVaultData} from 'utils/types';
@@ -19,8 +19,9 @@ type TStrategies = {
 	onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
 }
 function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
+	const chain = useChain();
+	const	chainExplorer = chain.getCurrent()?.block_explorer || 'https://etherscan.io';
 	const	{provider, isActive, address, chainID} = useWeb3();
-	const	chainExplorer = CHAINS[vault?.CHAIN_ID]?.block_explorer || 'https://etherscan.io';
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
 	const	[, set_nonce] = useState(0);
 	const	[isHarvesting, set_isHarvesting] = useState(false);
