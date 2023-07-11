@@ -12,6 +12,7 @@ import type {ReactElement} from 'react';
 
 import	'../style.css';
 
+
 function App(props: AppProps): ReactElement {
 	const	{Component, pageProps} = props;
 	const	vaultsCGIds = [...new Set(Object.values(vaults).map((vault): string => vault.COINGECKO_SYMBOL.toLowerCase()))];
@@ -25,7 +26,7 @@ function App(props: AppProps): ReactElement {
 				className={'relative p-4'}
 				style={{minHeight: '100vh'}}>
 				<div className={'pointer-events-auto absolute inset-x-0 top-0 z-30 px-4'}>
-					<Navbar/>
+					<Navbar />
 				</div>
 				<div className={'mb-8'}>
 					<Component

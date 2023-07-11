@@ -1,14 +1,15 @@
+import {useChain} from 'hook/useChain';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
 
 function	VaultWallet({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	{address, ens} = useWeb3();
-	const	chainCoin = CHAINS[vault?.CHAIN_ID]?.coin || 'ETH';
+	const chain = useChain();
+	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
 
 	return (
 		<section aria-label={'WALLET'} className={'mt-8'}>

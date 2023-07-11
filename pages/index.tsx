@@ -2,6 +2,7 @@ import {Fragment, useCallback, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import GraphemeSplitter from 'grapheme-splitter';
+import {useChain} from 'hook/useChain';
 import vaults from 'utils/vaults.json';
 import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
@@ -11,7 +12,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
 import type {TTVL, TVault} from 'utils/types';
@@ -107,6 +107,7 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 function	Index(): ReactElement {
 	const	{isActive, address} = useWeb3();
 	const	{safeChainID} = useChainID();
+	const chain = useChain();
 	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState<TVault[]>([]);
@@ -222,7 +223,7 @@ function	Index(): ReactElement {
 				<div>
 					<div>
 						<span className={'font-mono text-base font-semibold text-neutral-900'}>
-							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
+							{`${chain.getCurrent()?.displayName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}

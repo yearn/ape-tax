@@ -1,14 +1,12 @@
-import {arbitrum, fantom, gnosis, optimism, polygon, avalanche} from 'viem/chains';
+import {arbitrum, avalanche, fantom, optimism, polygon} from 'viem/chains';
 import {configureChains, createConfig, mainnet} from 'wagmi';
 import {CoinbaseWalletConnector} from 'wagmi/connectors/coinbaseWallet';
 import {LedgerConnector} from 'wagmi/connectors/ledger';
 import {MetaMaskConnector} from 'wagmi/connectors/metaMask';
-import {SafeConnector} from 'wagmi/connectors/safe';
 import {WalletConnectConnector} from 'wagmi/connectors/walletConnect';
 import {alchemyProvider} from 'wagmi/providers/alchemy';
 import {publicProvider} from 'wagmi/providers/public';
 import {InjectedConnector} from '@yearn-finance/web-lib/utils/web3/injectedConnector';
-import {IFrameEthereumConnector} from '@yearn-finance/web-lib/utils/web3/ledgerConnector';
 import {getRPC} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {Chain} from 'wagmi';
@@ -124,7 +122,6 @@ const {chains, publicClient, webSocketPublicClient} = configureChains(
 		avalancheOverride,
 		optimismOverride,
 		polygonOverride,
-		gnosis,
 		fantom,
 		arbitrum,
 		localhost
@@ -140,8 +137,6 @@ const config = createConfig({
 	publicClient,
 	webSocketPublicClient,
 	connectors: [
-		new SafeConnector({chains, options: {allowedDomains: [/gnosis-safe.io/, /app.safe.global/]}}),
-		new IFrameEthereumConnector({chains, options: {}}),
 		new InjectedConnector({chains}),
 		new MetaMaskConnector(),
 		new LedgerConnector({chains, options: {}}),
