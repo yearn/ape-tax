@@ -1,4 +1,3 @@
-import {type ReactElement} from 'react';
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';
 import {FactoryContextApp} from 'contexts/useFactory';
@@ -9,6 +8,7 @@ import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 
 import type {AppProps} from 'next/app';
+import type {ReactElement} from 'react';
 
 import	'../style.css';
 
