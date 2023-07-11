@@ -2,10 +2,10 @@ import {Fragment, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
-import useWindowInFocus from 'hook/useWindowInFocus';
 import vaults from 'utils/vaults.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
+import {useWindowInFocus} from '@yearn-finance/web-lib/hooks/useWindowInFocus';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import type {GetStaticPathsResult} from 'next';
