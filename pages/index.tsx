@@ -11,7 +11,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
 
 import type {ReactElement} from 'react';
 import type {TTVL, TVault} from 'utils/types';
@@ -103,6 +102,15 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 		</div>
 	);
 }
+
+const chainLabels: {[key: number]: string} = {
+	1: 'Ethereum',
+	10: 'Optimism',
+	137: 'Polygon',
+	250 : 'Fantom',
+	42161 : 'Arbitrum',
+	43114 : 'Avalanche'
+};
 
 function	Index(): ReactElement {
 	const	{isActive, address} = useWeb3();
@@ -222,7 +230,7 @@ function	Index(): ReactElement {
 				<div>
 					<div>
 						<span className={'font-mono text-base font-semibold text-neutral-900'}>
-							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
+							{`${chainLabels[safeChainID] || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}
