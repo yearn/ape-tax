@@ -140,7 +140,7 @@ const config = createConfig({
 	connectors: [
 		new IFrameEthereumConnector({chains, options: {}}),
 		new InjectedConnector({chains}),
-		new MetaMaskConnector(),
+		new MetaMaskConnector({chains}),
 		new LedgerConnector({chains, options: {}}),
 		new WalletConnectConnector({
 			chains,
