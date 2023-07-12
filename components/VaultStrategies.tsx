@@ -63,7 +63,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			const creditAvailable = decodeAsBigInt(callResult[0]);
 			const name = callResult[1].result as string;
 
-			if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
+			if ([1, 10, 250, 42161, 43114].includes(Number(vault.CHAIN_ID))) {
 				try {
 					const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
 					if (details) {

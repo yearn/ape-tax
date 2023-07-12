@@ -44,6 +44,13 @@ export async function fetchBlockTimestamp(timestamp: number, network = 1): Promi
 		}
 		return 0;
 	}
+	if (network === 43114) {
+		const	result = await performGet(`https://api.snowtrace.io/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before&apikey=${process.env.SNOWTRACE_API}`);
+		if (result) {
+			return result.result;
+		}
+		return 0;
+	}
 	if (network === 100) {
 		const	result = await performGet(`https://blockscout.com/xdai/mainnet/api?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before`);
 		if (result) {
