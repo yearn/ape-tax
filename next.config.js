@@ -51,14 +51,16 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 			10: process.env.WS_URL_OPTIMISM,
 			137: process.env.WS_URL_MATIC,
 			250: process.env.WS_URL_FANTOM,
-			42161: process.env.WS_URL_ARBITRUM
+			42161: process.env.WS_URL_ARBITRUM,
+			43114: process.env.WS_URL_AVALANCHE
 		},
 		JSON_RPC_URL: {
 			1: process.env.RPC_URL_MAINNET,
 			10: process.env.RPC_URL_OPTIMISM,
 			137: process.env.RPC_URL_MATIC || 'https://polygon.llamarpc.com',
 			250: process.env.RPC_URL_FANTOM,
-			42161: process.env.RPC_URL_ARBITRUM
+			42161: process.env.RPC_URL_ARBITRUM,
+			43114: process.env.RPC_URL_AVALANCHE
 		},
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
 		INFURA_KEY: process.env.INFURA_KEY,
@@ -69,6 +71,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
 		OPTISCAN_API: process.env.OPTISCAN_API,
 		BSCSCAN_API: process.env.BSCSCAN_API,
+		SNOWTRACE_API: process.env.SNOWTRACE_API,
 		MORALIS_ARBITRUM_KEY: process.env.MORALIS_ARBITRUM_KEY,
 		WALLETCONNECT_PROJECT_ID: process.env.WALLETCONNECT_PROJECT_ID,
 		
