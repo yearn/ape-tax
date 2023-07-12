@@ -7,6 +7,7 @@ import {WalletConnectConnector} from 'wagmi/connectors/walletConnect';
 import {alchemyProvider} from 'wagmi/providers/alchemy';
 import {publicProvider} from 'wagmi/providers/public';
 import {InjectedConnector} from '@yearn-finance/web-lib/utils/web3/injectedConnector';
+import {IFrameEthereumConnector} from '@yearn-finance/web-lib/utils/web3/ledgerConnector';
 import {getRPC} from '@yearn-finance/web-lib/utils/web3/providers';
 
 import type {Chain} from 'wagmi';
@@ -137,6 +138,7 @@ const config = createConfig({
 	publicClient,
 	webSocketPublicClient,
 	connectors: [
+		new IFrameEthereumConnector({chains, options: {}}),
 		new InjectedConnector({chains}),
 		new MetaMaskConnector(),
 		new LedgerConnector({chains, options: {}}),
