@@ -4,6 +4,7 @@ import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
@@ -20,8 +21,9 @@ type TStrategies = {
 }
 function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	const chain = useChain();
+	const {safeChainID} = useChainID();
 	const	chainExplorer = chain.getCurrent()?.block_explorer || 'https://etherscan.io';
-	const	{provider, isActive, address, chainID} = useWeb3();
+	const	{provider, isActive, address} = useWeb3();
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
 	const	[, set_nonce] = useState(0);
 	const	[isHarvesting, set_isHarvesting] = useState(false);
@@ -31,7 +33,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 	** elements for the UI.
 	**************************************************************************/
 	const prepreStrategiesData = useCallback(async (): Promise<void> => {
-		if (chainID !== vault?.CHAIN_ID && !(chainID === 1337)) {
+		if (safeChainID !== vault?.CHAIN_ID && !(safeChainID === 1337)) {
 			return;
 		}
 
@@ -47,18 +49,27 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			** retrieve the address of the strategy from withdrawQueue, looping
 			** through the max number of strategies until we hit 0
 			**************************************************************************/
-			const strategyAddress = await readContract({...vaultContract, functionName: 'withdrawalQueue', args: [toBigInt(index)]});
+			let strategyAddress = toAddress();
 
-			if (isZeroAddress(strategyAddress)) {
+			try {
+				const _strategyAddress = await readContract({...vaultContract, functionName: 'withdrawalQueue', args: [toBigInt(index)]});
+				if (isZeroAddress(_strategyAddress)) {
+					shouldBreak = true;
+					continue;
+				}
+
+				strategyAddress = toAddress(_strategyAddress);
+			} catch (error) {
 				shouldBreak = true;
 				continue;
 			}
+
 			const callResult = await multicall({
 				contracts: [
 					{address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI, functionName: 'creditAvailable', args: [strategyAddress]},
 					{address: strategyAddress, abi: VAULT_ABI, functionName: 'name'}
 				],
-				chainId: chainID || 1
+				chainId: safeChainID || 1
 			});
 			const creditAvailable = decodeAsBigInt(callResult[0]);
 			const name = callResult[1].result as string;
@@ -111,7 +122,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			}
 			set_nonce((n): number => n + 1);
 		}
-	}, [chainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL]);
+	}, [safeChainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL]);
 
 	useEffect((): void => {
 		if (!vault || !isActive || !provider || !address) {
@@ -145,7 +156,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 		calls.push({...vaultContract, functionName: 'availableDepositLimit'});
 		calls.push({...vaultContract, functionName: 'pricePerShare'});
 	
-		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
+		const callResult = await multicall({contracts: calls as never[], chainId: safeChainID});
 		const wantAllowance = decodeAsBigInt(callResult[0]);
 		const wantBalance = decodeAsBigInt(callResult[1]);
 		const vaultBalance = decodeAsBigInt(callResult[2]);
@@ -170,7 +181,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			totalAUM: formatToNormalizedValue(totalAssets, v.decimals) * v.wantPrice,
 			progress: isZero(depositLimit) ? 1 : (formatToNormalizedValue(depositLimit, v.decimals) - formatToNormalizedValue(availableDepositLimit, v.decimals)) / formatToNormalizedValue(depositLimit, v.decimals)
 		}));
-	}, [address, chainID, onUpdateVaultData, provider, vault]);
+	}, [address, safeChainID, onUpdateVaultData, provider, vault]);
 
 	const onHarvestStrategy = useCallback(async (strategyAddress: TAddress): Promise<void> => {
 		set_isHarvesting(true);
@@ -187,6 +198,11 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			fetchPostDepositOrWithdraw();
 		}
 	}, [fetchPostDepositOrWithdraw, prepreStrategiesData, provider]);
+
+	
+	if (Object.values(strategiesData).length === 0) {
+		return <Fragment />;
+	}
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
