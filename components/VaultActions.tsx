@@ -1,18 +1,180 @@
 import {Fragment, useCallback, useState} from 'react';
 import {useChain} from 'hook/useChain';
-import {approveERC20, deposit, withdrawShares} from 'utils/actions';
+import {approveERC20, deposit, withdrawShares, withdrawWithPermitERC20} from 'utils/actions';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
+import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
-import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
+import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
+import type {TNDict} from '@yearn-finance/web-lib/types';
+import type {TransactionReceipt} from '@ethersproject/providers';
+
+
+type TVaultActionInner = {
+	vault: TVault,
+	vaultData: TVaultData,
+	onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
+	onProceed: (receipt?: TransactionReceipt | undefined) => Promise<void>
+}
+
+function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
+	const	{provider, address} = useWeb3();
+	const	[isApproving, set_isApproving] = useState(false);
+
+	/**************************************************************************
+	** Some basic variables around the vault
+	**************************************************************************/
+	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
+	const	vaultSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
+
+	/**************************************************************************
+	** State management for our actions
+	**************************************************************************/
+	const	[amount, set_amount] = useState(toNormalizedBN(0));
+	// TODO add setter
+	const	[txStatusApproval] = useState(defaultTxStatus);
+	const	[txStatusWithdraw] = useState(defaultTxStatus);
+	const	shouldUseApproval = vaultSpender === yearnRouterForChain && !process.env.SHOULD_USE_PERMIT;
+
+	/**************************************************************************
+	** We need to update the status when some events occurs
+	**************************************************************************/
+	const fetchApproval = useCallback(async (): Promise<void> => {
+		if (!vault || isZeroAddress(address) || !address) {
+			return;
+		}
+		const allowance = await readContract({
+			abi: VAULT_ABI,
+			address: toAddress(vault.WANT_ADDR),
+			functionName: 'allowance',
+			args: [address, toAddress(vaultSpender)]
+		});
+		onUpdateVaultData((v): TVaultData => ({...v, allowance: toNormalizedBN(allowance, v.decimals)}));
+	}, [address, onUpdateVaultData, vault, vaultSpender]);
+
+
+	/**************************************************************************
+	** We need to perform some specific actions
+	**************************************************************************/
+	const onApprove = useCallback(async (): Promise<void> => {
+		if (!provider || isApproving) {
+			return;
+		}
+
+		set_isApproving(true);
+		const result = await approveERC20({
+			connector: provider,
+			contractAddress: toAddress(vault.WANT_ADDR),
+			spenderAddress: toAddress(vaultSpender),
+			amount: MAX_UINT_256
+		});
+		set_isApproving(false);
+
+
+		// I think this replaces need for onProceed 
+		if(result.isSuccessful){
+			fetchApproval();
+		}
+
+	}, [fetchApproval, isApproving, provider, vaultSpender, vault.WANT_ADDR]);
+		
+
+	async function	onWithdraw(): Promise<void> {
+		if(!provider){
+			return;
+		}
+
+		const result = await withdrawWithPermitERC20({
+			connector: provider,
+			contractAddress: toAddress(vault.VAULT_ADDR),
+			routerAddress: toAddress(vaultSpender),
+			amount: amount.raw,
+			isLegacy: vault.VAULT_ABI !== 'v3',
+			shouldRedeem: false 
+		});
+
+		if(result.isSuccessful){
+			onProceed();
+		}
+		
+	}
+
+	return (
+		<div className={'flex w-full flex-col border border-dashed border-neutral-500 p-4'}>
+			<div className={'mb-2'}>
+				<p className={'font-mono text-xl font-semibold text-neutral-700'}>
+					{'Withdraw'}
+				</p>
+			</div>
+			<div className={'mb-6 font-mono text-sm font-medium text-neutral-500'}>
+				<div>
+					<p className={'inline text-neutral-700'}>{'Your vault shares: '}</p>
+					<p className={'inline text-neutral-500'}>{`${formatAmount(vaultData?.balanceOf.normalized, 6)}`}</p>
+				</div>
+				<div>
+					<p className={'inline text-neutral-700'}>{'Your shares value: '}</p>
+					<p className={'inline text-neutral-500'}>{`$${vaultData.balanceOfValue === 0 ? '-' : formatAmount(vaultData?.balanceOfValue, 2)}`}</p>
+				</div>
+			</div>
+
+			<div className={'mb-2 flex w-full flex-row items-center'} style={{height: '33px'}}>
+				<input
+					className={'w-full border-neutral-500 bg-neutral-0/0 px-2 font-mono text-xs text-neutral-900'}
+					disabled={vault.VAULT_STATUS === 'withdraw'}
+					style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
+					type={'text'}
+					value={amount?.normalized}
+					onChange={(e: ChangeEvent<HTMLInputElement>): void => set_amount(
+						handleInputChangeEventValue(e.target.value, vaultData.decimals)
+					)} />
+				<button
+					onClick={(): void => set_amount(toNormalizedBN(vaultData.balanceOf.raw, vaultData.decimals))}
+					className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 font-mono text-xs text-neutral-700 transition-colors hover:bg-neutral-900 hover:text-neutral-0'}
+					style={{height: '33px'}}>
+					{'max'}
+				</button>
+				{shouldUseApproval ? (
+					<Button
+						variant={'outlined'}
+						style={{height: '33px'}}
+						className={'!mb-0 !ml-2 whitespace-nowrap'}
+						isBusy={txStatusApproval.pending}
+						isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
+						onClick={onApprove}>
+						{vaultData.allowanceYRouter.raw > 0n ? '✅ Vault approved' : '🚀 Approve vault'}
+					</Button>
+				) : <Fragment />}
+			</div>
+
+			{/* {shouldUseApproval ? (
+				<Button
+					variant={'outlined'}
+					isBusy={txStatusApproval.pending}
+					isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw.gt(0)}
+					onClick={onApprove}>
+					{vaultData.allowanceYRouter.raw.gt(0) ? '✅ Vault approved' : '🚀 Approve vault'}
+				</Button>
+			) : <Fragment />} */}
+			<Button
+				variant={'outlined'}
+				isBusy={txStatusWithdraw.pending}
+				// isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || vaultData.balanceOf.raw.isZero() || amount.raw.isZero() || (shouldUseApproval ? vaultData.allowanceYRouter.raw.isZero() : false)}
+				onClick={onWithdraw}>
+				{'💸 Withdraw'}
+			</Button>
+		</div>
+	);
+}
 
 type TVaultAction = {
 	vault: TVault,
@@ -265,6 +427,29 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'APE-IN/OUT'}</h1>
 			<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
 				<p className={'font-mono text-sm font-medium text-neutral-700'}>{'Deposit closed.'}</p>
+			</div>
+
+			{/* {vault.ZAP_ADDR ? <VaultActionZaps
+				vault={vault}
+				vaultData={vaultData}
+				onUpdateVaultData={onUpdateVaultData}
+				onProceed={fetchPostDepositOrWithdraw}
+			/> : (<Fragment />)} */}
+
+			<div className={'grid w-full max-w-5xl grid-cols-2 gap-8'}>
+				{/* {vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ? (
+					<VaultActionApeIn
+						vault={vault}
+						vaultData={vaultData}
+						onUpdateVaultData={onUpdateVaultData}
+						onProceed={fetchPostDepositOrWithdraw} />
+				) : (<Fragment />)} */}
+
+				<VaultActionApeOut
+					vault={vault}
+					vaultData={vaultData}
+					onUpdateVaultData={onUpdateVaultData}
+					onProceed={fetchPostDepositOrWithdraw} />
 			</div>
 
 			{vault.ZAP_ADDR ? (
