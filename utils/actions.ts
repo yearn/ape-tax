@@ -8,7 +8,7 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import {assertAddress, handleTx, toWagmiProvider} from './toWagmiProvider';
 import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
-// import YROUTER_ABI from './ABI/yRouter.abi';
+import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
 import type {Connector} from 'wagmi';
@@ -102,6 +102,77 @@ export async function approveERC20(props: TApproveERC20): Promise<TTxResponse> {
 		args: [props.spenderAddress, props.amount]
 	});
 }
+
+type TDepositERC20Args = TWriteTransaction & {
+	contractAddress: TAddress,
+	spenderAddress: TAddress,
+	amount: bigint,
+	isLegacy: boolean,
+}
+
+export async function	depositERC20(props: TDepositERC20Args): Promise<TTxResponse>{
+	assertAddress(props.contractAddress);
+	assertAddress(props.spenderAddress, 'spenderAddress');
+	assert(props.amount > 0n, 'Amount is 0');
+	assert(props.connector, 'No connector');
+
+	const wagmiProvider = await toWagmiProvider(props.connector);
+	const {chainId} = wagmiProvider;
+
+	const asset = await readContract({
+		...wagmiProvider,
+		abi: YVAULT_V3_BASE_ABI,
+		address: props.contractAddress,
+		functionName: 'asset'
+	}) as string;
+
+	const assetAddress = toAddress(asset);
+
+	if (props.isLegacy) {
+		return await handleTx(props, {
+			address: props.contractAddress,
+			abi: VAULT_ABI,
+			functionName: 'deposit',
+			args: [props.amount]
+		});
+	}
+
+	const calls = [];
+	const assetContract = {address: assetAddress, abi: erc20ABI};
+	const vaultV3Contract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
+
+	calls.push({...assetContract, functionName: 'allowance', args: [props.spenderAddress, props.contractAddress]});
+	calls.push({...vaultV3Contract, functionName: 'previewDeposit', args: [props.amount]});
+
+	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
+	const routerAllowance = decodeAsBigInt(callResult[0]);
+	const minOut = decodeAsBigInt(callResult[1]);
+
+	if (routerAllowance < props.amount) {
+		const	approveResult = await handleTx(props, {
+			address: props.spenderAddress,
+			abi: YROUTER_ABI,
+			functionName: 'approve',
+			args: [assetAddress, props.contractAddress, props.amount],
+			// Why is this asking for value? is 0n correct? 
+			value: 0n
+		});
+
+		if (!approveResult.isSuccessful) {
+			throw new Error('Failed to approve');
+		}
+	}
+
+	return await handleTx(props, {
+		address: props.spenderAddress,
+		abi: YROUTER_ABI,
+		functionName: 'depositToVault',
+		args: [props.contractAddress, props.amount, minOut],
+		value: 0n
+	});
+}
+
+
 
 /* 🔵 - Yearn Finance **********************************************************
 ** deposit is a _WRITE_ function that deposits a collateral into a vault using
