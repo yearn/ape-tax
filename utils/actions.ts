@@ -253,7 +253,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	calls.push({...vaultContract, functionName: 'nonces', args: [signerAddress]});
 	calls.push({...vaultContract, functionName: 'previewWithdraw', args: [props.amount]});
 	calls.push({...vaultContract, functionName: 'allowance', args: [signerAddress, props.routerAddress]});
-	calls.push({...vaultContract, functionName: 'balanceOf'});
+	calls.push({...vaultContract, functionName: 'balanceOf', args: [signerAddress]});
 
 	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 	const apiVersion = callResult[0].result as string;
