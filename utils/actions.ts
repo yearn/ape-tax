@@ -119,15 +119,6 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	const wagmiProvider = await toWagmiProvider(props.connector);
 	const {chainId} = wagmiProvider;
 
-	const asset = await readContract({
-		...wagmiProvider,
-		abi: YVAULT_V3_BASE_ABI,
-		address: props.contractAddress,
-		functionName: 'asset'
-	}) as string;
-
-	const assetAddress = toAddress(asset);
-
 	if (props.isLegacy) {
 		return await handleTx(props, {
 			address: props.contractAddress,
@@ -136,6 +127,15 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			args: [props.amount]
 		});
 	}
+
+	const asset = await readContract({
+		...wagmiProvider,
+		abi: YVAULT_V3_BASE_ABI,
+		address: props.contractAddress,
+		functionName: 'asset'
+	}) as string;
+
+	const assetAddress = toAddress(asset);
 
 	const calls = [];
 	const assetContract = {address: assetAddress, abi: erc20ABI};
