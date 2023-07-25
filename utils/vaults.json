@@ -1169,11 +1169,11 @@
     "LOGO": "🔒3️⃣",
     "VAULT_ABI": "v3",
     "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7253565CC8Cb11d94B9384eA4100C2fccd23d1B9",
-    "WANT_ADDR": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+    "VAULT_ADDR": "0xcaa17796bb3d4a71005cebd817cfeebf85d581b7",
+    "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
-    "CHAIN_ID": 43114
+    "CHAIN_ID": 137
   }
 }
