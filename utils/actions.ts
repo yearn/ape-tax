@@ -172,30 +172,6 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	});
 }
 
-
-
-/* 🔵 - Yearn Finance **********************************************************
-** deposit is a _WRITE_ function that deposits a collateral into a vault using
-** the vanilla direct deposit function.
-**
-** @app - Vaults
-** @param amount - The amount of ETH to deposit.
-******************************************************************************/
-type TDeposit = TWriteTransaction & {
-	amount: bigint;
-};
-export async function deposit(props: TDeposit): Promise<TTxResponse> {
-	assertAddress(props.contractAddress);
-	assert(props.amount > 0n, 'Amount is 0');
-
-	return await handleTx(props, {
-		address: props.contractAddress,
-		abi: VAULT_ABI,
-		functionName: 'deposit',
-		args: [props.amount]
-	});
-}
-
 type TWithdrawWithPermitERC20Args = TWriteTransaction & {
 	contractAddress: TAddress,
 	routerAddress: TAddress,
@@ -337,23 +313,33 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 
 }
 
-/* 🔵 - Yearn Finance **********************************************************
-** withdrawShares is a _WRITE_ function that withdraws a share of underlying
-** collateral from a vault.
-**
-** @app - Vaults
-** @param amount - The amount of ETH to withdraw.
-******************************************************************************/
-type TWithdrawShares = TWriteTransaction & {
+type TApeInVault = TWriteTransaction & {
 	amount: bigint;
 };
-export async function withdrawShares(props: TWithdrawShares): Promise<TTxResponse> {
-	assertAddress(props.contractAddress);
-	assert(props.amount > 0n, 'Amount is 0');
+export async function	apeInVault(props: TApeInVault): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
+	assertAddress(props.contractAddress, 'contractAddress');
+	assert(props.amount > 0n, 'Amount must be greater than 0');
 
 	return await handleTx(props, {
 		address: props.contractAddress,
-		abi: VAULT_ABI,
+		abi: ['function deposit() public payable'],
+		functionName: 'deposit',
+		args: [props.amount]
+	});
+}
+
+type TApeOutVault = TWriteTransaction & {
+	amount: bigint;
+};
+export async function	apeOutVault(props: TApeOutVault): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
+	assertAddress(props.contractAddress, 'contractAddress');
+	assert(props.amount > 0n, 'Amount must be greater than 0');
+
+	return await handleTx(props, {
+		address: props.contractAddress,
+		abi: ['function withdraw(uint256 amount) public'],
 		functionName: 'withdraw',
 		args: [props.amount]
 	});
