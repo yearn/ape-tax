@@ -1,6 +1,6 @@
 import {Fragment, useCallback, useState} from 'react';
 import {useChain} from 'hook/useChain';
-import {approveERC20, deposit, depositERC20, withdrawShares, withdrawWithPermitERC20} from 'utils/actions';
+import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -8,7 +8,7 @@ import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
-import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
@@ -20,6 +20,7 @@ import type {TransactionReceipt} from '@ethersproject/providers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {useNetwork } from 'wagmi';
 import { ethers } from 'ethers';
+import { defaultTxStatus } from '@yearn-finance/web-lib/utils/web3/transaction';
 
 
 type TVaultActionInner = {
@@ -31,126 +32,134 @@ type TVaultActionInner = {
 
 // TODO need to complete migration to wagmi
 
-// function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
-// 	const	{provider, address} = useWeb3();
-// 	const	chainCoin = CHAINS[vault?.CHAIN_ID]?.coin || 'ETH';
+function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
+	const	{provider, address} = useWeb3();
+	const chain = useChain();
+	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
 
-// 	/**************************************************************************
-// 	** State management for our actions
-// 	**************************************************************************/
-// 	const	[zapAmount, set_zapAmount] = useState(toNormalizedBN(0));
-// 	const	[isZapIn, set_isZapIn] = useState(false);
-// 	const	[isZapOut, set_isZapOut] = useState(false);
-// 	const	[txStatusZapApproval, set_txStatusZapApproval] = useState(defaultTxStatus);
+	/**************************************************************************
+	** State management for our actions
+	**************************************************************************/
+	const	[zapAmount, set_zapAmount] = useState(toNormalizedBN(0));
+	const	[isZapIn, set_isZapIn] = useState(false);
+	const	[isZapOut, set_isZapOut] = useState(false);
+	const	[txStatusZapApproval, set_txStatusZapApproval] = useState(defaultTxStatus);
 
-// 	/**************************************************************************
-// 	** Some memoized values to avoid re-rendering or just to make things
-// 	** easier in subsequent functions
-// 	**************************************************************************/
-// 	const	wantContract = useMemo((): ethers.Contract => new ethers.Contract(vault.WANT_ADDR, ERC20_ABI, provider), [vault, provider]);
+	/**************************************************************************
+	** Callback to handle the approvals updates
+	**************************************************************************/
+	const	fetchZapOutApproval = useCallback(async (): Promise<void> => {
+		if (!address || isZeroAddress(address) || !vault.ZAP_ADDR) {
+			return;
+		}
 
-// 	/**************************************************************************
-// 	** Callback to handle the approvals updates
-// 	**************************************************************************/
-// 	const	fetchZapOutApproval = useCallback(async (): Promise<void> => {
-// 		if (!address || isZeroAddress(address) || !wantContract || !vault.ZAP_ADDR) {
-// 			return;
-// 		}
-// 		const	allowance = await wantContract.allowance(address, vault.ZAP_ADDR);
-// 		onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
-// 	}, [address, onUpdateVaultData, vault.ZAP_ADDR, wantContract]);
+		const allowance = await readContract({
+			abi: erc20ABI,
+			address: toAddress(vault.WANT_ADDR),
+			functionName: 'allowance',
+			args: [address, toAddress(vault.ZAP_ADDR)]
+		});
+
+		onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
+	}, [address, onUpdateVaultData, vault.ZAP_ADDR]);
 
 
+	const onZapIn = useCallback(async (): Promise<void> => {
+		if (isZapIn || isZero(zapAmount.raw)) {
+			return;
+		}
 
-// 	async function	onZapIn(): Promise<void> {
-// 		if (isZapIn || zapAmount.raw.isZero()) {
-// 			return;
-// 		}
-// 		set_isZapIn(true);
-// 		apeInVault({
-// 			provider,
-// 			contractAddress: toAddress(vault.ZAP_ADDR),
-// 			amount: zapAmount.raw
-// 		}, ({error}): void => {
-// 			set_isZapIn(false);
-// 			if (error) {
-// 				return;
-// 			}
-// 			onProceed?.();
-// 		});
-// 	}
-// 	async function	onZapOutAllowance(): Promise<void> {
-// 		new Transaction(provider, approveERC20, set_txStatusZapApproval).populate(
-// 			toAddress(vault.VAULT_ADDR), //token
-// 			toAddress(vault.ZAP_ADDR), //spender
-// 			ethers.constants.MaxUint256 //amount
-// 		).onSuccess(fetchZapOutApproval).perform();
-// 	}
-// 	async function	onZapOut(): Promise<void> {
-// 		if (isZapOut || vaultData.balanceOf.raw.isZero() || vaultData.allowanceZapOut?.raw.isZero()) {
-// 			return;
-// 		}
-// 		set_isZapOut(true);
-// 		apeOutVault({
-// 			provider,
-// 			contractAddress: toAddress(vault.ZAP_ADDR),
-// 			amount: !zapAmount.raw.isZero() ? zapAmount.raw : vaultData.balanceOf.raw
-// 		}, ({error}): void => {
-// 			set_isZapOut(false);
-// 			if (error) {
-// 				return;
-// 			}
-// 			onProceed?.();
-// 		});
-// 	}
+		set_isZapIn(true);
+		const result = await apeInVault({
+			connector: provider,
+			contractAddress: toAddress(vault.ZAP_ADDR),
+			amount: zapAmount.raw
+		})
+		set_isZapIn(false);
+		
+		if(result.isSuccessful){
+			onProceed();
+		}
+	}, []);
 
-// 	return (
-// 		<div className={'mb-6 flex flex-col'}>
-// 			<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
-// 				<div className={'mb-2 mr-2 flex flex-row items-center'} style={{height: '33px'}}>
-// 					<input
-// 						className={'border-neutral-500 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
-// 						style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
-// 						type={'text'}
-// 						value={zapAmount?.normalized}
-// 						onChange={(e: ChangeEvent<HTMLInputElement>): void => set_zapAmount(
-// 							handleInputChangeEventValue(e.target.value, vaultData.decimals)
-// 						)} />
-// 					<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-500 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
-// 						{chainCoin}&nbsp;
-// 					</div>
-// 				</div>
-// 			</div>
-// 			<div>
-// 				{
-// 					vaultData.depositLimit.raw.gt(0) && vault.VAULT_STATUS !== 'withdraw' ?
-// 						<>
-// 							<button
-// 								onClick={onZapIn}
-// 								disabled={isZapIn || zapAmount.raw.isZero()}
-// 								className={`${isZapIn || zapAmount.raw.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
-// 								{'💰 Zap in'}
-// 							</button>
-// 						</> : <Fragment />
-// 				}
-// 				<Button
-// 					variant={'outlined'}
-// 					className={'bg-neutral-50 mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors hover:bg-neutral-100'}
-// 					isBusy={txStatusZapApproval.pending}
-// 					isDisabled={txStatusZapApproval.error || txStatusZapApproval.pending || vaultData?.allowanceZapOut?.raw.gt(0)}
-// 					onClick={onZapOutAllowance}>
-// 					{vaultData?.allowanceZapOut?.raw.gt(0) ? '✅ Approved' : '🚀 Approve Zap Out'}
-// 				</Button>
-// 				<button
-// 					onClick={onZapOut}
-// 					disabled={vaultData.balanceOf.raw.isZero() || vaultData?.allowanceZapOut?.raw?.isZero()}
-// 					className={`${vaultData.balanceOf.raw.isZero() || vaultData?.allowanceZapOut?.raw?.isZero() ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
-// 					{'💸 Zap out'}
-// 				</button>
-// 			</div>
-// 		</div>
-// 	);
-// }
+
+	async function	onZapOutAllowance(): Promise<void> {
+		const result = await approveERC20({
+			connector: provider,
+			contractAddress: toAddress(vault.VAULT_ADDR), //token
+			spenderAddress: toAddress(vault.ZAP_ADDR), //spender
+			amount: MAX_UINT_256
+		});
+
+		if(result.isSuccessful){
+			fetchZapOutApproval()
+		}
+	}
+	async function	onZapOut(): Promise<void> {
+		if (isZapOut || isZero(vaultData.balanceOf.raw) || isZero(vaultData.allowanceZapOut?.raw)) {
+			return;
+		}
+
+		set_isZapOut(true);
+		const result = await apeOutVault({
+			connector: provider,
+			contractAddress: toAddress(vault.ZAP_ADDR),
+			amount: !isZero(zapAmount.raw) ? zapAmount.raw : vaultData.balanceOf.raw
+		})
+		set_isZapOut(false);
+		
+		if(result.isSuccessful){
+			onProceed();
+		}
+	}
+
+	return (
+		<div className={'mb-6 flex flex-col'}>
+			<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
+				<div className={'mb-2 mr-2 flex flex-row items-center'} style={{height: '33px'}}>
+					<input
+						className={'border-neutral-500 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
+						style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
+						type={'text'}
+						value={zapAmount?.normalized}
+						onChange={(e: ChangeEvent<HTMLInputElement>): void => set_zapAmount(
+							handleInputChangeEventValue(e.target.value, vaultData.decimals)
+						)} />
+					<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-500 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
+						{chainCoin}&nbsp;
+					</div>
+				</div>
+			</div>
+			<div>
+				{
+					vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ?
+						<>
+							<button
+								onClick={onZapIn}
+								disabled={isZapIn || isZero(zapAmount.raw)}
+								className={`${isZapIn || isZero(zapAmount.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+								{'💰 Zap in'}
+							</button>
+						</> : <Fragment />
+				}
+				<Button
+					variant={'outlined'}
+					className={'bg-neutral-50 mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors hover:bg-neutral-100'}
+					isBusy={txStatusZapApproval.pending}
+					isDisabled={txStatusZapApproval.error || txStatusZapApproval.pending || (vaultData.allowanceZapOut && vaultData?.allowanceZapOut?.raw > 0n)}
+					onClick={onZapOutAllowance}>
+					{(vaultData.allowanceZapOut && vaultData?.allowanceZapOut?.raw > 0n) ? '✅ Approved' : '🚀 Approve Zap Out'}
+				</Button>
+				<button
+					onClick={onZapOut}
+					disabled={isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw)}
+					className={`${isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+					{'💸 Zap out'}
+				</button>
+			</div>
+		</div>
+	);
+}
 
 function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
 	const	{provider, address} = useWeb3();
@@ -340,8 +349,6 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		});
 		set_isApproving(false);
 
-
-		// I think this replaces need for onProceed 
 		if(result.isSuccessful){
 			fetchApproval();
 		}
@@ -488,7 +495,6 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			address: address
 		});
 
-
 		onUpdateVaultData((v): TVaultData => ({
 			...v,
 			allowance: toNormalizedBN(wantAllowance, v.decimals),
@@ -504,13 +510,16 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals)),
 		}));
 
+		if (vault.ZAP_ADDR) {
+			const allowanceZapOut = await readContract({
+				abi: VAULT_ABI,
+				address: toAddress(vault.WANT_ADDR),
+				functionName: 'allowance',
+				args: [address, toAddress(vault.ZAP_ADDR)]
+			});
 
-		// TODO
-		// if (vault.ZAP_ADDR) {
-		// 	const	vaultContract = new ethers.Contract(vault.VAULT_ADDR, VAULT_ABI, provider);
-		// 	const	allowantZapOut = await vaultContract.allowance(address, vault.ZAP_ADDR);
-		// 	onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowantZapOut, v.decimals)}));
-		// }
+			onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowanceZapOut, v.decimals)}));
+		}
 	}
 
 	return (
@@ -519,13 +528,13 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
 				<p className={'font-mono text-sm font-medium text-neutral-700'}>{'Deposit closed.'}</p>
 			</div>
-{/*  TODO complete conversion
+
 			{vault.ZAP_ADDR ? <VaultActionZaps
 				vault={vault}
 				vaultData={vaultData}
 				onUpdateVaultData={onUpdateVaultData}
 				onProceed={fetchPostDepositOrWithdraw}
-			/> : (<Fragment />)} */}
+			/> : (<Fragment />)}
 
 			<div className={'grid w-full max-w-5xl grid-cols-2 gap-8'}>
 				{vaultData.depositLimit.raw === 0n && vault.VAULT_STATUS !== 'withdraw' ? (
