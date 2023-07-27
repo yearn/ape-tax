@@ -2,7 +2,7 @@ import {Fragment, useCallback, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import GraphemeSplitter from 'grapheme-splitter';
-import { useNetwork } from 'wagmi';
+import {useNetwork} from 'wagmi';
 import vaults from 'utils/vaults.json';
 import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';

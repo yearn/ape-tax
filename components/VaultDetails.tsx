@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import { useNetwork } from 'wagmi';
+import {useNetwork} from 'wagmi';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import useSWR from 'swr';
@@ -12,7 +12,7 @@ import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	{chain} = useNetwork();
-	const	chainExplorer = chain?.blockExplorers?.default?.url || 'https://etherscan.io'
+	const	chainExplorer = chain?.blockExplorers?.default?.url || 'https://etherscan.io';
 
 	const	{data: vaultAPYSWR, isLoading} = useSWR<Maybe<TSpecificAPIResult>>(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
 

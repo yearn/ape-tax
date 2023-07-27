@@ -9,7 +9,7 @@ import type {TVault, TVaultData} from 'utils/types';
 function	VaultWallet({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	{address, ens} = useWeb3();
 	const	{chain} = useNetwork();
-	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH'
+	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH';
 
 	return (
 		<section aria-label={'WALLET'} className={'mt-8'}>
