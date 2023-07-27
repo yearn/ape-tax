@@ -2,7 +2,7 @@ import {Fragment, useCallback, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import GraphemeSplitter from 'grapheme-splitter';
-import {useChain} from 'hook/useChain';
+import {useNetwork} from 'wagmi';
 import vaults from 'utils/vaults.json';
 import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
@@ -107,7 +107,8 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 function	Index(): ReactElement {
 	const	{isActive, address} = useWeb3();
 	const	{safeChainID} = useChainID();
-	const chain = useChain();
+	const	{chain} = useNetwork();
+	const	chainName = chain?.name || 'Chain';
 	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState<TVault[]>([]);
@@ -223,7 +224,7 @@ function	Index(): ReactElement {
 				<div>
 					<div>
 						<span className={'font-mono text-base font-semibold text-neutral-900'}>
-							{`${chain.getCurrent()?.displayName || 'Chain'} TVL:`}
+							{`${chainName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}
