@@ -295,7 +295,6 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 
 function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
 	const	{provider, address} = useWeb3();
-	const	[isApproving, set_isApproving] = useState(false);
 
 	/**************************************************************************
 	** Some basic variables around the vault
@@ -332,11 +331,6 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	** We need to perform some specific actions
 	**************************************************************************/
 	const onApprove = useCallback(async (): Promise<void> => {
-		if (!provider || isApproving) {
-			return;
-		}
-
-		set_isApproving(true);
 		const result = await approveERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
@@ -344,13 +338,12 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			amount: MAX_UINT_256,
 			statusHandler: set_txStatusApproval
 		});
-		set_isApproving(false);
 
 		if(result.isSuccessful){
 			fetchApproval();
 		}
 
-	}, [fetchApproval, isApproving, provider, vaultSpender, vault.WANT_ADDR]);
+	}, [fetchApproval, provider, vaultSpender, vault.WANT_ADDR]);
 		
 
 	async function	onWithdraw(): Promise<void> {
