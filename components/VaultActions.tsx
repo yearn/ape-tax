@@ -88,7 +88,8 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR), //token
 			spenderAddress: toAddress(vault.ZAP_ADDR), //spender
-			amount: MAX_UINT_256
+			amount: MAX_UINT_256,
+			statusHandler: set_txStatusZapApproval
 		});
 
 		if(result.isSuccessful){
@@ -176,6 +177,8 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	** State management for our actions
 	**************************************************************************/
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
+	const	[txStatusApproval, set_txStatusApproval] = useState(defaultTxStatus);
+	const	[txStatusDeposit, set_txStatusDeposit] = useState(defaultTxStatus);
 
 	/**************************************************************************
 	** Callback to handle the approvals updates
@@ -199,15 +202,12 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	** We need to perform some specific actions
 	**************************************************************************/
 	const onApprove = useCallback(async (): Promise<void> => {
-		if (!provider) {
-			return;
-		}
-
 		const result = await approveERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: MAX_UINT_256
+			amount: MAX_UINT_256,
+			statusHandler: set_txStatusApproval
 		});
 
 		if(result.isSuccessful){
@@ -219,16 +219,13 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 
 
 	async function	onDeposit(): Promise<void> {
-		if(!provider){
-			return;
-		}
-
 		const result = await depositERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
 			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI !== 'v3'
+			isLegacy: vault.VAULT_ABI !== 'v3',
+			statusHandler: set_txStatusDeposit
 		});
 
 		if(result.isSuccessful){
@@ -273,8 +270,8 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 					variant={'outlined'}
 					style={{height: '33px'}}
 					className={'!mb-0 !ml-2 whitespace-nowrap'}
-					// isBusy={txStatusApproval.pending}
-					// isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowance.raw > 0n}
+					isBusy={txStatusApproval.pending}
+					isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowance.raw > 0n}
 					onClick={onApprove}>
 					{vaultData.allowance.raw > 0n ? `✅ ${vault.WANT_SYMBOL} approved` : `🚀 Approve ${vault.WANT_SYMBOL}`}
 				</Button>
@@ -283,14 +280,14 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			{/* <Button
 				variant={'outlined'}
 				isBusy={txStatusApproval.pending}
-				isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowance.raw.gt(0)}
+				isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowance.raw > 0n}
 				onClick={onApprove}>
-				{vaultData.allowance.raw.gt(0) ? `✅ ${vault.WANT_SYMBOL} approved` : `🚀 Approve ${vault.WANT_SYMBOL}`}
+				{vaultData.allowance.raw > 0n ? `✅ ${vault.WANT_SYMBOL} approved` : `🚀 Approve ${vault.WANT_SYMBOL}`}
 			</Button> */}
 			<Button
 				variant={'outlined'}
-				// isBusy={txStatusDeposit.pending}
-				// isDisabled={txStatusDeposit.error || txStatusDeposit.pending || isZero(vaultData.allowance.raw) || isZero(amount.raw)}
+				isBusy={txStatusDeposit.pending}
+				isDisabled={txStatusDeposit.error || txStatusDeposit.pending || isZero(vaultData.allowance.raw) || isZero(amount.raw)}
 				onClick={onDeposit}>
 				{'💰 Deposit'}
 			</Button>
@@ -313,6 +310,8 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	** State management for our actions
 	**************************************************************************/
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
+	const	[txStatusApproval, set_txStatusApproval] = useState(defaultTxStatus);
+	const	[txStatusWithdraw, set_txStatusWithdraw] = useState(defaultTxStatus);
 	const	shouldUseApproval = vaultSpender === yearnRouterForChain && !process.env.SHOULD_USE_PERMIT;
 
 	/**************************************************************************
@@ -345,7 +344,8 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: MAX_UINT_256
+			amount: MAX_UINT_256,
+			statusHandler: set_txStatusApproval
 		});
 		set_isApproving(false);
 
@@ -367,7 +367,8 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
 			isLegacy: vault.VAULT_ABI !== 'v3',
-			shouldRedeem: false 
+			shouldRedeem: false ,
+			statusHandler: set_txStatusWithdraw
 		});
 
 		if(result.isSuccessful){
@@ -415,8 +416,8 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 						variant={'outlined'}
 						style={{height: '33px'}}
 						className={'!mb-0 !ml-2 whitespace-nowrap'}
-						// isBusy={txStatusApproval.pending}
-						// isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
+						isBusy={txStatusApproval.pending}
+						isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
 						onClick={onApprove}>
 						{vaultData.allowanceYRouter.raw > 0n ? '✅ Vault approved' : '🚀 Approve vault'}
 					</Button>
@@ -427,15 +428,15 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 				<Button
 					variant={'outlined'}
 					isBusy={txStatusApproval.pending}
-					isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw.gt(0)}
+					isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
 					onClick={onApprove}>
-					{vaultData.allowanceYRouter.raw.gt(0) ? '✅ Vault approved' : '🚀 Approve vault'}
+					{vaultData.allowanceYRouter.raw > 0n ? '✅ Vault approved' : '🚀 Approve vault'}
 				</Button>
 			) : <Fragment />} */}
 			<Button
 				variant={'outlined'}
-				// isBusy={txStatusWithdraw.pending}
-				// isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || vaultData.balanceOf.raw.isZero() || amount.raw.isZero() || (shouldUseApproval ? vaultData.allowanceYRouter.raw.isZero() : false)}
+				isBusy={txStatusWithdraw.pending}
+				isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || isZero(vaultData.balanceOf.raw) || isZero(amount.raw) || (shouldUseApproval ? isZero(vaultData.allowanceYRouter.raw) : false)}
 				onClick={onWithdraw}>
 				{'💸 Withdraw'}
 			</Button>
