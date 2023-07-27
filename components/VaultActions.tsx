@@ -312,7 +312,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
 	const	[txStatusApproval, set_txStatusApproval] = useState(defaultTxStatus);
 	const	[txStatusWithdraw, set_txStatusWithdraw] = useState(defaultTxStatus);
-	const	shouldUseApproval = vaultSpender === yearnRouterForChain && !process.env.SHOULD_USE_PERMIT;
+	const	shouldUseApproval = vaultSpender === yearnRouterForChain;
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
