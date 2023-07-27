@@ -323,7 +323,19 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			functionName: 'allowance',
 			args: [address, toAddress(vaultSpender)]
 		});
-		onUpdateVaultData((v): TVaultData => ({...v, allowance: toNormalizedBN(allowance, v.decimals)}));
+
+		const allowanceYRouter = await readContract({
+			abi: YVAULT_V3_BASE_ABI,
+			address: toAddress(vault.WANT_ADDR),
+			functionName: 'allowance',
+			args: [address, toAddress(vaultSpender)]
+		}) as bigint;
+
+		onUpdateVaultData((v): TVaultData => ({ ...v,
+			allowanceYRouter: toNormalizedBN(allowanceYRouter, v.decimals),
+			allowance: toNormalizedBN(allowance, v.decimals)
+		}));
+
 	}, [address, onUpdateVaultData, vault, vaultSpender]);
 
 
@@ -464,6 +476,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
+		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 		
 		if (vault.VAULT_ABI === 'v3') {
 			calls.push({...vaultV3ContractMultiCall, functionName: 'depositLimit', args: [address]});
@@ -479,8 +492,9 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const vaultBalance = decodeAsBigInt(callResult[2]);
 		const totalAssets = decodeAsBigInt(callResult[3]);
 		const pricePerShare = decodeAsBigInt(callResult[4]);
-		const depositLimit = decodeAsBigInt(callResult[5]);
-		const availableDepositLimit = decodeAsBigInt(callResult[6]);
+		const allowanceYRouter = decodeAsBigInt(callResult[5]);
+		const depositLimit = decodeAsBigInt(callResult[6]);
+		const availableDepositLimit = decodeAsBigInt(callResult[7]);
 
 		const coinBalance = await fetchBalance({
 			address: address
@@ -489,6 +503,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		onUpdateVaultData((v): TVaultData => ({
 			...v,
 			allowance: toNormalizedBN(wantAllowance, v.decimals),
+			allowanceYRouter: toNormalizedBN(allowanceYRouter, v.decimals),
 			wantBalance: toNormalizedBN(wantBalance, v.decimals),
 			balanceOf: toNormalizedBN(vaultBalance, v.decimals),
 			balanceOfValue: formatToNormalizedValue(vaultBalance, v.decimals) * Number(v.pricePerShare.normalized) * v.wantPrice,
