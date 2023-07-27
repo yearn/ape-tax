@@ -1,5 +1,5 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
-import {useChain} from 'hook/useChain';
+import { useNetwork } from 'wagmi';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
@@ -20,9 +20,9 @@ type TStrategies = {
 	onUpdateVaultData: (fn: (v: TVaultData) => TVaultData) => void
 }
 function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
-	const chain = useChain();
-	const {safeChainID} = useChainID();
-	const	chainExplorer = chain.getCurrent()?.block_explorer || 'https://etherscan.io';
+	const	{chain} = useNetwork();
+	const	{safeChainID} = useChainID();
+	const	chainExplorer = chain?.blockExplorers?.default?.url || 'https://etherscan.io'
 	const	{provider, isActive, address} = useWeb3();
 	const	[strategiesData, set_strategiesData] = useState<TDict<TStrategyData>>({});
 	const	[, set_nonce] = useState(0);

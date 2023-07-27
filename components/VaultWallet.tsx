@@ -1,4 +1,4 @@
-import {useChain} from 'hook/useChain';
+import {useNetwork} from 'wagmi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
@@ -8,8 +8,8 @@ import type {TVault, TVaultData} from 'utils/types';
 
 function	VaultWallet({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	{address, ens} = useWeb3();
-	const chain = useChain();
-	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
+	const	{chain} = useNetwork();
+	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH'
 
 	return (
 		<section aria-label={'WALLET'} className={'mt-8'}>

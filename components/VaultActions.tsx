@@ -1,5 +1,4 @@
 import {Fragment, useCallback, useState} from 'react';
-import {useChain} from 'hook/useChain';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
@@ -34,8 +33,8 @@ type TVaultActionInner = {
 
 function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
 	const	{provider, address} = useWeb3();
-	const chain = useChain();
-	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
+	const	{chain} = useNetwork();
+	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH'
 
 	/**************************************************************************
 	** State management for our actions
@@ -169,8 +168,8 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	**************************************************************************/
 	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
 	const	vaultSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
-	const chain = useChain();
-	const	chainCoin = chain.getCurrent()?.coin || 'ETH';
+	const	{chain} = useNetwork();
+	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH'
 
 	/**************************************************************************
 	** State management for our actions
