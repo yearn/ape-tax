@@ -29,8 +29,6 @@ type TVaultActionInner = {
 	onProceed: (receipt?: TransactionReceipt | undefined) => Promise<void>
 }
 
-// TODO need to complete migration to wagmi
-
 function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
 	const	{provider, address} = useWeb3();
 	const	{chain} = useNetwork();
