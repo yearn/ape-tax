@@ -15,6 +15,8 @@ import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TWriteTransaction} from './toWagmiProvider';
+import { splitSignature } from 'ethers/lib/utils';
+import { ethers } from 'ethers';
 
 const PERMIT_TYPE = {
 	Permit: [
@@ -218,24 +220,24 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	**********************************************************************************************/
 
 	const calls = [];
-	// const multicalls = [];
+	const multicalls = [];
 	// Why do we need this with ethers? 
-	// const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
-	const vaultContract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
+	const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
+	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 	// const routerContract = {address: props.routerAddress, abi: YROUTER_ABI};
 
-	calls.push({...vaultContract, functionName: 'apiVersion'});
-	calls.push({...vaultContract, functionName: 'name'});
-	calls.push({...vaultContract, functionName: 'nonces', args: [signerAddress]});
-	calls.push({...vaultContract, functionName: 'previewWithdraw', args: [props.amount]});
-	calls.push({...vaultContract, functionName: 'allowance', args: [signerAddress, props.routerAddress]});
-	calls.push({...vaultContract, functionName: 'balanceOf', args: [signerAddress]});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'apiVersion'});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'nonces', args: [signerAddress]});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'previewWithdraw', args: [props.amount]});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [signerAddress, props.routerAddress]});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'balanceOf', args: [signerAddress]});
 
 	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 	const apiVersion = callResult[0].result as string;
 	const name = callResult[1].result as string;
 	const nonce = decodeAsBigInt(callResult[2]);
-	// const maxOut = decodeAsBigInt(callResult[3]);
+	const maxOut = decodeAsBigInt(callResult[3]);
 	const currentAllowance = decodeAsBigInt(callResult[4]);
 	const currentBalance = decodeAsBigInt(callResult[5]);
 
@@ -270,24 +272,31 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 			deadline: deadline
 		};
 		const signature = await signTypedData({domain, message: value, primaryType: 'Permit', types: PERMIT_TYPE});
-
-		console.log(signature);
+		const {v, r, s} = splitSignature(signature);
 		
-		// const {v, r, s} = splitSignature(signature);
-		// multicalls.push(routerIFace.encodeFunctionData('selfPermit', [props.vaultAddress, amountToUse, deadline, v, r, s]));
+		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [props.contractAddress, amountToUse, deadline, v, r, s]));
 
-		// /* 🔵 - Yearn Finance **********************************************************************
-		// ** To decide if we should use the withdraw or the redeem function, we will just check the
-		// ** amount we want to withdraw. If this amount is equal to the vault's balance, we will
-		// ** redeem the vault, otherwise we will withdraw the amount.
-		// ******************************************************************************************/
-		// if (isZero(props.amount) || props.shouldRedeem) {
-		// 	multicalls.push(routerIFace.encodeFunctionData('redeem(address)', [props.vaultAddress]));
-		// } else {
-		// 	multicalls.push(routerIFace.encodeFunctionData('withdraw', [props.vaultAddress, amountToUse, signerAddress, maxOut]));
-		// }
+		/* 🔵 - Yearn Finance **********************************************************************
+		** To decide if we should use the withdraw or the redeem function, we will just check the
+		** amount we want to withdraw. If this amount is equal to the vault's balance, we will
+		** redeem the vault, otherwise we will withdraw the amount.
+		******************************************************************************************/
+		if (isZero(props.amount) || props.shouldRedeem) {
+			multicalls.push(routerIFace.encodeFunctionData('redeem(address)', [props.contractAddress]));
+		} else {
+			multicalls.push(routerIFace.encodeFunctionData('withdraw', [props.contractAddress, amountToUse, signerAddress, maxOut]));
+		}
 
+		// old
 		// return await handleTx(props, routerContract.multicall(multicalls));
+
+		//new - possibly need alternative to encodeFunctionData and routerIFace....
+		return await handleTx(props, {
+			address: props.routerAddress,
+			abi: YROUTER_ABI,
+			functionName: 'multicall',
+			args: [multicalls]
+		});
 	}
 
 	/* 🔵 - Yearn Finance **************************************************************************
@@ -295,22 +304,22 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	** we want to withdraw. If this amount is equal to the vault's balance, we will redeem the vault
 	** otherwise we will withdraw the amount.
 	**********************************************************************************************/
-	// if (isZero(props.amount) || props.shouldRedeem) {
-	// 	return await handleTx(routerContract['redeem(address)'](vaultAddress));
-	// }
-	// return await handleTx(routerContract.withdraw(vaultAddress, amountToUse, signerAddress, maxOut));
-
-
-	// Just here to return something for now, will be changed
+	if (isZero(props.amount) || props.shouldRedeem) {
+		return await handleTx(props, {
+			address: props.routerAddress,
+			abi: YROUTER_ABI,
+			functionName: 'redeem',
+			args: [props.contractAddress],
+			value: 0n
+		});
+	}
 	return await handleTx(props, {
-		address: props.contractAddress,
-		abi: VAULT_ABI,
+		address: props.routerAddress,
+		abi: YROUTER_ABI,
 		functionName: 'withdraw',
-		args: [props.amount]
+		args: [props.contractAddress, props.amount, signerAddress, maxOut],
+		value: 0n
 	});
-
-
-
 }
 
 type TApeInVault = TWriteTransaction & {
