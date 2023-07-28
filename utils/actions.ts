@@ -1,6 +1,6 @@
 import assert from 'assert';
-import {ethers} from 'ethers';
-import {splitSignature} from 'ethers/lib/utils';
+import {encodeFunctionData, hexToNumber} from 'viem';
+import {secp256k1} from '@noble/curves/secp256k1';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -144,7 +144,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	const assetContract = {address: assetAddress, abi: erc20ABI};
 	const vaultV3Contract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 
-	calls.push({...assetContract, functionName: 'allowance', args: [props.spenderAddress, props.contractAddress]});
+	calls.push({...assetContract, functionName: 'allowance', args: [wagmiProvider.address, props.spenderAddress]});
 	calls.push({...vaultV3Contract, functionName: 'previewDeposit', args: [props.amount]});
 
 	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
@@ -164,6 +164,8 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			throw new Error('Failed to approve');
 		}
 	}
+
+	// Now transfer amount exceeds allowance 
 
 	return await handleTx(props, {
 		address: props.spenderAddress,
@@ -221,10 +223,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 
 	const calls = [];
 	const multicalls = [];
-	// Why do we need this with ethers? 
-	const routerIFace = new ethers.utils.Interface(YROUTER_ABI);
 	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
-	// const routerContract = {address: props.routerAddress, abi: YROUTER_ABI};
 
 	calls.push({...vaultV3ContractMultiCall, functionName: 'apiVersion'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
@@ -272,9 +271,11 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 			deadline: deadline
 		};
 		const signature = await signTypedData({domain, message: value, primaryType: 'Permit', types: PERMIT_TYPE});
-		const {v, r, s} = splitSignature(signature);
-		
-		multicalls.push(routerIFace.encodeFunctionData('selfPermit', [props.contractAddress, amountToUse, deadline, v, r, s]));
+		const {r, s} = secp256k1.Signature.fromCompact(signature.slice(2, 130));
+		const v = hexToNumber(`0x${signature.slice(130)}`);
+
+		const selfPermit = {abi: YROUTER_ABI, functionName: 'selfPermit', args: [props.contractAddress, amountToUse, deadline, v, r, s]};
+		multicalls.push(encodeFunctionData(selfPermit));
 
 		/* 🔵 - Yearn Finance **********************************************************************
 		** To decide if we should use the withdraw or the redeem function, we will just check the
@@ -282,15 +283,13 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		** redeem the vault, otherwise we will withdraw the amount.
 		******************************************************************************************/
 		if (isZero(props.amount) || props.shouldRedeem) {
-			multicalls.push(routerIFace.encodeFunctionData('redeem(address)', [props.contractAddress]));
+			const redeem = {abi: YROUTER_ABI, functionName: 'redeem', args: [props.contractAddress]};
+			multicalls.push(encodeFunctionData(redeem));
 		} else {
-			multicalls.push(routerIFace.encodeFunctionData('withdraw', [props.contractAddress, amountToUse, signerAddress, maxOut]));
+			const withdraw = {abi: YROUTER_ABI, functionName: 'withdraw', args: [props.contractAddress, amountToUse, signerAddress, maxOut]};
+			multicalls.push(encodeFunctionData(withdraw));
 		}
 
-		// old
-		// return await handleTx(props, routerContract.multicall(multicalls));
-
-		//new - possibly need alternative to encodeFunctionData and routerIFace....
 		return await handleTx(props, {
 			address: props.routerAddress,
 			abi: YROUTER_ABI,
