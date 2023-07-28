@@ -1,4 +1,6 @@
 import assert from 'assert';
+import {ethers} from 'ethers';
+import {splitSignature} from 'ethers/lib/utils';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -15,8 +17,6 @@ import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 import type {TWriteTransaction} from './toWagmiProvider';
-import { splitSignature } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
 
 const PERMIT_TYPE = {
 	Permit: [

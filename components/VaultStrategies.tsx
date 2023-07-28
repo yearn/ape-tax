@@ -1,7 +1,7 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
-import {useNetwork} from 'wagmi';
 import {harvestStrategy} from 'utils/actions';
 import {parseMarkdown, performGet} from 'utils/utils';
+import {useNetwork} from 'wagmi';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';

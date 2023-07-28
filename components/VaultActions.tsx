@@ -1,5 +1,8 @@
 import {Fragment, useCallback, useState} from 'react';
+import {ethers} from 'ethers';
+import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
+import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -11,15 +14,12 @@ import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/ut
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers/handleInputChangeEventValue';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
+import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 import type {TransactionReceipt} from '@ethersproject/providers';
-import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
-import {useNetwork} from 'wagmi';
-import { ethers } from 'ethers';
-import { defaultTxStatus } from '@yearn-finance/web-lib/utils/web3/transaction';
 
 
 type TVaultActionInner = {
@@ -58,7 +58,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 		});
 
 		onUpdateVaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowance, v.decimals)}));
-	}, [address, onUpdateVaultData, vault.ZAP_ADDR]);
+	}, [address, onUpdateVaultData, vault.WANT_ADDR, vault.ZAP_ADDR]);
 
 
 	const onZapIn = useCallback(async (): Promise<void> => {
@@ -71,13 +71,13 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: zapAmount.raw
-		})
+		});
 		set_isZapIn(false);
 		
 		if(result.isSuccessful){
 			onProceed();
 		}
-	}, []);
+	}, [isZapIn, onProceed, provider, vault.ZAP_ADDR, zapAmount.raw]);
 
 
 	async function	onZapOutAllowance(): Promise<void> {
@@ -90,7 +90,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 		});
 
 		if(result.isSuccessful){
-			fetchZapOutApproval()
+			fetchZapOutApproval();
 		}
 	}
 	async function	onZapOut(): Promise<void> {
@@ -103,7 +103,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			connector: provider,
 			contractAddress: toAddress(vault.ZAP_ADDR),
 			amount: !isZero(zapAmount.raw) ? zapAmount.raw : vaultData.balanceOf.raw
-		})
+		});
 		set_isZapOut(false);
 		
 		if(result.isSuccessful){
@@ -331,7 +331,8 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			args: [address, toAddress(vaultSpender)]
 		}) as bigint;
 
-		onUpdateVaultData((v): TVaultData => ({ ...v,
+		onUpdateVaultData((v): TVaultData => ({
+			...v,
 			allowanceYRouter: toNormalizedBN(allowanceYRouter, v.decimals),
 			allowance: toNormalizedBN(allowance, v.decimals)
 		}));
@@ -369,7 +370,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
 			isLegacy: vault.VAULT_ABI !== 'v3',
-			shouldRedeem: false ,
+			shouldRedeem: false,
 			statusHandler: set_txStatusWithdraw
 		});
 
@@ -485,7 +486,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
 		}
-		 
+		
 		const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 		const wantAllowance = decodeAsBigInt(callResult[0]);
 		const wantBalance = decodeAsBigInt(callResult[1]);
@@ -513,7 +514,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			availableDepositLimit: toNormalizedBN(availableDepositLimit, v.decimals),
 			pricePerShare: toNormalizedBN(pricePerShare, v.decimals),
 			totalAUM: formatToNormalizedValue(totalAssets, v.decimals) * v.wantPrice,
-			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals)),
+			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, v.decimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, v.decimals))) / Number(ethers.utils.formatUnits(depositLimit, v.decimals))
 		}));
 
 		if (vault.ZAP_ADDR) {

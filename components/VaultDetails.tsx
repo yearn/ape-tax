@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useNetwork} from 'wagmi';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
+import {useNetwork} from 'wagmi';
 import useSWR from 'swr';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
