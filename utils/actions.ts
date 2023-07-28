@@ -6,6 +6,7 @@ import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
+import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import {assertAddress, handleTx, toWagmiProvider} from './toWagmiProvider';
@@ -274,8 +275,11 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		const {r, s} = secp256k1.Signature.fromCompact(signature.slice(2, 130));
 		const v = hexToNumber(`0x${signature.slice(130)}`);
 
-		const selfPermit = {abi: YROUTER_ABI, functionName: 'selfPermit', args: [props.contractAddress, amountToUse, deadline, v, r, s]};
-		multicalls.push(encodeFunctionData(selfPermit));
+		multicalls.push(encodeFunctionData({
+			abi: YROUTER_ABI,
+			functionName: 'selfPermit',
+			args: [props.contractAddress, amountToUse, toBigInt(deadline), v, toAddress(r.toString()), toAddress(s.toString())]
+		}));
 
 		/* 🔵 - Yearn Finance **********************************************************************
 		** To decide if we should use the withdraw or the redeem function, we will just check the
@@ -283,18 +287,25 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		** redeem the vault, otherwise we will withdraw the amount.
 		******************************************************************************************/
 		if (isZero(props.amount) || props.shouldRedeem) {
-			const redeem = {abi: YROUTER_ABI, functionName: 'redeem', args: [props.contractAddress]};
-			multicalls.push(encodeFunctionData(redeem));
+			multicalls.push(encodeFunctionData({
+				abi: YROUTER_ABI,
+				functionName: 'redeem',
+				args: [props.contractAddress]
+			}));
 		} else {
-			const withdraw = {abi: YROUTER_ABI, functionName: 'withdraw', args: [props.contractAddress, amountToUse, signerAddress, maxOut]};
-			multicalls.push(encodeFunctionData(withdraw));
+			multicalls.push(encodeFunctionData({
+				abi: YROUTER_ABI,
+				functionName: 'withdraw',
+				args: [props.contractAddress, amountToUse, signerAddress, maxOut]
+			}));
 		}
 
 		return await handleTx(props, {
 			address: props.routerAddress,
 			abi: YROUTER_ABI,
 			functionName: 'multicall',
-			args: [multicalls]
+			args: [multicalls as readonly `0x${string}`[]],
+			value: 0n
 		});
 	}
 
