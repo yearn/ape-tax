@@ -84,6 +84,7 @@ type TApproveERC20 = TWriteTransaction & {
 	amount: bigint;
 };
 export async function approveERC20(props: TApproveERC20): Promise<TTxResponse> {
+	assert(props.connector, 'No connector');
 	assertAddress(props.spenderAddress, 'spenderAddress');
 	assertAddress(props.contractAddress);
 
@@ -156,7 +157,6 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			abi: YROUTER_ABI,
 			functionName: 'approve',
 			args: [assetAddress, props.contractAddress, props.amount],
-			// Why is this asking for value? is 0n correct? 
 			value: 0n
 		});
 
