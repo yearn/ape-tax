@@ -113,7 +113,6 @@ type TDepositERC20Args = TWriteTransaction & {
 	amount: bigint,
 	isLegacy: boolean,
 }
-
 export async function	depositERC20(props: TDepositERC20Args): Promise<TTxResponse>{
 	assertAddress(props.contractAddress);
 	assertAddress(props.spenderAddress, 'spenderAddress');
@@ -145,13 +144,18 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	const assetContract = {address: assetAddress, abi: erc20ABI};
 	const vaultV3Contract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 
-	calls.push({...assetContract, functionName: 'allowance', args: [wagmiProvider.address, props.spenderAddress]});
+	calls.push({...assetContract, functionName: 'allowance', args: [props.spenderAddress, props.contractAddress]});
 	calls.push({...vaultV3Contract, functionName: 'previewDeposit', args: [props.amount]});
 
 	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 	const routerAllowance = decodeAsBigInt(callResult[0]);
 	const minOut = decodeAsBigInt(callResult[1]);
 
+	/**
+	 * The first interaction between the router and a specific vault will require a max approval for
+	 * the specific asset to the specifc vault. This should only every have to be done once per vault.
+	 * But is a check that should be run before sending a tx otherwise deposits will fail.
+	 */
 	if (routerAllowance < props.amount) {
 		const	approveResult = await handleTx(props, {
 			address: props.spenderAddress,
@@ -165,9 +169,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			throw new Error('Failed to approve');
 		}
 	}
-
-	// Now transfer amount exceeds allowance 
-
+	
 	return await handleTx(props, {
 		address: props.spenderAddress,
 		abi: YROUTER_ABI,
