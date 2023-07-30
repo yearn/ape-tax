@@ -6,8 +6,6 @@ export type Maybe<T> = T | null | undefined;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type Err = {error: never}
 
-export type TCallbackFunction = (arg: {error: unknown; data: any}) => void;
-
 export type TVault = {
 	TITLE: string;
 	LOGO: string;
