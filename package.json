@@ -50,7 +50,8 @@
     "viem": "^1.2.5",
     "wagmi": "^1.3.3",
     "web3-eth-contract": "^1.9.0",
-    "wido": "^0.2.8"
+    "wido": "^0.2.8",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "^20.1.2",
