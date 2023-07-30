@@ -32,13 +32,15 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		_grossAPRWeek = '-';
 		_grossAPRMonth = '-';
 	} else if (activationTimestamp > oneMonthAgo) {
-		const blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
+
+		const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
+		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
 
 		const calls = [];
 		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 
-		const ppsData = await multicallInstance({contracts: calls});
+		const ppsData = await multicallInstance({contracts: calls as never[]});
 		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
 		const pastPriceWeek = formatToNormalizedValue(_pastPricePerShareWeek, Number(decimals));
 		const weekRoi = (currentPrice / pastPriceWeek - 1);
@@ -46,8 +48,11 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
 		_grossAPRMonth = '-';
 	} else {
-		const blockOneWeekAgo = Number(await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1) || 0);
-		const blockOneMonthAgo = Number(await fetchBlockTimestamp(oneMonthAgo, vault?.CHAIN_ID || 1) || 0);
+		const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
+		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
+
+		const monthTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
+		const blockOneMonthAgo = monthTimestamp.data?.result || 0;
 
 		const calls = [];
 		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
