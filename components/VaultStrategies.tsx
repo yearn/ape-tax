@@ -1,6 +1,5 @@
 import {Fragment, useCallback, useEffect, useState} from 'react';
 import {harvestStrategy} from 'utils/actions';
-import {parseMarkdown, performGet} from 'utils/utils';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -74,41 +73,20 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			const creditAvailable = decodeAsBigInt(callResult[0]);
 			const name = callResult[1].result as string;
 
-			if ([1, 10, 250, 42161, 43114].includes(Number(vault.CHAIN_ID))) {
-				try {
-					const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
-					if (details) {
-						set_strategiesData((s): TDict<TStrategyData> => {
-							s[toAddress(strategyAddress)] = {
-								address: toAddress(strategyAddress),
-								name: name,
-								description: details?.description ? parseMarkdown(details?.description.replaceAll('{{token}}', vault.WANT_SYMBOL)) : 'Description not provided for this strategy.',
-								creditAvailable: toNormalizedBN(creditAvailable)
-							};
-							return (s);
-						});
-					} else {
-						set_strategiesData((s): TDict<TStrategyData> => {
-							s[toAddress(strategyAddress)] = {
-								address: toAddress(strategyAddress),
-								name: name,
-								description: 'Description not provided for this strategy.',
-								creditAvailable: toNormalizedBN(creditAvailable)
-							};
-							return (s);
-						});
-					}
-				} catch (error) {
-					set_strategiesData((s): TDict<TStrategyData> => {
-						s[toAddress(strategyAddress)] = {
-							address: toAddress(strategyAddress),
-							name: name,
-							description: 'Description not provided for this strategy.',
-							creditAvailable: toNormalizedBN(creditAvailable)
-						};
-						return (s);
-					});
-				}
+			if ([1, 10, 250, 42161].includes(Number(vault.CHAIN_ID))) {
+				// Always comes back as null, consider yDaemon switch but not ideal currently
+				// const	details = await performGet(`https://meta.yearn.network/api/${vault.CHAIN_ID}/strategies/${strategyAddress}`);
+
+				set_strategiesData((s): TDict<TStrategyData> => {
+					s[toAddress(strategyAddress)] = {
+						address: toAddress(strategyAddress),
+						name: name,
+						description: 'Description not provided for this strategy.',
+						creditAvailable: toNormalizedBN(creditAvailable)
+					};
+					return (s);
+				});
+				
 			} else {
 				set_strategiesData((s): TDict<TStrategyData> => {
 					s[toAddress(strategyAddress)] = {
@@ -122,7 +100,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			}
 			set_nonce((n): number => n + 1);
 		}
-	}, [safeChainID, vault.CHAIN_ID, vault.VAULT_ADDR, vault.WANT_SYMBOL]);
+	}, [safeChainID, vault.CHAIN_ID, vault.VAULT_ADDR]);
 
 	useEffect((): void => {
 		if (!vault || !isActive || !provider || !address) {
