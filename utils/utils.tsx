@@ -1,31 +1,16 @@
 import {z} from 'zod';
-import axios from 'axios';
 
 import {fetch} from './fetch';
 
-import type {AxiosError, AxiosResponse} from 'axios';
 import type {TFetchReturn} from './fetch';
 
 export const blockTimestampResponseSchema = z.object({
 	status: z.string(),
 	message: z.string(),
-	result: z.number()
+	result: z.string()
 });
 
 export type TBlockTimestampDetails = z.infer<typeof blockTimestampResponseSchema>;
-
-export const performGet = async (url: string): Promise<any> => {
-	return (
-		axios.get(url)
-			.then(function (response: AxiosResponse): any {
-				return response.data;
-			})
-			.catch(function (error: AxiosError): null {
-				console.warn(error);
-				return null;
-			})
-	);
-};
 
 export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetchReturn<TBlockTimestampDetails> {
 	if (network === 250) {
@@ -76,12 +61,12 @@ export async function asyncForEach<T>(array: T[], callback: (item: T, index: num
 	}
 }
 
-export function	parseMarkdown(markdownText: string): string {
-	const htmlText = markdownText
-		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
+// export function	parseMarkdown(markdownText: string): string {
+// 	const htmlText = markdownText
+// 		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
 
-	return htmlText.trim();
-}
+// 	return htmlText.trim();
+// }
 
 // export async function fetchCryptoPrice(from = '', to = 'usd'): Promise<any> {
 // 	const	result = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
