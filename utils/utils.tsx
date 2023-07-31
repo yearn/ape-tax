@@ -29,10 +29,16 @@ export const performGet = async (url: string): Promise<any> => {
 
 export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetchReturn<TBlockTimestampDetails> {
 	if (network === 250) {
-		const baseURL = 'https://api.ftmscan.com/api?module=block&action=getblocknobytime&timestamp';
-
+		const blockTimestampQueryParams = new URLSearchParams({
+			module: 'block',
+			action: 'getblocknobytime',
+			timestamp: timestamp.toString(),
+			closest:'before',
+			apikey: process.env.FTMSCAN_API || ''
+		});
+		
 		return fetch<TBlockTimestampDetails>({
-			endpoint: `${baseURL}=${new URLSearchParams(`${timestamp}`)}&closest=before&apikey=${process.env.FTMSCAN_API}`,
+			endpoint: `https://api.ftmscan.com/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 			schema: blockTimestampResponseSchema
 		});
 	}
