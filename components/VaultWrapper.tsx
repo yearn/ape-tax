@@ -17,6 +17,7 @@ import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/ut
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {ReactElement} from 'react';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 
@@ -41,7 +42,7 @@ const		defaultVaultData: TVaultData = {
 	apiVersion: '-'
 };
 
-function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElement {
+function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;}): ReactElement {
 	const	{address, chainID} = useWeb3();
 	const	{networks} = useSettings();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);

@@ -8,12 +8,13 @@ import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {useWindowInFocus} from '@yearn-finance/web-lib/hooks/useWindowInFocus';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
-import type {GetStaticPathsResult} from 'next';
+import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
 import type {ReactElement} from 'react';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
-function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement {
+function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TCoinGeckoPrices}): ReactElement {
 	const	{isActive, chainID, onSwitchChain, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
@@ -128,11 +129,12 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-	const	slug = Object.keys(vaults).filter((key): boolean => key !== 'yvsteth').map((key): any => ({params: {slug: key}})) || [];
+	type TSlug = {params: {slug: string}}
+	const	slug = Object.keys(vaults).filter((key): boolean => key !== 'yvsteth').map((key): TSlug => ({params: {slug: key}})) || [];
 	return	{paths: slug, fallback: true};
 }
 
-export async function getStaticProps({params}: {params: {slug: string}}): Promise<any> {
+export async function getStaticProps({params}: {params: {slug: string}}): Promise<Promise<GetStaticPropsResult<{vault: TVault | null, slug: string}>>> {
 	if ((params.slug.toLowerCase()).startsWith('0x')) {
 		return {props: {vault: null, slug: params.slug}};
 	}

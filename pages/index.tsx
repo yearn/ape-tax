@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
@@ -15,6 +16,7 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {ReactElement} from 'react';
 import type {TTVL, TVault} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 const	splitter = new GraphemeSplitter();
@@ -178,14 +180,14 @@ function	Index(): ReactElement {
 			return;
 		}
 		
-		const calls: any[] = [];
+		const calls: ContractFunctionConfig[] = [];
 		vaultsInactive.forEach(({VAULT_ADDR}): void => {
-			const vaultContract = {address: VAULT_ADDR, abi: erc20ABI};
+			const vaultContract = {address: toAddress(VAULT_ADDR), abi: erc20ABI};
 			calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
 		});
 
 		const needToWidthdraw: TVault[] = [];
-		const userBalances = await multicall({contracts: calls, chainId: safeChainID});
+		const userBalances = await multicall({contracts: calls as never[], chainId: safeChainID});
 		
 		userBalances.forEach((balance, idx): void => {
 			if(!isZero(decodeAsBigInt(balance))){
