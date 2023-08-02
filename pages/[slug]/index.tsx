@@ -1,11 +1,9 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
 import vaults from 'utils/vaults.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
-import {useWindowInFocus} from '@yearn-finance/web-lib/hooks/useWindowInFocus';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
@@ -18,25 +16,16 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 	const	{isActive, chainID, onSwitchChain, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
-	const	isWindowInFocus = useWindowInFocus();
 
-	useClientEffect((): void => {
-		if (!vault) {
-			return;
-		}
-		if (isWindowInFocus && chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
-			onSwitchChain(vault.CHAIN_ID);
-		}
-	}, [chainID, onSwitchChain, vault, isWindowInFocus]);
 
-	useClientEffect((): void => {
+	useEffect((): void => {
 		if (!vault && communityVaults !== undefined) {
 			const	_currentVault = communityVaults.find((v: TVault): boolean => v.VAULT_ADDR === toAddress(slug));
 			if (_currentVault) {
 				set_currentVault(_currentVault);
 			}
 		}
-	}, [vault, communityVaults]);
+	}, [vault, communityVaults, slug]);
 
 	if (!currentVault) {
 		return <Fragment />;

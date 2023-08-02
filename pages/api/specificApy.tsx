@@ -3,7 +3,7 @@ import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
 import YVAULT_ABI from 'utils/ABI/yVault.abi';
 import {fetchBlockTimestamp} from 'utils/utils';
 import vaults from 'utils/vaults.json';
-import config from 'utils/wagmiConfig';
+import {getPublicClient} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
@@ -26,7 +26,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 	const oneWeekAgo = Number((new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const currentPrice = formatToNormalizedValue(pricePerShare, Number(decimals));
-	const multicallInstance = config.getPublicClient({chainId: vault?.CHAIN_ID || 1}).multicall;
+	const multicallInstance = getPublicClient({chainId: vault?.CHAIN_ID || 1}).multicall;
 
 	if (activationTimestamp > oneWeekAgo) {
 		_grossAPRWeek = '-';
@@ -87,8 +87,8 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 
 async function getCommunityVaults(): Promise<TVault[]> {
 	const BALANCER_FACTORY_ADDRESS = toAddress(process.env.YEARN_BALANCER_FACTORY_ADDRESS);
-	const multicallInstance = config.getPublicClient({chainId: 1}).multicall;
-	const readContractInstance = config.getPublicClient({chainId: 1}).readContract;
+	const multicallInstance = getPublicClient({chainId: 1}).multicall;
+	const readContractInstance = getPublicClient({chainId: 1}).readContract;
 
 	const numVaults = await readContractInstance({
 		address: BALANCER_FACTORY_ADDRESS,
@@ -139,7 +139,7 @@ async function getCommunityVaults(): Promise<TVault[]> {
 }
 
 async function getSpecificAPY({network, address}: {network: number, address: string}): Promise<TSpecificAPIResult> {
-	const multicallInstance = config.getPublicClient({chainId: network || 1}).multicall;
+	const multicallInstance = getPublicClient({chainId: network || 1}).multicall;
 	const apyCalls = [];
 	const vaultContract = {address: toAddress(address), abi: VAULT_ABI};
 	apyCalls.push({...vaultContract, functionName: 'pricePerShare'});

@@ -1,7 +1,7 @@
 import {ethers} from 'ethers';
 import {coinGeckoPricesSchema} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
-import config from 'utils/wagmiConfig';
+import {getPublicClient} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
@@ -25,7 +25,7 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 }
 
 async function getTVL({network}: {network: number}): Promise<TTVL> {
-	const multicallInstance = config.getPublicClient({chainId: network || 1}).multicall;
+	const multicallInstance = getPublicClient({chainId: network || 1}).multicall;
 	const tvlCalls: ContractFunctionConfig[] = [];
 	const _cgIDS: string[] = [];
 	let _tvlEndorsed = 0;

@@ -2,10 +2,12 @@ import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';
 import {FactoryContextApp} from 'contexts/useFactory';
 import vaults from 'utils/vaults.json';
-import config from 'utils/wagmiConfig';
+import {arbitrum, fantom, mainnet} from 'viem/chains';
 import useSWR from 'swr';
 import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
+
+import {localhost, optimismOverride, polygonOverride} from '../utils/wagmiChains';
 
 import type {AppProps} from 'next/app';
 import type {ReactElement} from 'react';
@@ -51,7 +53,14 @@ function App(props: AppProps): ReactElement {
 function	MyApp(props: AppProps): ReactElement {
 	return (
 		<WithYearn
-			config={config}
+			supportedChains={[			
+				mainnet,
+				optimismOverride,
+				polygonOverride,
+				fantom,
+				arbitrum,
+				localhost
+			]}
 			options={{
 				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
 				ui: {shouldUseThemes: false}

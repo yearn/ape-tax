@@ -1,9 +1,8 @@
-import {Fragment, useMemo, useState} from 'react';
+import {Fragment, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {useConnect} from 'wagmi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 import type {ReactElement} from 'react';
@@ -62,7 +61,7 @@ function	Navbar(): ReactElement {
 	const {connectors} = useConnect();
 	const	[hasInitialPopup, set_hasInitialPopup] = useState(false);
 
-	useClientEffect((): VoidFunction => {
+	useEffect((): VoidFunction => {
 		const	timeout = setTimeout((): void => {
 			if (hasInitialPopup) {
 				return;
@@ -74,7 +73,7 @@ function	Navbar(): ReactElement {
 			set_hasInitialPopup(true);
 		}, 1000);
 		return (): void => clearTimeout(timeout);
-	}, [address]);
+	}, [address, hasInitialPopup, openLoginModal]);
 
 	const supportedNetworks = useMemo((): TNetwork[] => {
 		const injectedConnector = connectors.find((e): boolean => e.id.toLowerCase() === 'injected');
