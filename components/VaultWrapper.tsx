@@ -5,10 +5,8 @@ import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
-import LENS_ABI from 'utils/ABI/lens.abi';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
-import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -44,7 +42,6 @@ const		defaultVaultData: TVaultData = {
 
 function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;}): ReactElement {
 	const	{address, chainID} = useWeb3();
-	const	{networks} = useSettings();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);
 
 	const	prepareVaultData = useCallback(async (): Promise<void> => {
@@ -140,45 +137,17 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		prepareVaultData();
 	}, [prepareVaultData]);
 
-	/**************************************************************************
-	** If we had some issues getting the prices ... Let's try again
-	**************************************************************************/
-	const	refetchVaultData = useCallback(async (): Promise<void> => {
-		const	currentNetwork = networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1];
-
-		if (currentNetwork.lensOracleAddress) {
-			const price = await readContract({
-				abi: LENS_ABI,
-				address: toAddress(currentNetwork.lensOracleAddress),
-				functionName: 'getPriceUsdcRecommended',
-				args: [toAddress(vault.WANT_ADDR)]
-			});
-
-			const normalizedPrice = formatToNormalizedValue(price, 6);
-			set_vaultData((v): TVaultData => ({
-				...v,
-				wantPrice: normalizedPrice,
-				wantPriceError: false,
-				balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * normalizedPrice,
-				totalAUM: Number(v.totalAssets.normalized) * normalizedPrice
-			}));
-		}
-	}, [chainID, networks, vault.CHAIN_ID, vault.WANT_ADDR]);
-
 	useEffect((): void => {
-		if (vault?.PRICE_SOURCE?.startsWith('Lens')) {
-			refetchVaultData();
-		} else {
-			const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-			set_vaultData((v): TVaultData => ({
-				...v,
-				wantPrice: price,
-				wantPriceError: false,
-				balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
-				totalAUM: Number(v.totalAssets.normalized) * price
-			}));
-		}
-	}, [prices, refetchVaultData, vault]);
+		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		set_vaultData((v): TVaultData => ({
+			...v,
+			wantPrice: price,
+			wantPriceError: false,
+			balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
+			totalAUM: Number(v.totalAssets.normalized) * price
+		}));
+		
+	}, [prices, vault]);
 
 	return (
 		<div className={'mt-8 text-neutral-700'}>
