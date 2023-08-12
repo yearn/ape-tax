@@ -27,35 +27,35 @@ export type TVault = {
 	ZAP_ADDR?: string;
 }
 
-export type TAPIVault = {
-	title: string;
-	logo: string;
-	displayName: string;
-	src: string;
-	status: string;
-	type: string;
-	address: string;
-	network: number;
-	APY?: {
-		week: string;
-		month: string;
-		inception: string;
-	}
-	data: {
-		apiVersion: string;
-		depositLimit: string;
-		totalAssets: string;
-		availableDepositLimit: string;
-		pricePerShare: string;
-		decimals: number;
-		activation: number;
-	};
-	want: {
-		address: string;
-		symbol: string;
-		cgID: string;
-	};
-}
+// export type TAPIVault = {
+// 	title: string;
+// 	logo: string;
+// 	displayName: string;
+// 	src: string;
+// 	status: string;
+// 	type: string;
+// 	address: string;
+// 	network: number;
+// 	APY?: {
+// 		week: string;
+// 		month: string;
+// 		inception: string;
+// 	}
+// 	data: {
+// 		apiVersion: string;
+// 		depositLimit: string;
+// 		totalAssets: string;
+// 		availableDepositLimit: string;
+// 		pricePerShare: string;
+// 		decimals: number;
+// 		activation: number;
+// 	};
+// 	want: {
+// 		address: string;
+// 		symbol: string;
+// 		cgID: string;
+// 	};
+// }
 
 export type TSpecificAPIResult = {
 	week: string;
@@ -105,10 +105,10 @@ export type TTVL = {
 	tvl: number;
 }
 
-export type TGauge = {
-	address: TAddress,
-	name: string,
-	symbol: string,
-	exists: boolean,
-	isAuraOK: boolean,
-}
+// export type TGauge = {
+// 	address: TAddress,
+// 	name: string,
+// 	symbol: string,
+// 	exists: boolean,
+// 	isAuraOK: boolean,
+// }
