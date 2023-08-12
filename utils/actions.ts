@@ -14,6 +14,7 @@ import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
+import type {ContractFunctionConfig} from 'viem';
 import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
@@ -140,7 +141,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 
 	const assetAddress = toAddress(asset);
 
-	const calls = [];
+	const calls: ContractFunctionConfig[] = [];
 	const assetContract = {address: assetAddress, abi: erc20ABI};
 	const vaultV3Contract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 
@@ -224,7 +225,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	** - The current allowance of the signer to the router
 	**********************************************************************************************/
 
-	const calls = [];
+	const calls: ContractFunctionConfig[] = [];
 	const multicalls = [];
 	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 
