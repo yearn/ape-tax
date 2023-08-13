@@ -29,28 +29,43 @@ export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetc
 	}
 
 	if (network === 137) {
-		const baseURL = 'https://api.polygonscan.com/api?module=block&action=getblocknobytime&timestamp';
+		const blockTimestampQueryParams = new URLSearchParams({
+			module: 'block',
+			action: 'getblocknobytime',
+			timestamp: timestamp.toString(),
+			closest:'before',
+			apikey: process.env.POLYGONSCAN_API || ''
+		});
 
 		return fetch<TBlockTimestampDetails>({
-			endpoint: `${baseURL}=${new URLSearchParams(`${timestamp}`)}&closest=before&apikey=${process.env.POLYGONSCAN_API}`,
+			endpoint: `https://api.polygonscan.com/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 			schema: blockTimestampResponseSchema
 		});
 	}
 
 	if (network === 42161) {
-		const baseURL = 'https://api.arbiscan.io/api?module=block&action=getblocknobytime&timestamp';
-
+		const blockTimestampQueryParams = new URLSearchParams({
+			module: 'block',
+			action: 'getblocknobytime',
+			timestamp: timestamp.toString(),
+			closest:'before',
+			apikey: process.env.ETHERSCAN_API || ''
+		});
 		return fetch<TBlockTimestampDetails>({
-			endpoint: `${baseURL}=${new URLSearchParams(`${timestamp}`)}&closest=before&apikey=${process.env.ETHERSCAN_API}`,
+			endpoint: `https://api.arbiscan.io/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 			schema: blockTimestampResponseSchema
 		});
 	}
 
-
-	const baseURL = 'https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp';
-				
+	const blockTimestampQueryParams = new URLSearchParams({
+		module: 'block',
+		action: 'getblocknobytime',
+		timestamp: timestamp.toString(),
+		closest:'before',
+		apikey: process.env.ETHERSCAN_API || ''
+	});		
 	return fetch<TBlockTimestampDetails>({
-		endpoint: `${baseURL}=${new URLSearchParams(`${timestamp}`)}&closest=before&apikey=${process.env.ETHERSCAN_API}`,
+		endpoint: `https://api.etherscan.io/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 		schema: blockTimestampResponseSchema
 	});
 }
