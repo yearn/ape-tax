@@ -11,6 +11,7 @@ import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNu
 
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {TSpecificAPIResult, TVault} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
@@ -36,7 +37,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
 		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 
@@ -54,12 +55,12 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		const monthTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
 		const blockOneMonthAgo = monthTimestamp.data?.result || 0;
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
 
-		const ppsData = await multicallInstance({contracts: calls});
+		const ppsData = await multicallInstance({contracts: calls as never[]});
 		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
 		const _pastPricePerShareMonth = decodeAsBigInt(ppsData[1]);
 
@@ -113,7 +114,7 @@ async function getCommunityVaults(): Promise<TVault[]> {
 	}
 
 	const vaultDetails = await multicallInstance({contracts: vaultDetailsCalls});
-	const vaults = [];
+	const vaults: TVault[] = [];
 	let	rIndex = 0;
 	for (let i = 0; i < Number(numVaults); i++) {
 		const name = vaultDetails[rIndex++].result as string;

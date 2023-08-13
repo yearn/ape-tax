@@ -12,6 +12,7 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {ReactElement} from 'react';
 import type {TStrategyData, TVault, TVaultData} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TAddress, TDict} from '@yearn-finance/web-lib/types';
 
 type TStrategies = {
@@ -115,7 +116,7 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 			return;
 		}
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const wantContract = {
 			address: toAddress(vault.WANT_ADDR),
 			abi: erc20ABI

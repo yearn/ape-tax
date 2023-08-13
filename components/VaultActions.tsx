@@ -18,6 +18,7 @@ import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 import type {TransactionReceipt} from '@ethersproject/providers';
 
@@ -465,7 +466,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			return;
 		}
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const wantContractMultiCall = {address: toAddress(vault.WANT_ADDR), abi: erc20ABI};
 		const vaultV2ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI};
 		const vaultV3ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_V3_BASE_ABI};

@@ -17,6 +17,7 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
@@ -49,7 +50,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			return;
 		}
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const wantContractMultiCall = {
 			address: toAddress(vault.WANT_ADDR),
 			abi: erc20ABI
