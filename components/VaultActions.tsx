@@ -545,7 +545,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			/> : (<Fragment />)}
 
 			<div className={'grid w-full max-w-5xl grid-cols-2 gap-8'}>
-				{vaultData.depositLimit.raw === 0n && vault.VAULT_STATUS !== 'withdraw' ? (
+				{vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ? (
 					<VaultActionApeIn
 						vault={vault}
 						vaultData={vaultData}
