@@ -4,15 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "open-browser": "open http://localhost:3000",
-    "analyze": "ANALYZE=true next build",
     "dev:ts": "tsc --watch",
     "start": "tsc && next build && next start",
     "build": "tsc && next build",
     "export": "tsc && next build && next export -o ipfs",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lintfix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "bump": "bump"
+    "lintfix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
