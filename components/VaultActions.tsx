@@ -481,8 +481,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 		
 		if (vault.VAULT_ABI === 'v3') {
-			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit', args: [address]});
-			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit', args: [address]});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit'});
 		} else {
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
