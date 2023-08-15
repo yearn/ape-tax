@@ -1,6 +1,5 @@
 import assert from 'assert';
-import {encodeFunctionData, hexToNumber} from 'viem';
-import {secp256k1} from '@noble/curves/secp256k1';
+import {encodeFunctionData, hexToSignature} from 'viem';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -275,13 +274,12 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 			deadline: deadline
 		};
 		const signature = await signTypedData({domain, message: value, primaryType: 'Permit', types: PERMIT_TYPE});
-		const {r, s} = secp256k1.Signature.fromCompact(signature.slice(2, 130));
-		const v = hexToNumber(`0x${signature.slice(130)}`);
+		const {v, r, s} = hexToSignature(signature);
 
 		multicalls.push(encodeFunctionData({
 			abi: YROUTER_ABI,
 			functionName: 'selfPermit',
-			args: [props.contractAddress, amountToUse, toBigInt(deadline), v, toAddress(r.toString()), toAddress(s.toString())]
+			args: [props.contractAddress, amountToUse, toBigInt(deadline), Number(v), r, s]
 		}));
 
 		/* 🔵 - Yearn Finance **********************************************************************
