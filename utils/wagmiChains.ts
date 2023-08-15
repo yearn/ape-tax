@@ -2,14 +2,24 @@ import {optimism, polygon} from 'viem/chains';
 
 import type {Chain} from 'wagmi';
 
+const currencyDetails: {[key: number]: {name: string, symbol: string}} = {
+	1: {name: 'Ether', symbol: 'ETH'},
+	10: {name: 'Ether', symbol: 'ETH'},
+	137: {name: 'Matic', symbol: 'MATIC'},
+	250: {name: 'Fantom', symbol: 'FTM'},
+	42161: {name: 'Ether', symbol: 'ETH'}
+};
+
+const forkedChainID = Number(process.env.FORKED_CHAIN_ID);
+
 export const localhost = {
 	id: 1_337,
 	name: 'Localhost',
 	network: 'localhost',
 	nativeCurrency: {
 		decimals: 18,
-		name: 'Ether',
-		symbol: 'ETH'
+		name: currencyDetails[forkedChainID || 1].name,
+		symbol: currencyDetails[forkedChainID || 1].symbol
 	},
 	rpcUrls: {
 		default: {http: ['http://0.0.0.0:8545', 'http://127.0.0.1:8545', 'http://localhost:8545']},
