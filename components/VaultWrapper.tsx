@@ -67,7 +67,6 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
 		const	allowanceSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
 
-		calls.push({...vaultV2ContractMultiCall, functionName: 'apiVersion'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'decimals'});
@@ -77,22 +76,24 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 
 		if (vault.VAULT_ABI === 'v3') {
-			calls.push({...vaultV3ContractMultiCall, functionName: 'depositLimit', args: [address]});
-			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit', args: [address]});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit'});
 		} else {
+			calls.push({...vaultV2ContractMultiCall, functionName: 'apiVersion'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
 		}
 			
 		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
-		const apiVersion = callResult[0].result as string;
-		const totalAssets = decodeAsBigInt(callResult[1]);
-		const pricePerShare = decodeAsBigInt(callResult[2]);
-		const decimals = decodeAsBigInt(callResult[3]);
-		const balanceOf = decodeAsBigInt(callResult[4]);
-		const wantBalance = decodeAsBigInt(callResult[5]);
-		const wantAllowance = decodeAsBigInt(callResult[6]);
-		const allowanceYRouter = decodeAsBigInt(callResult[7]);
+		const totalAssets = decodeAsBigInt(callResult[0]);
+		const pricePerShare = decodeAsBigInt(callResult[1]);
+		const decimals = decodeAsBigInt(callResult[2]);
+		const balanceOf = decodeAsBigInt(callResult[3]);
+		const wantBalance = decodeAsBigInt(callResult[4]);
+		const wantAllowance = decodeAsBigInt(callResult[5]);
+		const allowanceYRouter = decodeAsBigInt(callResult[6]);
+		const apiVersion = callResult[7].result as string;
 		const depositLimit = decodeAsBigInt(callResult[8]);
 		const availableDepositLimit = decodeAsBigInt(callResult[9]);
 

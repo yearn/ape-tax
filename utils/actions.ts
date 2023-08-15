@@ -229,7 +229,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const multicalls = [];
 	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 
-	calls.push({...vaultV3ContractMultiCall, functionName: 'apiVersion'});
+	calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'nonces', args: [signerAddress]});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'previewWithdraw', args: [props.amount]});
