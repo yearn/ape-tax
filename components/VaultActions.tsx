@@ -222,7 +222,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
 			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI.startsWith('v3'),
+			isLegacy: vault.VAULT_ABI === 'yVaultV2',
 			statusHandler: set_txStatusDeposit
 		});
 
@@ -370,7 +370,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI.startsWith('v3'),
+			isLegacy: vault.VAULT_ABI === 'yVaultV2',
 			shouldRedeem: false,
 			statusHandler: set_txStatusWithdraw
 		});
@@ -497,8 +497,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const allowanceYRouter = decodeAsBigInt(callResult[5]);
 
 		// Set defaults for v3 strategies that don't return these values
-		const depositLimit = callResult[8].result ? decodeAsBigInt(callResult[6]) : 0n;
-		const availableDepositLimit = callResult[9].result ? decodeAsBigInt(callResult[7]) : 0n;
+		const depositLimit = callResult[6].result ? decodeAsBigInt(callResult[6]) : 0n;
+		const availableDepositLimit = callResult[7].result ? decodeAsBigInt(callResult[7]) : 0n;
 
 		const coinBalance = await fetchBalance({
 			address: address
