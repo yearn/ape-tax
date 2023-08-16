@@ -131,7 +131,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			</div>
 			<div>
 				{
-					vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ?
+					(vaultData.apiVersion === 'strategy' || vaultData.depositLimit.raw > 0n) && vault.VAULT_STATUS !== 'withdraw' ?
 						<>
 							<button
 								onClick={onZapIn}
@@ -167,7 +167,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	** Some basic variables around the vault
 	**************************************************************************/
 	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-	const	vaultSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
+	const	vaultSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
 	const	{chain} = useNetwork();
 	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH';
 
@@ -222,7 +222,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
 			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI !== 'v3',
+			isLegacy: vault.VAULT_ABI.startsWith('v3'),
 			statusHandler: set_txStatusDeposit
 		});
 
@@ -301,7 +301,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	** Some basic variables around the vault
 	**************************************************************************/
 	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-	const	vaultSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
+	const	vaultSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
 
 	/**************************************************************************
 	** State management for our actions
@@ -370,7 +370,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
-			isLegacy: vault.VAULT_ABI !== 'v3',
+			isLegacy: vault.VAULT_ABI.startsWith('v3'),
 			shouldRedeem: false,
 			statusHandler: set_txStatusWithdraw
 		});
@@ -471,7 +471,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const vaultV2ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI};
 		const vaultV3ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_V3_BASE_ABI};
 		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-		const	allowanceSpender = vault.VAULT_ABI === 'v3' ? yearnRouterForChain : vault.VAULT_ADDR;
+		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
 
 		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
 		calls.push({...wantContractMultiCall, functionName: 'balanceOf', args: [address]});
@@ -480,7 +480,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
 		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 		
-		if (vault.VAULT_ABI === 'v3') {
+		if (vault.VAULT_ABI.startsWith('v3')) {
 			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
 			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit'});
 		} else {
@@ -495,8 +495,10 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const totalAssets = decodeAsBigInt(callResult[3]);
 		const pricePerShare = decodeAsBigInt(callResult[4]);
 		const allowanceYRouter = decodeAsBigInt(callResult[5]);
-		const depositLimit = decodeAsBigInt(callResult[6]);
-		const availableDepositLimit = decodeAsBigInt(callResult[7]);
+
+		// Set defaults for v3 strategies that don't return these values
+		const depositLimit = callResult[8].result ? decodeAsBigInt(callResult[6]) : 0n;
+		const availableDepositLimit = callResult[9].result ? decodeAsBigInt(callResult[7]) : 0n;
 
 		const coinBalance = await fetchBalance({
 			address: address
@@ -545,7 +547,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			/> : (<Fragment />)}
 
 			<div className={'grid w-full max-w-5xl grid-cols-2 gap-8'}>
-				{vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ? (
+				{(vaultData.apiVersion === 'strategy' || vaultData.depositLimit.raw > 0n) && vault.VAULT_STATUS !== 'withdraw' ? (
 					<VaultActionApeIn
 						vault={vault}
 						vaultData={vaultData}
