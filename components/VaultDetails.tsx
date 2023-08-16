@@ -53,7 +53,9 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Deposit Limit: '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${isZero(vaultData.depositLimit.raw) ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
+							{vaultData.apiVersion === 'strategy' ?
+								'strategy (TODO)' :
+								`${isZero(vaultData.depositLimit.raw) ? '-' : formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}` }
 						</Suspense>
 					</p>
 				</div>
@@ -113,27 +115,33 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Available limit: '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${formatAmount(vaultData.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
+							{vaultData.apiVersion === 'strategy' ?
+								'strategy (TODO)' :
+								`${formatAmount(vaultData.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}` }
 						</Suspense>
 					</p>
 				</div>
-				<div className={'progress-bar'}>
-					<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
+
+				{!(vaultData.apiVersion === 'strategy') && (
+					<div className={'progress-bar'}>
+						<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
 							&nbsp;{'['}&nbsp;
-						<ProgressChart
-							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
-							width={50} />
+							<ProgressChart
+								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
+								width={50} />
 							&nbsp;{']'}&nbsp;
-					</span>
-					<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
+						</span>
+						<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
 							&nbsp;{'['}&nbsp;
-						<ProgressChart
-							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
-							width={30} />
+							<ProgressChart
+								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
+								width={30} />
 							&nbsp;{']'}&nbsp;
-					</span>
-					{`${vault.VAULT_STATUS === 'withdraw' ? '100' : (vaultData.progress * 100).toFixed(2)}%`}
-				</div>
+						</span>
+						{`${vault.VAULT_STATUS === 'withdraw' ? '100' : (vaultData.progress * 100).toFixed(2)}%`}
+					</div>
+				)}
+
 			</div>
 		</section>
 	);
