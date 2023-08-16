@@ -149,7 +149,11 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 
 	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 	const routerAllowance = decodeAsBigInt(callResult[0]);
-	const minOut = decodeAsBigInt(callResult[1]);
+	let minOut = decodeAsBigInt(callResult[1]);
+
+	// 1% tolerance to minOut to avoid router rounding issues causing tx failure
+	const errorTolerance = minOut / 100n;
+	minOut = minOut - errorTolerance;
 
 	/**
 	 * The first interaction between the router and a specific vault will require a max approval for
