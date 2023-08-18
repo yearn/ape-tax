@@ -320,14 +320,14 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		}
 		const allowance = await readContract({
 			abi: VAULT_ABI,
-			address: toAddress(vault.WANT_ADDR),
+			address: toAddress(vault.VAULT_ADDR),
 			functionName: 'allowance',
 			args: [address, toAddress(vaultSpender)]
 		});
 
 		const allowanceYRouter = await readContract({
 			abi: YVAULT_V3_BASE_ABI,
-			address: toAddress(vault.WANT_ADDR),
+			address: toAddress(vault.VAULT_ADDR),
 			functionName: 'allowance',
 			args: [address, toAddress(vaultSpender)]
 		}) as bigint;
@@ -347,7 +347,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	const onApprove = useCallback(async (): Promise<void> => {
 		const result = await approveERC20({
 			connector: provider,
-			contractAddress: toAddress(vault.WANT_ADDR),
+			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
 			amount: MAX_UINT_256,
 			statusHandler: set_txStatusApproval
@@ -357,7 +357,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			fetchApproval();
 		}
 
-	}, [fetchApproval, provider, vaultSpender, vault.WANT_ADDR]);
+	}, [provider, vault.VAULT_ADDR, vaultSpender, fetchApproval]);
 		
 
 	async function	onWithdraw(): Promise<void> {
