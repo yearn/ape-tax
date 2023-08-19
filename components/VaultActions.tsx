@@ -309,7 +309,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
 	const	[txStatusApproval, set_txStatusApproval] = useState(defaultTxStatus);
 	const	[txStatusWithdraw, set_txStatusWithdraw] = useState(defaultTxStatus);
-	const	shouldUseApproval = vaultSpender === yearnRouterForChain;
+	const	shouldUseApproval = vaultSpender !== yearnRouterForChain;
 
 	/**************************************************************************
 	** We need to update the status when some events occurs
@@ -318,6 +318,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		if (!vault || isZeroAddress(address) || !address) {
 			return;
 		}
+		
 		const allowance = await readContract({
 			abi: VAULT_ABI,
 			address: toAddress(vault.VAULT_ADDR),
@@ -325,18 +326,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			args: [address, toAddress(vaultSpender)]
 		});
 
-		const allowanceYRouter = await readContract({
-			abi: YVAULT_V3_BASE_ABI,
-			address: toAddress(vault.VAULT_ADDR),
-			functionName: 'allowance',
-			args: [address, toAddress(vaultSpender)]
-		}) as bigint;
-
-		onUpdateVaultData((v): TVaultData => ({
-			...v,
-			allowanceYRouter: toNormalizedBN(allowanceYRouter, v.decimals),
-			allowance: toNormalizedBN(allowance, v.decimals)
-		}));
+		onUpdateVaultData((v): TVaultData => ({...v, allowanceYRouter: toNormalizedBN(allowance, v.decimals)}));
 
 	}, [address, onUpdateVaultData, vault, vaultSpender]);
 
@@ -428,19 +418,10 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 				) : <Fragment />}
 			</div>
 
-			{/* {shouldUseApproval ? (
-				<Button
-					variant={'outlined'}
-					isBusy={txStatusApproval.pending}
-					isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
-					onClick={onApprove}>
-					{vaultData.allowanceYRouter.raw > 0n ? '✅ Vault approved' : '🚀 Approve vault'}
-				</Button>
-			) : <Fragment />} */}
 			<Button
 				variant={'outlined'}
 				isBusy={txStatusWithdraw.pending}
-				isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || isZero(vaultData.balanceOf.raw) || isZero(amount.raw) || (shouldUseApproval ? isZero(vaultData.allowanceYRouter.raw) : false)}
+				isDisabled={txStatusWithdraw.error || txStatusWithdraw.pending || isZero(vaultData.balanceOf.raw) || isZero(amount.raw)}
 				onClick={onWithdraw}>
 				{'💸 Withdraw'}
 			</Button>
@@ -478,7 +459,6 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
-		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 		
 		if (vault.VAULT_ABI.startsWith('v3')) {
 			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
@@ -494,11 +474,10 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const vaultBalance = decodeAsBigInt(callResult[2]);
 		const totalAssets = decodeAsBigInt(callResult[3]);
 		const pricePerShare = decodeAsBigInt(callResult[4]);
-		const allowanceYRouter = decodeAsBigInt(callResult[5]);
 
 		// Set defaults for v3 strategies that don't return these values
-		const depositLimit = callResult[6].result ? decodeAsBigInt(callResult[6]) : 0n;
-		const availableDepositLimit = callResult[7].result ? decodeAsBigInt(callResult[7]) : 0n;
+		const depositLimit = callResult[5].result ? decodeAsBigInt(callResult[5]) : 0n;
+		const availableDepositLimit = callResult[6].result ? decodeAsBigInt(callResult[6]) : 0n;
 
 		const coinBalance = await fetchBalance({
 			address: address
@@ -507,7 +486,6 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		onUpdateVaultData((v): TVaultData => ({
 			...v,
 			allowance: toNormalizedBN(wantAllowance, v.decimals),
-			allowanceYRouter: toNormalizedBN(allowanceYRouter, v.decimals),
 			wantBalance: toNormalizedBN(wantBalance, v.decimals),
 			balanceOf: toNormalizedBN(vaultBalance, v.decimals),
 			balanceOfValue: formatToNormalizedValue(vaultBalance, v.decimals) * Number(v.pricePerShare.normalized) * v.wantPrice,
