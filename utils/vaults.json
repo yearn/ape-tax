@@ -551,42 +551,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
-  "matic_woofy": {
-    "TITLE": "Matic's Wandering Woofy",
-    "LOGO": "🧭🐶",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xEAFB3Ee25B5a9a1b35F193A4662E3bDba7A95BEb",
-    "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
-    "WANT_SYMBOL": "WOOFY",
-    "COINGECKO_SYMBOL": "woofy",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "matic-idle-dai": {
-    "TITLE": "Matic's Magic Idle DAI",
-    "LOGO": "🏆🚀",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9Cfeb5e00a38ed1c9950dBadC0821ce4cb648a90",
-    "WANT_ADDR": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-    "WANT_SYMBOL": "DAI",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "purpletwister": {
-    "TITLE": "Purple Twister",
-    "LOGO": "🟣🧬",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xCcba0B868106d55704cb7ff19782C829dc949feB",
-    "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-    "WANT_SYMBOL": "WMATIC",
-    "COINGECKO_SYMBOL": "wmatic",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
   "ultrasoundmoney": {
     "TITLE": "Wrapped Ultra Sound Money",
     "LOGO": "🦇🔊",
@@ -610,18 +574,6 @@
     "COINGECKO_SYMBOL": "huobi-btc",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
-  },
-  "dollarstorebento": {
-    "TITLE": "Dollar Store Bento",
-    "LOGO": "💵🍱",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x32A2d6F07079b6CdFe942B198773cDA1398544b1",
-    "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-    "WANT_SYMBOL": "USDC",
-    "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
   },
   "splitcameron": {
     "TITLE": "Split Cameron",
@@ -682,30 +634,6 @@
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
-  },
-  "wether": {
-    "TITLE": "Wether",
-    "LOGO": "🧬🐑",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9ecE944BBcd320F224293117E2780259411D34A3",
-    "WANT_ADDR": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-    "WANT_SYMBOL": "weth",
-    "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "curvedaave": {
-    "TITLE": "Curved aave",
-    "LOGO": "🧬🐑",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xccaC4F77f6984C989cc38EdED99e1c7A83a9c7f4",
-    "WANT_ADDR": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
-    "WANT_SYMBOL": "am3CRV",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
   },
   "daihard3": {
     "TITLE": "DAI Hard with a Vengeance",
