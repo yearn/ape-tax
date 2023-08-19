@@ -10,6 +10,7 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import {assertAddress, handleTx, toWagmiProvider} from './toWagmiProvider';
 import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
+import STRATEGY_V3_BASE_ABI from './ABI/tokenizedStrategyV3.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
@@ -231,8 +232,9 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const calls: ContractFunctionConfig[] = [];
 	const multicalls = [];
 	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
+	const tokenizedStrategyContract = {address: props.contractAddress, abi: STRATEGY_V3_BASE_ABI};
 
-	calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'});
+	calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'nonces', args: [signerAddress]});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'previewWithdraw', args: [props.amount]});
@@ -246,14 +248,6 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const maxOut = decodeAsBigInt(callResult[3]);
 	const currentAllowance = decodeAsBigInt(callResult[4]);
 	const currentBalance = decodeAsBigInt(callResult[5]);
-	console.log(apiVersion);
-	console.log(name);
-
-
-	console.log(currentBalance);
-	console.log(props.amount);
-
-
 
 	let amountToUse = props.amount;
 	if (props.amount >= currentBalance) {
@@ -263,11 +257,6 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		amountToUse = currentBalance;
 		props.shouldRedeem = true;
 	}
-
-	console.log(`allowance ${currentAllowance}`);
-	console.log(`new current balance ${currentBalance}`);
-
-	// if currentBalance === props.amount redeem
 
 	/* 🔵 - Yearn Finance **************************************************************************
 	** If the allowance is not sufficient, we will sign a permit and call the router's selfPermit
