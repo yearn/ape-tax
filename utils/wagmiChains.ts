@@ -10,6 +10,14 @@ const currencyDetails: {[key: number]: {name: string, symbol: string}} = {
 	42161: {name: 'Ether', symbol: 'ETH'}
 };
 
+const explorerDetails: {[key: number]: {name: string, url: string}} = {
+	1: {name: 'Etherscan', url: 'https://etherscan.io'},
+	10: {name: 'Optimism Explorer', url: 'https://explorer.optimism.io'},
+	137: {name: 'PolygonScan', url: 'https://polygonscan.com'},
+	250: {name: 'FTMScan', url: 'https://ftmscan.com'},
+	42161: {name: 'Arbiscan', url: 'https://arbiscan.io'}
+};
+
 const forkedChainID = Number(process.env.FORKED_CHAIN_ID);
 
 export const localhost = {
@@ -24,6 +32,12 @@ export const localhost = {
 	rpcUrls: {
 		default: {http: ['http://0.0.0.0:8545', 'http://127.0.0.1:8545', 'http://localhost:8545']},
 		public: {http: ['http://0.0.0.0:8545', 'http://127.0.0.1:8545', 'http://localhost:8545']}
+	},
+	blockExplorers: {
+		default: {
+			name: explorerDetails[forkedChainID || 1].name,
+			url : explorerDetails[forkedChainID || 1].url
+		}
 	},
 	contracts: {
 		ensRegistry: {
