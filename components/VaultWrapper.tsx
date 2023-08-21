@@ -5,6 +5,7 @@ import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
+import STRATEGY_V3_BASE_ABI from 'utils/ABI/tokenizedStrategyV3.abi';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -63,6 +64,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			address: toAddress(vault.VAULT_ADDR),
 			abi: YVAULT_V3_BASE_ABI
 		};
+		const tokenizedStrategyContract = {address: toAddress(vault.VAULT_ADDR), abi: STRATEGY_V3_BASE_ABI};
 
 		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
 		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
@@ -76,10 +78,13 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
 
 		if (vault.VAULT_ABI.startsWith('v3')) {
-			// Will only succeed fetching data for vaults, strategies don't have these functions
-			calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'});
-			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
-			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit'});
+			vault.VAULT_ABI === 'v3-vault' ?
+				calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'}) : // v3 vault
+				calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}); // v3 strategy
+
+
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // === depositLimit
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // ok to have same in this case
 		} else {
 			calls.push({...vaultV2ContractMultiCall, functionName: 'apiVersion'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
@@ -94,11 +99,9 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		const wantBalance = decodeAsBigInt(callResult[4]);
 		const wantAllowance = decodeAsBigInt(callResult[5]);
 		const allowanceYRouter = decodeAsBigInt(callResult[6]);
-
-		// Set defaults for v3 strategies that don't return these values
-		const apiVersion = callResult[7].result ? callResult[7].result as string : 'strategy';
-		const depositLimit = callResult[8].result ? decodeAsBigInt(callResult[8]) : 0n;
-		const availableDepositLimit = callResult[9].result ? decodeAsBigInt(callResult[9]) : 0n;
+		const apiVersion = callResult[7].result as string;
+		const depositLimit = decodeAsBigInt(callResult[8]);
+		const availableDepositLimit = decodeAsBigInt(callResult[9]);
 
 		const coinBalance = await fetchBalance({
 			address: address
