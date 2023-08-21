@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import {maxUint256} from 'viem';
@@ -123,23 +123,24 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</p>
 				</div>
 
-				<div className={'progress-bar'}>
-					<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
+				{vaultData.progress > 0 ? (				
+					<div className={'progress-bar'}>
+						<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
 							&nbsp;{'['}&nbsp;
-						<ProgressChart
-							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
-							width={50} />
+							<ProgressChart
+								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
+								width={50} />
 							&nbsp;{']'}&nbsp;
-					</span>
-					<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
+						</span>
+						<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
 							&nbsp;{'['}&nbsp;
-						<ProgressChart
-							progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
-							width={30} />
+							<ProgressChart
+								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
+								width={30} />
 							&nbsp;{']'}&nbsp;
-					</span>
-					{`${vault.VAULT_STATUS === 'withdraw' ? '100' : (vaultData.progress * 100).toFixed(2)}%`}
-				</div>
+						</span>
+						{`${vault.VAULT_STATUS === 'withdraw' ? '100' : (vaultData.progress * 100).toFixed(2)}%`}
+					</div>) : <Fragment/>}
 			</div>
 		</section>
 	);
