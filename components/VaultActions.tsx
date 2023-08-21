@@ -2,13 +2,13 @@ import {Fragment, useCallback, useState} from 'react';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
+import {maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
-import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
@@ -86,7 +86,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR), //token
 			spenderAddress: toAddress(vault.ZAP_ADDR), //spender
-			amount: MAX_UINT_256,
+			amount: maxUint256,
 			statusHandler: set_txStatusZapApproval
 		});
 
@@ -131,7 +131,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			</div>
 			<div>
 				{
-					(vaultData.apiVersion === 'strategy' || vaultData.depositLimit.raw > 0n) && vault.VAULT_STATUS !== 'withdraw' ?
+					vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ?
 						<>
 							<button
 								onClick={onZapIn}
@@ -204,7 +204,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: MAX_UINT_256,
+			amount: maxUint256,
 			statusHandler: set_txStatusApproval
 		});
 
@@ -339,7 +339,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: MAX_UINT_256,
+			amount: maxUint256,
 			statusHandler: set_txStatusApproval
 		});
 

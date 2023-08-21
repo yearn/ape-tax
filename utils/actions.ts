@@ -1,9 +1,8 @@
 import assert from 'assert';
-import {encodeFunctionData, hexToSignature} from 'viem';
+import {encodeFunctionData, hexToSignature, maxUint256} from 'viem';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
@@ -41,7 +40,7 @@ export async function isApprovedERC20(
 	connector: Connector | undefined,
 	tokenAddress: TAddress,
 	spender: TAddress,
-	amount = MAX_UINT_256
+	amount = maxUint256
 ): Promise<boolean> {
 	const wagmiProvider = await toWagmiProvider(connector);
 	const result = await readContract({
@@ -166,7 +165,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			address: props.spenderAddress,
 			abi: YROUTER_ABI,
 			functionName: 'approve',
-			args: [assetAddress, props.contractAddress, MAX_UINT_256],
+			args: [assetAddress, props.contractAddress, maxUint256],
 			value: 0n
 		});
 

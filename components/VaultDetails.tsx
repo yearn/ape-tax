@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
+import {maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import useSWR from 'swr';
-import {MAX_UINT_256} from '@yearn-finance/web-lib/utils/constants';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
@@ -55,7 +55,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'ml-3 inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
 							{isZero(vaultData.depositLimit.raw) ? '-' :
-								vaultData.depositLimit.raw === MAX_UINT_256 ? `∞ ${vault.WANT_SYMBOL}` :
+								vaultData.depositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
 									`${formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
@@ -116,7 +116,9 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Available limit: '}</p>
 					<p className={'ml-3 inline text-neutral-700'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`${formatAmount(vaultData.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}` }
+							{isZero(vaultData.availableDepositLimit.raw) ? '-' :
+								vaultData.availableDepositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
+									`${formatAmount(vaultData?.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
 				</div>
