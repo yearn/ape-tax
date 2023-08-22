@@ -188,6 +188,7 @@ type TWithdrawWithPermitERC20Args = TWriteTransaction & {
 	routerAddress: TAddress,
 	amount: bigint,
 	isLegacy: boolean,
+	isV3Strategy: boolean,
 	shouldRedeem: boolean
 }
 export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Args): Promise<TTxResponse> {
@@ -233,7 +234,9 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const vaultV3ContractMultiCall = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
 	const tokenizedStrategyContract = {address: props.contractAddress, abi: STRATEGY_V3_BASE_ABI};
 
-	calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'});
+	props.isV3Strategy ?
+		calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}) : 
+		calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'}); 
 	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'nonces', args: [signerAddress]});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'previewWithdraw', args: [props.amount]});
@@ -249,7 +252,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const currentBalance = decodeAsBigInt(callResult[5]);
 
 	let amountToUse = props.amount;
-	if (props.amount >= currentBalance) {
+	if (props.amount > currentBalance) {
 		amountToUse = currentBalance;
 		props.shouldRedeem = true;
 	} else if (isZero(props.amount) && currentBalance > 0n) {

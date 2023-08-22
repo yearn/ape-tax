@@ -361,6 +361,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
 			isLegacy: vault.VAULT_ABI === 'yVaultV2',
+			isV3Strategy: vault.VAULT_ABI === 'v3-strategy',
 			shouldRedeem: false,
 			statusHandler: set_txStatusWithdraw
 		});
