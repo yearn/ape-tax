@@ -86,7 +86,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR), //token
 			spenderAddress: toAddress(vault.ZAP_ADDR), //spender
-			amount: maxUint256,
+			amount: maxUint256 - 1n,
 			statusHandler: set_txStatusZapApproval
 		});
 
@@ -204,7 +204,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			connector: provider,
 			contractAddress: toAddress(vault.WANT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: maxUint256,
+			amount: maxUint256 - 1n,
 			statusHandler: set_txStatusApproval
 		});
 
@@ -339,7 +339,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
 			spenderAddress: toAddress(vaultSpender),
-			amount: maxUint256,
+			amount: maxUint256 - 1n,
 			statusHandler: set_txStatusApproval
 		});
 

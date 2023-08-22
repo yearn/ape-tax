@@ -165,7 +165,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			address: props.spenderAddress,
 			abi: YROUTER_ABI,
 			functionName: 'approve',
-			args: [assetAddress, props.contractAddress, maxUint256],
+			args: [assetAddress, props.contractAddress, maxUint256 - 1n],
 			value: 0n
 		});
 
