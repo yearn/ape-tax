@@ -7,6 +7,7 @@ import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
 import STRATEGY_V3_BASE_ABI from 'utils/ABI/tokenizedStrategyV3.abi';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
+import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
@@ -18,7 +19,6 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
-import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
@@ -100,7 +100,8 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		const wantAllowance = decodeAsBigInt(callResult[5]);
 		const allowanceYRouter = decodeAsBigInt(callResult[6]);
 		const apiVersion = callResult[7].result as string;
-		const depositLimit = decodeAsBigInt(callResult[8]);
+		const depositLimit = decodeAsBigInt(callResult[8]) === (maxUint256 - 1n) ?
+			decodeAsBigInt(callResult[8]) : decodeAsBigInt(callResult[8]) + totalAssets;
 		const availableDepositLimit = decodeAsBigInt(callResult[9]);
 
 		const coinBalance = await fetchBalance({
