@@ -252,12 +252,14 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const currentBalance = decodeAsBigInt(callResult[5]);
 
 	let amountToUse = props.amount;
-	if (props.amount > currentBalance) {
-		amountToUse = currentBalance;
+
+	// Conditions below focus on addition cases where we should redeem
+	if (props.amount >= currentBalance) {
 		props.shouldRedeem = true;
+		amountToUse = currentBalance;
 	} else if (isZero(props.amount) && currentBalance > 0n) {
-		amountToUse = currentBalance;
 		props.shouldRedeem = true;
+		amountToUse = currentBalance;
 	}
 
 	/* 🔵 - Yearn Finance **************************************************************************
