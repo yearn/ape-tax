@@ -281,7 +281,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		const value = {
 			owner: signerAddress,
 			spender: props.routerAddress,
-			value: amountToUse,
+			value: maxUint256 - 1n,
 			nonce: nonce,
 			deadline: deadline
 		};
@@ -291,7 +291,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 		multicalls.push(encodeFunctionData({
 			abi: YROUTER_ABI,
 			functionName: 'selfPermit',
-			args: [props.contractAddress, amountToUse, toBigInt(deadline), Number(v), r, s]
+			args: [props.contractAddress, maxUint256 - 1n, toBigInt(deadline), Number(v), r, s]
 		}));
 
 		/* 🔵 - Yearn Finance **********************************************************************
