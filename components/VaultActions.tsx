@@ -461,8 +461,8 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
 		
 		if (vault.VAULT_ABI.startsWith('v3')) {
-			calls.push({...vaultV3ContractMultiCall, functionName: 'deposit_limit'});
-			calls.push({...vaultV3ContractMultiCall, functionName: 'availableDepositLimit'});
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // === depositLimit
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // ok to have same in this case
 		} else {
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
@@ -474,10 +474,9 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const vaultBalance = decodeAsBigInt(callResult[2]);
 		const totalAssets = decodeAsBigInt(callResult[3]);
 		const pricePerShare = decodeAsBigInt(callResult[4]);
-
-		// Set defaults for v3 strategies that don't return these values
-		const depositLimit = callResult[5].result ? decodeAsBigInt(callResult[5]) : 0n;
-		const availableDepositLimit = callResult[6].result ? decodeAsBigInt(callResult[6]) : 0n;
+		const depositLimit = decodeAsBigInt(callResult[5]) === (maxUint256 - 1n) ?
+			decodeAsBigInt(callResult[5]) : decodeAsBigInt(callResult[5]) + totalAssets;
+		const availableDepositLimit = decodeAsBigInt(callResult[6]);
 
 		const coinBalance = await fetchBalance({
 			address: address
