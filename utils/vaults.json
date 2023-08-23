@@ -1109,7 +1109,7 @@
     "LOGO": "📈3️⃣",
     "VAULT_ABI": "v3-strategy",
     "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xfb7f581e10c79d6da7a3dce8366887b7eb26db62",
+    "VAULT_ADDR": "0xF32C48793CAe27880D18Ee4697fAB6D08748228E",
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
