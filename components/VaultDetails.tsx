@@ -25,11 +25,11 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 	return (
 		<section aria-label={'DETAILS'}>
-			<div className={'mb-4 font-mono text-sm font-medium'}>
+			<div className={'mb-4 text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Vault: '}</p>
 					<a
-						className={'dashed-underline-gray ml-3 text-neutral-700'}
+						className={'dashed-underline-gray ml-3'}
 						href={`${chainExplorer}/address/${vault.VAULT_ADDR}#code`}
 						target={'_blank'}
 						rel={'noreferrer'}>
@@ -38,13 +38,13 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Version: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>{vaultData.apiVersion}</Suspense>
 					</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
 						</Suspense>
@@ -52,7 +52,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Deposit Limit: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{isZero(vaultData.depositLimit.raw) ? '-' :
 								vaultData.depositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
@@ -62,7 +62,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Total Assets: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${formatAmount(vaultData?.totalAssets.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
@@ -70,17 +70,17 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Total AUM: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.totalAUM === 0 ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
 						</Suspense>
 					</p>
 				</div>
 			</div>
-			<div className={`mb-4 font-mono text-sm font-medium ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
+			<div className={`mb-4 text-sm font-medium ${vault.VAULT_STATUS === 'withdraw' || vault.CHAIN_ID === 56 ? 'hidden' : ''}`}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last week): '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.week || '-'}`}
 						</Suspense>
@@ -88,7 +88,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (last month): '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.month || '-'}`}
 						</Suspense>
@@ -96,17 +96,17 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Gross APR (inception): '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultAPY && isLoading}>
 							{`${vaultAPY?.inception || '-'}`}
 						</Suspense>
 					</p>
 				</div>
 			</div>
-			<div className={'mb-4 font-mono text-sm font-medium text-neutral-700'}>
+			<div className={'mb-4 text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Price Per Share: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`${vaultData.pricePerShare.normalized}`}
 						</Suspense>
@@ -114,7 +114,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Available limit: '}</p>
-					<p className={'ml-3 inline text-neutral-700'}>
+					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{isZero(vaultData.availableDepositLimit.raw) ? '-' :
 								vaultData.availableDepositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
@@ -125,14 +125,14 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 				{vaultData.progress > 0 ? (				
 					<div className={'progress-bar'}>
-						<span className={'-ml-2 mr-2 hidden bg-neutral-0 text-neutral-700 md:inline'}>
+						<span className={'-ml-2 mr-2 hidden md:inline'}>
 							&nbsp;{'['}&nbsp;
 							<ProgressChart
 								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}
 								width={50} />
 							&nbsp;{']'}&nbsp;
 						</span>
-						<span className={'-ml-2 mr-2 inline bg-neutral-0 text-neutral-700 md:hidden'}>
+						<span className={'-ml-2 mr-2 inline md:hidden'}>
 							&nbsp;{'['}&nbsp;
 							<ProgressChart
 								progress={vault.VAULT_STATUS === 'withdraw' ? 1 : vaultData.progress}

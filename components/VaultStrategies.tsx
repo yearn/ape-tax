@@ -185,15 +185,15 @@ function	Strategies({vault, onUpdateVaultData}: TStrategies): ReactElement {
 
 	return (
 		<section aria-label={'STRATEGIES'} className={'mt-8'}>
-			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'Strategies'}</h1>
+			<h1 className={'mb-6 text-2xl font-semibold text-neutral-900'}>{'Strategies'}</h1>
 			{
 				Object.values(strategiesData).map((strategy, index): ReactElement => (
-					<div key={index} className={'mb-4 font-mono text-sm text-neutral-700'}>
+					<div key={index} className={'mb-4 text-sm'}>
 						<div>
 							<p className={'inline font-bold'}>{`Strat. ${index}: `}</p>
 							<p className={'inline font-bold'}>{strategy.name}</p>
 						</div>
-						<div className={'w-full max-w-xl text-justify'}>
+						<div className={'max-w-xl text-justify'}>
 							<p className={'inline text-xs'} dangerouslySetInnerHTML={{__html: strategy?.description || ''}} />
 						</div>
 						<div>

@@ -36,12 +36,12 @@ function App(props: AppProps): ReactElement {
 						prices={data}
 						{...pageProps} />
 				</div>
-				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center font-mono text-xxs text-neutral-700'}>
+				<div className={'absolute inset-x-0 bottom-3 flex items-center justify-center text-xxs text-neutral-700'}>
 					<a
 						href={'https://twitter.com/ape_tax'}
 						target={'_blank'}
 						rel={'noreferrer'}
-						className={'dashed-underline-gray cursor-pointer'}>
+						className={'dashed-underline-gray'}>
 						{'Made with 💙 by the 🦍 community'}
 					</a>
 				</div>
