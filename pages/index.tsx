@@ -29,7 +29,7 @@ function Tag({status}: {status: string}): ReactElement {
 	if (status === 'use_production' || status === 'endorsed') {
 		return (
 			<>
-				<span className={'ml-2 hidden rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:inline'}>
+				<span className={'ml-2 hidden rounded-md bg-[#0657f9] px-2 py-1 text-xxs text-white lg:inline'}>
 					<a
 						href={'https://yearn.finance/vaults'}
 						target={'_blank'}
@@ -37,7 +37,7 @@ function Tag({status}: {status: string}): ReactElement {
 						{'Use Production'}
 					</a>
 				</span>
-				<span className={'ml-2 inline rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:hidden'}>
+				<span className={'ml-2 inline rounded-md bg-[#0657f9] px-2 py-1 text-xxs text-white lg:hidden'}>
 					<a
 						href={'https://yearn.finance/vaults'}
 						target={'_blank'}
@@ -50,21 +50,21 @@ function Tag({status}: {status: string}): ReactElement {
 	}
 	if (status === 'disabled') {
 		return (
-			<span className={'ml-2 rounded-md bg-yellow-900 px-2 py-1 font-mono text-xxs text-white'}>
+			<span className={'ml-2 rounded-md bg-yellow-900 px-2 py-1 text-xxs text-[#9da0a5]'}>
 				{'Disabled'}
 			</span>
 		);
 	}
 	if (status === 'withdraw') {
 		return (
-			<span className={'ml-2 rounded-md bg-red-900 px-2 py-1 font-mono text-xxs text-white'}>
+			<span className={'ml-2 rounded-md bg-red-900 px-2 py-1 text-xxs text-white'}>
 				{'Withdraw'}
 			</span>
 		);
 	}
 	if (status === 'new') {
 		return (
-			<span className={'ml-2 rounded-md bg-[#10B981] px-2 py-1 font-mono text-xxs text-white'}>
+			<span className={'ml-2 rounded-md bg-[#10B981] px-2 py-1 text-xxs text-white'}>
 				{'New'}
 			</span>
 		);
@@ -77,7 +77,7 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 		return <Fragment />;
 	}
 	return (
-		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 font-mono text-sm font-normal text-[#485570]'}>
+		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 text-justify text-sm font-normal text-[#485570]'}>
 			{'⚠️ '}<strong>{'WARNING'}</strong>{' 🚨 '}<strong>{'YOU ARE USING DEPRECATED VAULTS'}</strong> {'You have funds in deprecated vaults. Theses vaults are no longer generating any profit and are now an image from the past. Please remove your funds from these vaults.'}
 			<div className={'mt-4'}>
 				<ul className={'grid grid-cols-2 gap-2'}>
@@ -92,7 +92,7 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 											))
 										}
 									</span>
-									<span className={'dashed-underline-white ml-4 cursor-pointer font-mono text-base font-normal text-[#485570]'}>
+									<span className={'dashed-underline-white ml-4 cursor-pointer text-base font-normal text-[#485570]'}>
 										{vault.TITLE}
 									</span>
 								</div>
@@ -202,7 +202,7 @@ function	Index(): ReactElement {
 	if (!isActive) {
 		return (
 			<section>
-				<h1 className={'font-mono text-sm font-semibold text-neutral-700'}>{'Not connected to Ex'}<sup>{'2'}</sup>{' 🧪'}</h1>
+				<h1 className={'text-sm font-semibold text-neutral-700'}>{'Not connected to Ex'}<sup>{'2'}</sup>{' 🧪'}</h1>
 			</section>
 		);
 	}
@@ -211,68 +211,70 @@ function	Index(): ReactElement {
 		<main className={'max-w-5xl'}>
 			<div>
 				<div className={'hidden lg:block'}>
-					<h1 className={'mb-6 font-mono text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
+					<h1 className={'mb-6 text-3xl font-semibold leading-9 text-neutral-900'}>{'Experimental Experiments Registry'}</h1>
 				</div>
 				<div className={'flex lg:hidden'}>
-					<h1 className={'font-mono text-xl font-semibold leading-9 text-neutral-900 md:text-3xl'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
+					<h1 className={'text-xl font-semibold leading-9 text-neutral-900 md:text-3xl'}>{'Ex'}<sup className={'mr-2 mt-4'}>{'2'}</sup>{' Registry'}</h1>
 				</div>
 			</div>
-			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
+			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 text-justify text-sm font-normal text-[#485570]'}>
 				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 
 			<section aria-label={'TVL & new Vault'} className={'my-8 grid grid-cols-2'}>
 				<div>
-					<div>
-						<span className={'font-mono text-base font-semibold text-neutral-900'}>
+					<div className={'text-base'}>
+						<span className={'font-semibold text-neutral-900'}>
 							{`${chainName || 'Chain'} TVL:`}
 						</span>
-						<span className={'font-mono text-base font-normal text-neutral-700'}>
+						<span className={'font-normal'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}
 						</span>
 					</div>
 
 					<div className={'text-xs opacity-60'}>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-semibold'}>
 								{'Endorsed:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-normal'}>
 								{` $${formatAmount(tvl?.tvlEndorsed, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-semibold'}>
 								{'Experimental:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-normal'}>
 								{` $${formatAmount(tvl?.tvlExperimental, 2)}`}
 							</span>
 						</div>
 						<div>
-							<span className={'font-mono font-semibold text-neutral-700'}>
+							<span className={'font-semibold'}>
 								{'Deprecated:'}
 							</span>
-							<span className={'font-mono font-normal text-neutral-700'}>
+							<span className={'font-normal'}>
 								{` $${formatAmount(tvl?.tvlDeprecated, 2)}`}
 							</span>
 						</div>
 					</div>
 				</div>
-				<div className={'flex items-center max-sm:justify-center md:justify-start'}>
-					<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
-						{'🏦 Deploy vault'}
-					</span>
-					<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
-						{'🏦 Deploy your own vault'}
-					</span>
+				<div className={'flex items-center justify-center text-sm md:justify-start'}>
+					<div className={'cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 transition-colors hover:bg-neutral-0'}>
+						<span className={'md:hidden'}>
+							{'🏦 Deploy vault'}
+						</span>
+						<span className={'hidden md:block'}>
+							{'🏦 Deploy your own vault'}
+						</span>
+					</div>
 				</div>
 			</section>
 
-			<div className={'grid max-w-5xl grid-cols-2 gap-2'}>
-				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🚀 Experimental'}</h2>
+			<div className={'grid grid-cols-2 gap-2'}>
+				<div className={'col-span-2 mb-4 md:col-span-1'}>
+					<h2 className={'mb-4 text-2xl font-semibold text-neutral-900'}>{'🚀 Experimental'}</h2>
 					<ul>
 						{vaultsActiveExperimental?.map((vault): ReactElement => (
 							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
@@ -285,7 +287,7 @@ function	Index(): ReactElement {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
 									</div>
@@ -296,8 +298,8 @@ function	Index(): ReactElement {
 					</ul>
 				</div>
 
-				<div className={'col-span-2 mb-4 w-full md:col-span-1'}>
-					<h2 className={'mb-4 font-mono text-2xl font-semibold text-neutral-900'}>{'🧠 Weird'}</h2>
+				<div className={'col-span-2 mb-4 md:col-span-1'}>
+					<h2 className={'mb-4 text-2xl font-semibold text-neutral-900'}>{'🧠 Weird'}</h2>
 					<ul>
 						{vaultsActiveWeird?.map((vault): ReactElement => (
 							<li key={vault.VAULT_SLUG} className={'flex cursor-pointer flex-row items-baseline'}>
@@ -310,7 +312,7 @@ function	Index(): ReactElement {
 												))
 											}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer text-base font-normal text-neutral-700'}>
 											{vault.TITLE}
 										</span>
 									</div>
@@ -320,7 +322,7 @@ function	Index(): ReactElement {
 						))}
 					</ul>
 
-					<h2 className={'mb-4 mt-12 font-mono text-2xl font-semibold text-neutral-900'}>{'🦍 Community'}</h2>
+					<h2 className={'mb-4 mt-12 text-2xl font-semibold text-neutral-900'}>{'🦍 Community'}</h2>
 					<ul>
 						{(communityVaults || [])?.map((vault: TVault): ReactElement => (
 							<li key={vault.VAULT_ADDR} className={'cursor-pointer'}>
@@ -329,7 +331,7 @@ function	Index(): ReactElement {
 										<span className={'flex flex-row items-center'}>
 											{'🦍🦍'}
 										</span>
-										<span className={'dashed-underline-gray ml-4 cursor-pointer font-mono text-base font-normal text-neutral-700'}>
+										<span className={'dashed-underline-gray ml-4 cursor-pointer text-base font-normal text-neutral-700'}>
 											{vault.SYMBOL || ''}
 										</span>
 									</div>
