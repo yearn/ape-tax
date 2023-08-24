@@ -1,4 +1,4 @@
-import	AnimatedWait			from	'components/AnimatedWait';
+import AnimatedWait from 'components/AnimatedWait';
 
 import type {ReactElement, ReactNode} from 'react';
 

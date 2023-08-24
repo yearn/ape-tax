@@ -1,4 +1,4 @@
-import {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import {createContext, type ReactElement, useCallback, useContext, useEffect, useState} from 'react';
 import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
 import {multicall, readContract} from '@wagmi/core';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
@@ -6,7 +6,6 @@ import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
 
-import type {ReactElement} from 'react';
 import type {TVault} from 'utils/types';
 
 type TFactoryContext = {

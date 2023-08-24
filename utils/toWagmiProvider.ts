@@ -1,6 +1,6 @@
 import assert from 'assert';
-import {BaseError} from 'viem';
-import {prepareWriteContract, waitForTransaction, writeContract} from '@wagmi/core';
+import {type Abi, BaseError, type SimulateContractParameters} from 'viem';
+import {type GetWalletClientResult, prepareWriteContract, waitForTransaction, type WalletClient, writeContract} from '@wagmi/core';
 import {toast} from '@yearn-finance/web-lib/components/yToast';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {ZERO_ADDRESS} from '@yearn-finance/web-lib/utils/constants';
@@ -9,11 +9,10 @@ import {isEth} from '@yearn-finance/web-lib/utils/isEth';
 import {isTAddress} from '@yearn-finance/web-lib/utils/isTAddress';
 import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
-import type {Abi, SimulateContractParameters} from 'viem';
 import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
-import type {GetWalletClientResult, WalletClient} from '@wagmi/core';
+
 
 export type TWagmiProviderContract = {
 	walletClient: GetWalletClientResult,

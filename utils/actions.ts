@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {encodeFunctionData, hexToSignature, maxUint256} from 'viem';
+import {type ContractFunctionConfig, encodeFunctionData, hexToSignature, maxUint256} from 'viem';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -7,17 +7,15 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
-import {assertAddress, handleTx, toWagmiProvider} from './toWagmiProvider';
+import {assertAddress, handleTx, toWagmiProvider,type TWriteTransaction} from './toWagmiProvider';
 import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
 import STRATEGY_V3_BASE_ABI from './ABI/tokenizedStrategyV3.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
 
-import type {ContractFunctionConfig} from 'viem';
 import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
-import type {TWriteTransaction} from './toWagmiProvider';
 
 const PERMIT_TYPE = {
 	Permit: [

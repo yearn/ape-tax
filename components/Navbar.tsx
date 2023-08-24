@@ -1,11 +1,10 @@
-import {Fragment, useEffect, useMemo, useState} from 'react';
+import {Fragment, type ReactElement, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {useConnect} from 'wagmi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 
-import type {ReactElement} from 'react';
 import type {Chain} from 'viem';
 
 function stringToColour(str: string): string {
