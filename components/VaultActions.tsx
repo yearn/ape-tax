@@ -1,7 +1,7 @@
 import {Fragment, useCallback, useState} from 'react';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
-import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawWithPermitERC20} from 'utils/actions';
+import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawERC20} from 'utils/actions';
 import {maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
@@ -355,21 +355,17 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			return;
 		}
 
-		const result = await withdrawWithPermitERC20({
+		const result = await withdrawERC20({
 			connector: provider,
 			contractAddress: toAddress(vault.VAULT_ADDR),
-			routerAddress: toAddress(vaultSpender),
 			amount: amount.raw,
 			isLegacy: vault.VAULT_ABI === 'yVaultV2',
-			isV3Strategy: vault.VAULT_ABI === 'v3-strategy',
-			shouldRedeem: false,
 			statusHandler: set_txStatusWithdraw
 		});
 
 		if(result.isSuccessful){
 			onProceed();
 		}
-		
 	}
 
 	return (

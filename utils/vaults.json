@@ -347,30 +347,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
-  "bscbaby": {
-    "TITLE": "BSC's Ape Ape Baby",
-    "LOGO": "🧊👶",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x78bef219b3348CD65387F6f7B27c9ee3Bf525704",
-    "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
-    "WANT_SYMBOL": "ICE",
-    "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
-  "ellipsoidal": {
-    "TITLE": "Ellipsoidal Farmer",
-    "LOGO": "🍩3️⃣",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xC8057Fd6F7917b5398f52d861d50685E6AbbED14",
-    "WANT_ADDR": "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452",
-    "WANT_SYMBOL": "3EPS",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
   "ethbaby": {
     "TITLE": "ETH's Ape Ape Baby",
     "LOGO": "🧊👶",
@@ -382,42 +358,6 @@
     "COINGECKO_SYMBOL": "ice-token",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
-  },
-  "bscfrappedape": {
-    "TITLE": "BSC's Frapped Ape",
-    "LOGO": "☕️🦧",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x626530FCD25a8c9A949B024AAbbAe4BAE7D5F320",
-    "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
-    "WANT_SYMBOL": "fUSDT",
-    "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
-  "bscfusdtproxyeth": {
-    "TITLE": "BSC's fUSDT proxy to ETH",
-    "LOGO": "😷🐙",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x2A3020a71Ab92D5CdBAfEB72f0b90D1DfdF1B6E2",
-    "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
-    "WANT_SYMBOL": "fUSDT",
-    "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "stealth",
-    "CHAIN_ID": 56
-  },
-  "bsceth": {
-    "TITLE": "BSC ETH",
-    "LOGO": "🕳️🐨",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9cBdd0f1d9FB5D1ea6f3d022D0896E57aF5f087f",
-    "WANT_ADDR": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
-    "WANT_SYMBOL": "ETH",
-    "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
   },
   "ftmfusdtproxyeth": {
     "TITLE": "FTM's fUSDT proxy to ETH",
@@ -455,18 +395,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
-  "bnbfarmer": {
-    "TITLE": "BNB Farmer",
-    "LOGO": "🔶👨‍🌾",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7E12d21eeEF120dc5E23c8e70162815A9071Dde9",
-    "WANT_ADDR": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-    "WANT_SYMBOL": "wBNB",
-    "COINGECKO_SYMBOL": "binancecoin",
-    "VAULT_STATUS": "withdraw",
-    "CHAIN_ID": 56
-  },
   "spooky": {
     "TITLE": "Spooky Skeletons",
     "LOGO": "🙀👻",
@@ -490,18 +418,6 @@
     "COINGECKO_SYMBOL": "rai",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
-  },
-  "nrv": {
-    "TITLE": "Nervy Mastermind",
-    "LOGO": "☸️🤔",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7C1Db8938D8170A244635e9ae3AEb41663B6D858",
-    "WANT_ADDR": "0x42F6f551ae042cBe50C739158b4f0CAC0Edb9096",
-    "WANT_SYMBOL": "NRV",
-    "COINGECKO_SYMBOL": "nerve-finance",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
   },
   "ftm_woofy": {
     "TITLE": "FTM's Wandering Woofy",
@@ -1109,7 +1025,7 @@
     "LOGO": "📈3️⃣",
     "VAULT_ABI": "v3-strategy",
     "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xfb7f581e10c79d6da7a3dce8366887b7eb26db62",
+    "VAULT_ADDR": "0xF32C48793CAe27880D18Ee4697fAB6D08748228E",
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",

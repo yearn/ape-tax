@@ -83,6 +83,10 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 			137: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			43114: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			1337: '0x1112dbcf805682e828606f74ab717abf4b4fd8de'
+		},
+		APR_ORACLE_V3: {
+			137: '0x02b0210fC1575b38147B232b40D7188eF14C04f2',
+			1337: '0x02b0210fC1575b38147B232b40D7188eF14C04f2'
 		}
 	}
 })));

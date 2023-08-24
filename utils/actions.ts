@@ -183,6 +183,74 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	});
 }
 
+type TWithdrawERC20Args = TWriteTransaction & {
+	contractAddress: TAddress,
+	amount: bigint,
+	isLegacy: boolean,
+}
+export async function	withdrawERC20(props: TWithdrawERC20Args): Promise<TTxResponse> {
+	assertAddress(props.contractAddress, 'receiverAddress');
+	assert(props.connector, 'No connector');
+	assert(props.amount > 0n, 'Amount is 0');
+	
+	let shouldRedeem = false; 
+	const signer = await props.connector.getWalletClient();
+	const signerAddress = signer.account.address;
+
+	/* 🔵 - Yearn Finance **************************************************************************
+	** If we are using a legacy vault, aka a vault prior to V3, we will use the legacy withdraw,
+	** aka directly withdrawing from the vault.
+	** This path should be less and less used as time goes by.
+	**********************************************************************************************/
+	if (props.isLegacy) {
+		return await handleTx(props, {
+			address: props.contractAddress,
+			abi: VAULT_ABI,
+			functionName: 'withdraw',
+			args: [props.amount]
+		});
+	}
+
+	/** V3 Path **/
+	/* 🔵 - Yearn Finance **************************************************************************
+	** To decide if we should use the withdraw or the redeem function, we will just check the amount
+	** we want to withdraw. If this amount is greater than or equal to the total value of our shares
+	** then we will redeem  all of the shares we current hold from the vault otherwise we will
+	** proceed to only withdraw the specified amount.
+	**********************************************************************************************/
+	const userBalance = await readContract({
+		abi: YVAULT_V3_BASE_ABI,
+		address: props.contractAddress,
+		functionName: 'balanceOf',
+		args: [signerAddress]
+	});
+
+	let amountToUse = props.amount;
+	if (props.amount >= userBalance) {
+		shouldRedeem = true;
+		amountToUse = userBalance;
+	} else if (isZero(props.amount) && userBalance > 0n) {
+		shouldRedeem = true;
+		amountToUse = userBalance;
+	}
+
+	if (shouldRedeem) {
+		return await handleTx(props, {
+			address: props.contractAddress,
+			abi: YVAULT_V3_BASE_ABI,
+			functionName: 'redeem',
+			args: [amountToUse, signerAddress, signerAddress, 1n]
+		});
+	}
+	return await handleTx(props, {
+		address: props.contractAddress,
+		abi: YVAULT_V3_BASE_ABI,
+		functionName: 'withdraw',
+		args: [amountToUse, signerAddress, signerAddress, 1n]
+	});
+}
+
+
 type TWithdrawWithPermitERC20Args = TWriteTransaction & {
 	contractAddress: TAddress,
 	routerAddress: TAddress,
