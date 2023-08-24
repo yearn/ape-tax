@@ -50,11 +50,11 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
+					<p className={'text-4xl font-medium leading-11'}>{'❌🔌'}</p>
+					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
 					<button
 						onClick={openLoginModal}
-						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔌 Connect wallet'}
 					</button>
 				</div>
@@ -81,11 +81,11 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
+					<p className={'text-4xl font-medium leading-11'}>{'❌⛓'}</p>
+					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
 					<button
 						onClick={(): void => onSwitchChain(currentVault.CHAIN_ID)}
-						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔀 Change network'}
 					</button>
 				</div>
