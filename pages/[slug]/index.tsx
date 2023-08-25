@@ -84,7 +84,7 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
 					<p className={'text-4xl font-medium leading-11'}>
-						<span className={'text-[#e90000]'}>{'❌'}</span>{'⛓'}
+						<span className={'font-bold text-[#e90000]'}>{'❌'}</span>{'⛓'}
 					</p>
 					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
 					<button
