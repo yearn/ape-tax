@@ -1,4 +1,4 @@
-import {Fragment, useCallback, useEffect, useState} from 'react';
+import {Fragment, type ReactElement, useCallback, useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import APR_ORACLE_V3_ABI from 'utils/ABI/yAPROracleV3.abi';
@@ -12,7 +12,6 @@ import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNu
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
-import type {ReactElement} from 'react';
 import type {Maybe, TSpecificAPIResult, TVault, TVaultData} from 'utils/types';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 

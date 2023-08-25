@@ -1,8 +1,6 @@
 import {z} from 'zod';
 
-import {fetch} from './fetch';
-
-import type {TFetchReturn} from './fetch';
+import {fetch, type TFetchReturn} from './fetch';
 
 export const blockTimestampResponseSchema = z.object({
 	status: z.string(),

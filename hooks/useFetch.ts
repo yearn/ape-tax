@@ -1,8 +1,7 @@
-import useSWR from 'swr';
+import useSWR, {type SWRResponse} from 'swr';
 // import * as Sentry from '@sentry/nextjs';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 
-import type {SWRResponse} from 'swr';
 import type {z} from 'zod';
 
 type TUseZodProps<T> = {

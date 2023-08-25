@@ -1,8 +1,8 @@
-import {Fragment, useCallback, useState} from 'react';
+import {type ChangeEvent, Fragment, type ReactElement,useCallback, useState} from 'react';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawERC20} from 'utils/actions';
-import {maxUint256} from 'viem';
+import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
@@ -16,9 +16,7 @@ import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
-import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
-import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 import type {TransactionReceipt} from '@ethersproject/providers';
 

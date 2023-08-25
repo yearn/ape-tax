@@ -1,5 +1,5 @@
 import {ethers} from 'ethers';
-import {coinGeckoPricesSchema} from 'schemas/coinGeckoSchemas';
+import {coinGeckoPricesSchema,type TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
 import {getPublicClient} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
@@ -9,7 +9,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {fetch} from '../../utils/fetch';
 
 import type {NextApiRequest, NextApiResponse} from 'next';
-import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TTVL} from 'utils/types';
 import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';

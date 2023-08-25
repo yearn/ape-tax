@@ -1,8 +1,7 @@
-import axios from 'axios';
+import axios, {type AxiosRequestConfig} from 'axios';
 // import * as Sentry from '@sentry/nextjs';
 import {serialize} from '@wagmi/core';
 
-import type {AxiosRequestConfig} from 'axios';
 import type {z} from 'zod';
 
 type TFetchProps = {
