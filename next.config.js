@@ -49,7 +49,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		WEB_SOCKET_URL: {
 			1: process.env.WS_URL_MAINNET,
 			10: process.env.WS_URL_OPTIMISM,
-			137: process.env.WS_URL_MATIC,
+			137: process.env.WS_URL_POLYGON,
 			250: process.env.WS_URL_FANTOM,
 			42161: process.env.WS_URL_ARBITRUM,
 			43114: process.env.WS_URL_AVALANCHE
@@ -57,7 +57,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		JSON_RPC_URL: {
 			1: process.env.RPC_URL_MAINNET,
 			10: process.env.RPC_URL_OPTIMISM,
-			137: process.env.RPC_URL_MATIC || 'https://polygon.llamarpc.com',
+			137: process.env.RPC_URL_POLYGON || 'https://polygon.llamarpc.com',
 			250: process.env.RPC_URL_FANTOM,
 			42161: process.env.RPC_URL_ARBITRUM,
 			43114: process.env.RPC_URL_AVALANCHE
