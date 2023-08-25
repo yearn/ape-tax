@@ -77,7 +77,7 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 		return <Fragment />;
 	}
 	return (
-		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 text-justify text-sm font-normal text-[#485570]'}>
+		<div className={'my-4 max-w-5xl bg-red-900 p-4 pb-2 text-justify text-sm font-normal'}>
 			{'⚠️ '}<strong>{'WARNING'}</strong>{' 🚨 '}<strong>{'YOU ARE USING DEPRECATED VAULTS'}</strong> {'You have funds in deprecated vaults. Theses vaults are no longer generating any profit and are now an image from the past. Please remove your funds from these vaults.'}
 			<div className={'mt-4'}>
 				<ul className={'grid grid-cols-2 gap-2'}>
