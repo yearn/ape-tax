@@ -3,7 +3,6 @@ import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
 import GraphemeSplitter from 'grapheme-splitter';
 import vaults from 'utils/vaults.json';
-import {useNetwork} from 'wagmi';
 import useSWR from 'swr';
 import {erc20ABI, multicall} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -13,6 +12,7 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
+import {getNetwork} from '@yearn-finance/web-lib/utils/wagmi/utils';
 
 import type {ReactElement} from 'react';
 import type {TTVL, TVault} from 'utils/types';
@@ -109,8 +109,7 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 function	Index(): ReactElement {
 	const	{isActive, address} = useWeb3();
 	const	{safeChainID} = useChainID();
-	const	{chain} = useNetwork();
-	const	chainName = chain?.name || 'Chain';
+	const	chainName = getNetwork(safeChainID)?.name || 'Chain';
 	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState<TVault[]>([]);
