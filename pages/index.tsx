@@ -218,7 +218,7 @@ function	Index(): ReactElement {
 				</div>
 			</div>
 			<div className={'my-4 max-w-5xl bg-yellow-900 p-4 text-justify text-sm font-normal text-[#485570]'}>
-				{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
+				{'⚠️ '}<strong>{'WARNING'}</strong> {"These experiments are experimental. They are extremely risky and will probably be discarded when the test is over. There's a good chance that you can lose your funds. If you choose to proceed, do it with extreme caution."}
 			</div>
 			<DisabledVaults vaultsInactive={vaultsInactiveForUser} />
 
