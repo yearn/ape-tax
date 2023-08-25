@@ -1,5 +1,4 @@
 import useSWR from 'swr';
-// import * as Sentry from '@sentry/nextjs';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 
 import type {SWRResponse} from 'swr';
@@ -20,7 +19,6 @@ export function useFetch<T>({endpoint, schema, config}: TUseZodProps<T>): SWRRes
 
 	if (result.error) {
 		console.error(endpoint, result.error);
-		// Sentry.captureException(result.error, {tags: {endpoint}});
 		return {...result, isSuccess: false};
 	}
 
@@ -29,7 +27,6 @@ export function useFetch<T>({endpoint, schema, config}: TUseZodProps<T>): SWRRes
 
 	if (!parsedData.success) {
 		console.error(endpoint, parsedData.error);
-		// Sentry.captureException(parsedData.error, {tags: {endpoint}});
 		return {...result, isSuccess: false};
 	}
 

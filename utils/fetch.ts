@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import * as Sentry from '@sentry/nextjs';
 import {serialize} from '@wagmi/core';
 
 import type {AxiosRequestConfig} from 'axios';
@@ -29,14 +28,12 @@ export async function fetch<T>({endpoint, schema, config}: TFetchProps): TFetchR
 
 		if (!parsedData.success) {
 			console.error(endpoint, parsedData.error);
-			// Sentry.captureException(parsedData.error, {tags: {endpoint}});
 			return {data, error: parsedData.error};
 		}
 
 		return {...data, data: parsedData.data};
 	} catch (error) {
 		console.error(endpoint, error);
-		// Sentry.captureException(error, {tags: {endpoint}});
 		if (error instanceof Error) {
 			return {data: null, error};
 		}
