@@ -17,7 +17,7 @@ function	InfoMessage({status}: {status: string}): ReactElement {
 	}
 	return (
 		<div className={'my-4 max-w-5xl bg-yellow-900 p-4 font-mono text-sm font-normal text-[#485570]'}>
-			{'⚠️ '}<strong>{'WARNING'}</strong> {"this experiments are experimental. It's extremely risky and will probably be discarded when the test is over. Proceed with extreme caution."}
+			{'⚠️ '}<strong>{'WARNING'}</strong> {"These experiments are experimental. It's extremely risky and will probably be discarded when the test is over. Proceed with extreme caution."}
 		</div>
 	);
 }
