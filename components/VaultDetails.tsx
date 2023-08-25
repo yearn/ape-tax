@@ -1,4 +1,4 @@
-import {Fragment, useCallback, type ReactElement, useEffect, useState} from 'react';
+import {Fragment, type ReactElement, useCallback, useEffect, useState} from 'react';
 import ProgressChart from 'components/ProgressChart';
 import Suspense from 'components/Suspense';
 import APR_ORACLE_V3_ABI from 'utils/ABI/yAPROracleV3.abi';
