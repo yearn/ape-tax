@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, type ReactElement, useEffect, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
@@ -7,7 +7,6 @@ import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
-import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';

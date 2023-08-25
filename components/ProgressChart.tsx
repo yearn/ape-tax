@@ -1,6 +1,4 @@
-import {Fragment} from 'react';
-
-import type {ReactElement} from 'react';
+import {Fragment, type ReactElement} from 'react';
 
 function ProgressChart({progress = 0, width = 0}): ReactElement {
 	const	partChar = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];

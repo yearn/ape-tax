@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useState} from 'react';
 import InfoMessage from 'components/InfoMessage';
 import VaultActions from 'components/VaultActions';
 import VaultDetails from 'components/VaultDetails';
@@ -16,7 +16,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
-import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
 import type {TNDict} from '@yearn-finance/web-lib/types';
