@@ -1,13 +1,17 @@
 import {ethers} from 'ethers';
-import {performGet} from 'utils/utils';
+import {coinGeckoPricesSchema} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
-import config from 'utils/wagmiConfig';
+import {getPublicClient} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 
+import {fetch} from '../../utils/fetch';
+
 import type {NextApiRequest, NextApiResponse} from 'next';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TTVL} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -21,8 +25,8 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 }
 
 async function getTVL({network}: {network: number}): Promise<TTVL> {
-	const multicallInstance = config.getPublicClient({chainId: network || 1}).multicall;
-	const tvlCalls: any[] = [];
+	const multicallInstance = getPublicClient({chainId: network || 1}).multicall;
+	const tvlCalls: ContractFunctionConfig[] = [];
 	const _cgIDS: string[] = [];
 	let _tvlEndorsed = 0;
 	let _tvlExperimental = 0;
@@ -39,9 +43,18 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});
 
-	const callResult = await multicallInstance({contracts: tvlCalls});
+	const callResult = await multicallInstance({contracts: tvlCalls as never[]});
 	const chunkedCallResult = chunk(callResult, 2);
-	const prices = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${_cgIDS}&vs_currencies=usd`);
+	const cgPricesQueryParams = new URLSearchParams({
+		ids: `${_cgIDS}`,
+		vs_currencies: 'usd'
+	});
+
+	const {data: cgPrices} = await fetch<TCoinGeckoPrices>({
+		endpoint: `https://api.coingecko.com/api/v3/simple/price?${cgPricesQueryParams}`,
+		schema: coinGeckoPricesSchema
+	});
+	
 	let index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([, v]): Promise<void> => {
@@ -50,7 +63,7 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		}
 		const totalAssets = decodeAsBigInt(chunkedCallResult[index][0]);
 		const decimals = decodeAsBigInt(chunkedCallResult[index][1]);
-		const price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
+		const price = cgPrices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
 		const dec = Number(decimals);
 		index++;
 

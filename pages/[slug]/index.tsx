@@ -1,41 +1,31 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
 import vaults from 'utils/vaults.json';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
-import {useWindowInFocus} from '@yearn-finance/web-lib/hooks/useWindowInFocus';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
-import type {GetStaticPathsResult} from 'next';
+import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
 import type {ReactElement} from 'react';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
-function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: any}): ReactElement {
+function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TCoinGeckoPrices}): ReactElement {
 	const	{isActive, chainID, onSwitchChain, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
-	const	isWindowInFocus = useWindowInFocus();
 
-	useClientEffect((): void => {
-		if (!vault) {
-			return;
-		}
-		if (isWindowInFocus && chainID !== vault.CHAIN_ID && !(chainID === 1337)) {
-			onSwitchChain(vault.CHAIN_ID);
-		}
-	}, [chainID, onSwitchChain, vault, isWindowInFocus]);
 
-	useClientEffect((): void => {
+	useEffect((): void => {
 		if (!vault && communityVaults !== undefined) {
 			const	_currentVault = communityVaults.find((v: TVault): boolean => v.VAULT_ADDR === toAddress(slug));
 			if (_currentVault) {
 				set_currentVault(_currentVault);
 			}
 		}
-	}, [vault, communityVaults]);
+	}, [vault, communityVaults, slug]);
 
 	if (!currentVault) {
 		return <Fragment />;
@@ -60,11 +50,11 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌🔌'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
+					<p className={'text-4xl font-medium leading-11'}>{'❌🔌'}</p>
+					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
 					<button
 						onClick={openLoginModal}
-						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔌 Connect wallet'}
 					</button>
 				</div>
@@ -91,11 +81,11 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'font-mono text-4xl font-medium leading-11'}>{'❌⛓'}</p>
-					<p className={'font-mono text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
+					<p className={'text-4xl font-medium leading-11'}>{'❌⛓'}</p>
+					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
 					<button
 						onClick={(): void => onSwitchChain(currentVault.CHAIN_ID)}
-						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-medium transition-colors hover:bg-neutral-100'}>
+						className={'bg-neutral-50 mt-8 border border-solid border-neutral-500 p-1.5 text-sm font-medium transition-colors hover:bg-neutral-100'}>
 						{'🔀 Change network'}
 					</button>
 				</div>
@@ -128,11 +118,12 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: an
 }
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-	const	slug = Object.keys(vaults).filter((key): boolean => key !== 'yvsteth').map((key): any => ({params: {slug: key}})) || [];
+	type TSlug = {params: {slug: string}}
+	const	slug = Object.keys(vaults).filter((key): boolean => key !== 'yvsteth').map((key): TSlug => ({params: {slug: key}})) || [];
 	return	{paths: slug, fallback: true};
 }
 
-export async function getStaticProps({params}: {params: {slug: string}}): Promise<any> {
+export async function getStaticProps({params}: {params: {slug: string}}): Promise<Promise<GetStaticPropsResult<{vault: TVault | null, slug: string}>>> {
 	if ((params.slug.toLowerCase()).startsWith('0x')) {
 		return {props: {vault: null, slug: params.slug}};
 	}

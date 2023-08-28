@@ -5,9 +5,10 @@ import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
-import LENS_ABI from 'utils/ABI/lens.abi';
+import STRATEGY_V3_BASE_ABI from 'utils/ABI/tokenizedStrategyV3.abi';
+import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
+import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
-import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -16,7 +17,9 @@ import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/ut
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {ReactElement} from 'react';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
+import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
 	loaded: false,
@@ -27,6 +30,7 @@ const		defaultVaultData: TVaultData = {
 	balanceOf: toNormalizedBN(0),
 	wantBalance: toNormalizedBN(0),
 	allowance: toNormalizedBN(0),
+	allowanceYRouter: toNormalizedBN(0),
 	allowanceZapOut: toNormalizedBN(0),
 	pricePerShare: toNormalizedBN(1),
 	decimals: 18,
@@ -38,9 +42,8 @@ const		defaultVaultData: TVaultData = {
 	apiVersion: '-'
 };
 
-function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElement {
+function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;}): ReactElement {
 	const	{address, chainID} = useWeb3();
-	const	{networks} = useSettings();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);
 
 	const	prepareVaultData = useCallback(async (): Promise<void> => {
@@ -48,36 +51,58 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			return;
 		}
 
-		const calls = [];
+		const calls: ContractFunctionConfig[] = [];
 		const wantContractMultiCall = {
 			address: toAddress(vault.WANT_ADDR),
 			abi: erc20ABI
 		};
-		const vaultContractMultiCall = {
+		const vaultV2ContractMultiCall = {
 			address: toAddress(vault.VAULT_ADDR),
 			abi: VAULT_ABI
 		};
+		const vaultV3ContractMultiCall = {
+			address: toAddress(vault.VAULT_ADDR),
+			abi: YVAULT_V3_BASE_ABI
+		};
+		const tokenizedStrategyContract = {address: toAddress(vault.VAULT_ADDR), abi: STRATEGY_V3_BASE_ABI};
 
-		calls.push({...vaultContractMultiCall, functionName: 'apiVersion'});
-		calls.push({...vaultContractMultiCall, functionName: 'depositLimit'});
-		calls.push({...vaultContractMultiCall, functionName: 'totalAssets'});
-		calls.push({...vaultContractMultiCall, functionName: 'availableDepositLimit'});
-		calls.push({...vaultContractMultiCall, functionName: 'pricePerShare'});
-		calls.push({...vaultContractMultiCall, functionName: 'decimals'});
-		calls.push({...vaultContractMultiCall, functionName: 'balanceOf', args: [address]});
+		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
+		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
+
+		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
+		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
+		calls.push({...vaultV2ContractMultiCall, functionName: 'decimals'});
+		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...wantContractMultiCall, functionName: 'balanceOf', args: [address]});
-		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, vault.VAULT_ADDR]});
-	
+		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
+		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
+
+		if (vault.VAULT_ABI.startsWith('v3')) {
+			vault.VAULT_ABI === 'v3-vault' ?
+				calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'}) : // v3 vault
+				calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}); // v3 strategy
+
+
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // === depositLimit
+			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // ok to have same in this case
+		} else {
+			calls.push({...vaultV2ContractMultiCall, functionName: 'apiVersion'});
+			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
+			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
+		}
+			
 		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
-		const apiVersion = callResult[0].result as string;
-		const depositLimit = decodeAsBigInt(callResult[1]);
-		const totalAssets = decodeAsBigInt(callResult[2]);
-		const availableDepositLimit = decodeAsBigInt(callResult[3]);
-		const pricePerShare = decodeAsBigInt(callResult[4]);
-		const decimals = decodeAsBigInt(callResult[5]);
-		const balanceOf = decodeAsBigInt(callResult[6]);
-		const wantBalance = decodeAsBigInt(callResult[7]);
-		const wantAllowance = decodeAsBigInt(callResult[8]);
+		const totalAssets = decodeAsBigInt(callResult[0]);
+		const pricePerShare = decodeAsBigInt(callResult[1]);
+		const decimals = decodeAsBigInt(callResult[2]);
+		const balanceOf = decodeAsBigInt(callResult[3]);
+		const wantBalance = decodeAsBigInt(callResult[4]);
+		const wantAllowance = decodeAsBigInt(callResult[5]);
+		const allowanceYRouter = decodeAsBigInt(callResult[6]);
+		const apiVersion = callResult[7].result as string;
+		const depositLimit = decodeAsBigInt(callResult[8]) === (maxUint256 - 1n) ?
+			decodeAsBigInt(callResult[8]) : decodeAsBigInt(callResult[8]) + totalAssets;
+		const availableDepositLimit = decodeAsBigInt(callResult[9]);
 
 		const coinBalance = await fetchBalance({
 			address: address
@@ -101,7 +126,8 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 			wantPrice: price,
 			totalAUM: formatToNormalizedValue(totalAssets, numberDecimals) * price,
 			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, numberDecimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, numberDecimals))) / Number(ethers.utils.formatUnits(depositLimit, numberDecimals)),
-			allowance: toNormalizedBN(wantAllowance, numberDecimals)
+			allowance: toNormalizedBN(wantAllowance, numberDecimals),
+			allowanceYRouter: toNormalizedBN(allowanceYRouter, numberDecimals)
 		});
 
 		if (vault.ZAP_ADDR) {
@@ -120,53 +146,23 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: any;}): ReactElem
 		prepareVaultData();
 	}, [prepareVaultData]);
 
-	/**************************************************************************
-	** If we had some issues getting the prices ... Let's try again
-	**************************************************************************/
-	const	refetchVaultData = useCallback(async (): Promise<void> => {
-		if (vault?.PRICE_SOURCE?.startsWith('Lens')) {
-		
-			const	currentNetwork = networks[chainID === 1337 ? 1 : vault.CHAIN_ID || 1];
-			if (currentNetwork.lensOracleAddress) {
-
-				const price = await readContract({
-					abi: LENS_ABI,
-					address: toAddress(currentNetwork.lensOracleAddress),
-					functionName: 'getPriceUsdcRecommended',
-					args: [toAddress(vault.WANT_ADDR)]
-				});
-
-				const normalizedPrice = formatToNormalizedValue(price, 6);
-				set_vaultData((v): TVaultData => ({
-					...v,
-					wantPrice: normalizedPrice,
-					wantPriceError: false,
-					balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * normalizedPrice,
-					totalAUM: Number(v.totalAssets.normalized) * normalizedPrice
-				}));
-			}
-
-		} else {
-			const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-			set_vaultData((v): TVaultData => ({
-				...v,
-				wantPrice: price,
-				wantPriceError: false,
-				balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
-				totalAUM: Number(v.totalAssets.normalized) * price
-			}));
-		}
-	}, [vault, chainID, networks, prices]);
-
 	useEffect((): void => {
-		refetchVaultData();
-	}, [refetchVaultData]);
+		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		set_vaultData((v): TVaultData => ({
+			...v,
+			wantPrice: price,
+			wantPriceError: false,
+			balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
+			totalAUM: Number(v.totalAssets.normalized) * price
+		}));
+		
+	}, [prices, vault]);
 
 	return (
 		<div className={'mt-8 text-neutral-700'}>
 			<div>
-				<h1 className={'font-mono text-7xl font-semibold leading-120px'}>{vault.LOGO}</h1>
-				<h1 className={'font-mono text-3xl font-semibold text-neutral-900'}>{vault.TITLE}</h1>
+				<h1 className={'text-7xl leading-120px'}>{vault.LOGO}</h1>
+				<h1 className={'text-3xl font-semibold text-neutral-900'}>{vault.TITLE}</h1>
 			</div>
 			<InfoMessage
 				status={vault.VAULT_STATUS} />

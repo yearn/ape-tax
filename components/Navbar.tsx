@@ -1,9 +1,8 @@
-import {Fragment, useMemo, useState} from 'react';
+import {Fragment, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import {useConnect} from 'wagmi';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import {useClientEffect} from '@yearn-finance/web-lib/hooks/useClientEffect';
 import {toAddress, truncateHex} from '@yearn-finance/web-lib/utils/address';
 
 import type {ReactElement} from 'react';
@@ -29,7 +28,7 @@ function	WalletButton(): ReactElement {
 		return (
 			<button
 				onClick={openLoginModal}
-				className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
+				className={'items-center border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 text-xs font-semibold'}>
 				<span className={'hidden md:block'}>{'Connect wallet'}</span>
 				<span className={'block md:hidden'}>{'+'}</span>
 			</button>
@@ -39,7 +38,7 @@ function	WalletButton(): ReactElement {
 		<p
 			onClick={onDesactivate}
 			suppressHydrationWarning
-			className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 font-mono text-xs font-semibold leading-4 text-neutral-700'}>
+			className={'inline-flex cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 text-xs font-semibold'}>
 			<svg
 				className={'mr-0 md:mr-2'}
 				width={'16'}
@@ -62,7 +61,7 @@ function	Navbar(): ReactElement {
 	const {connectors} = useConnect();
 	const	[hasInitialPopup, set_hasInitialPopup] = useState(false);
 
-	useClientEffect((): VoidFunction => {
+	useEffect((): VoidFunction => {
 		const	timeout = setTimeout((): void => {
 			if (hasInitialPopup) {
 				return;
@@ -74,7 +73,7 @@ function	Navbar(): ReactElement {
 			set_hasInitialPopup(true);
 		}, 1000);
 		return (): void => clearTimeout(timeout);
-	}, [address]);
+	}, [address, hasInitialPopup, openLoginModal]);
 
 	const supportedNetworks = useMemo((): TNetwork[] => {
 		const injectedConnector = connectors.find((e): boolean => e.id.toLowerCase() === 'injected');
@@ -89,12 +88,12 @@ function	Navbar(): ReactElement {
 	}, [connectors]);
 
 	return (
-		<div className={'flex h-12 w-full flex-row justify-center'}>
-			<div className={'flex w-full flex-row items-center justify-between'}>
+		<div className={'flex h-12 text-neutral-700'}>
+			<div className={'flex w-full items-center justify-between'}>
 				<div>
 					{router.route !== '/' ? (
 						<Link href={'/'}>
-							<p className={'dashed-underline-gray cursor-pointer font-mono text-xs font-semibold text-neutral-700 transition-all'}>
+							<p className={'dashed-underline-gray text-xs font-semibold transition-all'}>
 								{'<< Back home'}
 							</p>
 						</Link>
@@ -104,7 +103,7 @@ function	Navbar(): ReactElement {
 					{router.route === '/' ? (
 						<select
 							value={chainID}
-							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 bg-neutral-0 px-3 py-2 pr-7 font-mono text-xs font-semibold leading-4 text-neutral-700 md:flex'}
+							className={'m-0 mr-2 hidden cursor-pointer items-center whitespace-nowrap border border-solid border-neutral-500 px-3 py-2 pr-7 text-xs font-semibold md:flex'}
 							onChange={(e): void => onSwitchChain(Number(e.target.value))}>
 							{supportedNetworks.map((chain, index): ReactElement => (
 								<option key={index} value={chain.value}>{chain.label}</option>
