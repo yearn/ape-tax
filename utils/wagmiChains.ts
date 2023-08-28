@@ -1,5 +1,3 @@
-import {optimism, polygon} from 'viem/chains';
-
 import type {Chain} from 'wagmi';
 
 const currencyDetails: {[key: number]: {name: string, symbol: string}} = {
@@ -54,61 +52,3 @@ export const localhost = {
 	}
 } as const satisfies Chain;
 
-export const polygonOverride = {
-	...polygon,
-	rpcUrls: {
-		default: {
-			http: [
-				...polygon.rpcUrls.default.http,
-				'https://polygon.llamarpc.com',
-				process.env.RPC_URL_POLYGON_TENDERLY || 'https://1rpc.io/matic'
-			]
-		},
-		public: {
-			http: [
-				...polygon.rpcUrls.default.http,
-				'https://polygon.llamarpc.com',
-				process.env.RPC_URL_POLYGON_TENDERLY || 'https://1rpc.io/matic'
-			]
-		}
-	}
-
-} as const satisfies Chain;
-
-export const optimismOverride = {
-	...optimism,
-	rpcUrls: {
-		default: {
-			http: [
-				...optimism.rpcUrls.default.http,
-				(process.env.RPC_URL_OPTIMISM_YEARN_2 || 'https://1rpc.io/op') as string,
-				(process.env.RPC_URL_OPTIMISM_YEARN || 'https://1rpc.io/op') as string,
-				'https://opt-mainnet.g.alchemy.com/v2/demo',
-				'https://endpoints.omniatech.io/v1/op/mainnet/public',
-				'https://optimism-mainnet.public.blastapi.io',
-				'https://optimism.blockpi.network/v1/rpc/public',
-				'https://rpc.ankr.com/optimism',
-				'https://1rpc.io/op',
-				'https://optimism.api.onfinality.io/public',
-				'https://rpc.optimism.gateway.fm'
-
-			]
-		},
-		public: {
-			http: [
-				...optimism.rpcUrls.default.http,
-				(process.env.RPC_URL_OPTIMISM_YEARN_2 || 'https://1rpc.io/op') as string,
-				(process.env.RPC_URL_OPTIMISM_YEARN || 'https://1rpc.io/op') as string,
-				'https://opt-mainnet.g.alchemy.com/v2/demo',
-				'https://endpoints.omniatech.io/v1/op/mainnet/public',
-				'https://optimism-mainnet.public.blastapi.io',
-				'https://optimism.blockpi.network/v1/rpc/public',
-				'https://rpc.ankr.com/optimism',
-				'https://1rpc.io/op',
-				'https://optimism.api.onfinality.io/public',
-				'https://rpc.optimism.gateway.fm'
-			]
-		}
-	}
-
-} as const satisfies Chain;

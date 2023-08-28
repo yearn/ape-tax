@@ -49,7 +49,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		WEB_SOCKET_URL: {
 			1: process.env.WS_URL_MAINNET,
 			10: process.env.WS_URL_OPTIMISM,
-			137: process.env.WS_URL_MATIC,
+			137: process.env.WS_URL_POLYGON,
 			250: process.env.WS_URL_FANTOM,
 			42161: process.env.WS_URL_ARBITRUM,
 			43114: process.env.WS_URL_AVALANCHE
@@ -57,20 +57,16 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		JSON_RPC_URL: {
 			1: process.env.RPC_URL_MAINNET,
 			10: process.env.RPC_URL_OPTIMISM,
-			137: process.env.RPC_URL_MATIC || 'https://polygon.llamarpc.com',
+			137: process.env.RPC_URL_POLYGON || 'https://polygon.llamarpc.com',
 			250: process.env.RPC_URL_FANTOM,
 			42161: process.env.RPC_URL_ARBITRUM,
 			43114: process.env.RPC_URL_AVALANCHE
 		},
-		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
-		INFURA_KEY: process.env.INFURA_KEY,
-		ALCHEMY_KEY_POLYGON: process.env.ALCHEMY_KEY_POLYGON,
 		SECRET: process.env.SECRET,
 		FTMSCAN_API: process.env.FTMSCAN_API,
 		ETHERSCAN_API: process.env.ETHERSCAN_API,
 		POLYGONSCAN_API: process.env.POLYGONSCAN_API,
 		OPTISCAN_API: process.env.OPTISCAN_API,
-		BSCSCAN_API: process.env.BSCSCAN_API,
 		SNOWTRACE_API: process.env.SNOWTRACE_API,
 		MORALIS_ARBITRUM_KEY: process.env.MORALIS_ARBITRUM_KEY,
 		WALLETCONNECT_PROJECT_ID: process.env.WALLETCONNECT_PROJECT_ID,
