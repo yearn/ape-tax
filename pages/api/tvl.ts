@@ -25,7 +25,19 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 }
 
 async function getTVL({network}: {network: number}): Promise<TTVL> {
-	const multicallInstance = await getPublicClient({chainId: network || 1}).multicall;
+	const client = getPublicClient({chainId: network || 1});
+
+	const multicallInstance = client.multicall;
+
+	console.log('hello');
+	console.log(`Network: ${network}`);
+
+	console.log(client);
+	console.log(multicallInstance);
+
+
+
+
 	const tvlCalls: ContractFunctionConfig[] = [];
 	const _cgIDS: string[] = [];
 	let _tvlEndorsed = 0;
