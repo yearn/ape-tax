@@ -1,0 +1,33 @@
+name: Bug Report
+description: Hello, friend bug when using ape-tax? Please help us by answering the questions below. The more detail you can give us, the less 2am DMs you'll be getting from saltyfacu. Thanks!
+title: "Bug: "
+labels: ["bug"]
+projects: ["yearn/24"]
+body:
+  - type: textarea
+    id: overview
+    attributes:
+      label: Overview
+      description: What happened? 🆘
+      placeholder: |
+          - What is broken?
+          - How should it have worked? 
+          - A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce
+      description: How to Reproduce the bug? 🔂
+      placeholder: |
+          Steps to reproduce the behavior:
+    validations:
+      required: true
+  - type: textarea
+    id: thoughts
+    attributes:
+      label: Thoughts
+      description: Any idea or thoughts for the ape-tax team?
+    validations:
+      required: false
