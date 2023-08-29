@@ -1,18 +1,22 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useFactory} from 'contexts/useFactory';
-import {ethers} from 'ethers';
 import GraphemeSplitter from 'grapheme-splitter';
 import vaults from 'utils/vaults.json';
 import useSWR from 'swr';
+import {erc20ABI, multicall} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
-import CHAINS from '@yearn-finance/web-lib/utils/web3/chains';
+import {isZero} from '@yearn-finance/web-lib/utils/isZero';
+import {getNetwork} from '@yearn-finance/web-lib/utils/wagmi/utils';
 
 import type {ReactElement} from 'react';
-import type {Maybe, TTVL, TVault} from 'utils/types';
+import type {TTVL, TVault} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
 const	splitter = new GraphemeSplitter();
@@ -103,8 +107,9 @@ function	DisabledVaults({vaultsInactive}: {vaultsInactive: TVault[]}): ReactElem
 }
 
 function	Index(): ReactElement {
-	const	{provider, isActive, address} = useWeb3();
+	const	{isActive, address} = useWeb3();
 	const	{safeChainID} = useChainID();
+	const	chainName = getNetwork(safeChainID)?.name || 'Chain';
 	const	{communityVaults} = useFactory();
 	const	[, set_nonce] = useState(0);
 	const	[vaultsActiveExperimental, set_vaultsActiveExperimental] = useState<TVault[]>([]);
@@ -168,21 +173,30 @@ function	Index(): ReactElement {
 		set_nonce((n): number => n + 1);
 	}, [safeChainID, isActive]);
 
-	useEffect((): void => {
-		if (isActive) {
-			Promise.all(vaultsInactive.map(async ({VAULT_ADDR}): Promise<Maybe<string>> => {
-				const	vaultContract = new ethers.Contract(VAULT_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
-				const	balance = await vaultContract.balanceOf(address);
-				return balance.isZero() ? null : VAULT_ADDR;
-			})).then((promises): void => {
-				const needToWidthdraw = promises.filter(Boolean);
-				set_vaultsInactiveForUser(vaultsInactive.filter((v): boolean => needToWidthdraw.includes(v.VAULT_ADDR)));
-			}).catch((e): void => {
-				console.error(e);
-			});
+
+	useCallback(async (): Promise<void> => {
+		if (!isActive) {
+			return;
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [vaultsInactive, isActive]);
+		
+		const calls: ContractFunctionConfig[] = [];
+		vaultsInactive.forEach(({VAULT_ADDR}): void => {
+			const vaultContract = {address: toAddress(VAULT_ADDR), abi: erc20ABI};
+			calls.push({...vaultContract, functionName: 'balanceOf', args: [address]});
+		});
+
+		const needToWidthdraw: TVault[] = [];
+		const userBalances = await multicall({contracts: calls as never[], chainId: safeChainID});
+		
+		userBalances.forEach((balance, idx): void => {
+			if(!isZero(decodeAsBigInt(balance))){
+				needToWidthdraw.push(vaultsInactive[idx]);
+			}
+		});
+		
+		set_vaultsInactiveForUser(needToWidthdraw);
+		
+	}, [vaultsInactive, isActive, address, safeChainID]);
 
 	if (!isActive) {
 		return (
@@ -211,7 +225,7 @@ function	Index(): ReactElement {
 				<div>
 					<div>
 						<span className={'font-mono text-base font-semibold text-neutral-900'}>
-							{`${CHAINS[safeChainID]?.displayName || 'Chain'} TVL:`}
+							{`${chainName || 'Chain'} TVL:`}
 						</span>
 						<span className={'font-mono text-base font-normal text-neutral-700'}>
 							{` $${formatAmount(tvl?.tvl, 2)}`}
@@ -246,14 +260,12 @@ function	Index(): ReactElement {
 					</div>
 				</div>
 				<div className={'flex items-center max-sm:justify-center md:justify-start'}>
-					<Link href={'/newVault'}>
-						<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
-							{'🏦 Deploy vault'}
-						</span>
-						<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
-							{'🏦 Deploy your own vault'}
-						</span>
-					</Link>
+					<span className={'flex cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:hidden'}>
+						{'🏦 Deploy vault'}
+					</span>
+					<span className={'hidden cursor-pointer border border-dashed border-neutral-500 bg-neutral-200 px-4 py-2 font-mono text-sm text-neutral-700 transition-colors hover:bg-neutral-0 md:block'}>
+						{'🏦 Deploy your own vault'}
+					</span>
 				</div>
 			</section>
 

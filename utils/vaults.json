@@ -347,30 +347,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
   },
-  "bscbaby": {
-    "TITLE": "BSC's Ape Ape Baby",
-    "LOGO": "🧊👶",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x78bef219b3348CD65387F6f7B27c9ee3Bf525704",
-    "WANT_ADDR": "0xf16e81dce15b08f326220742020379b855b87df9",
-    "WANT_SYMBOL": "ICE",
-    "COINGECKO_SYMBOL": "ice-token",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
-  "ellipsoidal": {
-    "TITLE": "Ellipsoidal Farmer",
-    "LOGO": "🍩3️⃣",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xC8057Fd6F7917b5398f52d861d50685E6AbbED14",
-    "WANT_ADDR": "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452",
-    "WANT_SYMBOL": "3EPS",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
   "ethbaby": {
     "TITLE": "ETH's Ape Ape Baby",
     "LOGO": "🧊👶",
@@ -382,42 +358,6 @@
     "COINGECKO_SYMBOL": "ice-token",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
-  },
-  "bscfrappedape": {
-    "TITLE": "BSC's Frapped Ape",
-    "LOGO": "☕️🦧",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x626530FCD25a8c9A949B024AAbbAe4BAE7D5F320",
-    "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
-    "WANT_SYMBOL": "fUSDT",
-    "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
-  },
-  "bscfusdtproxyeth": {
-    "TITLE": "BSC's fUSDT proxy to ETH",
-    "LOGO": "😷🐙",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x2A3020a71Ab92D5CdBAfEB72f0b90D1DfdF1B6E2",
-    "WANT_ADDR": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
-    "WANT_SYMBOL": "fUSDT",
-    "COINGECKO_SYMBOL": "tether",
-    "VAULT_STATUS": "stealth",
-    "CHAIN_ID": 56
-  },
-  "bsceth": {
-    "TITLE": "BSC ETH",
-    "LOGO": "🕳️🐨",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9cBdd0f1d9FB5D1ea6f3d022D0896E57aF5f087f",
-    "WANT_ADDR": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
-    "WANT_SYMBOL": "ETH",
-    "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
   },
   "ftmfusdtproxyeth": {
     "TITLE": "FTM's fUSDT proxy to ETH",
@@ -455,18 +395,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
-  "bnbfarmer": {
-    "TITLE": "BNB Farmer",
-    "LOGO": "🔶👨‍🌾",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7E12d21eeEF120dc5E23c8e70162815A9071Dde9",
-    "WANT_ADDR": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-    "WANT_SYMBOL": "wBNB",
-    "COINGECKO_SYMBOL": "binancecoin",
-    "VAULT_STATUS": "withdraw",
-    "CHAIN_ID": 56
-  },
   "spooky": {
     "TITLE": "Spooky Skeletons",
     "LOGO": "🙀👻",
@@ -490,18 +418,6 @@
     "COINGECKO_SYMBOL": "rai",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
-  },
-  "nrv": {
-    "TITLE": "Nervy Mastermind",
-    "LOGO": "☸️🤔",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x7C1Db8938D8170A244635e9ae3AEb41663B6D858",
-    "WANT_ADDR": "0x42F6f551ae042cBe50C739158b4f0CAC0Edb9096",
-    "WANT_SYMBOL": "NRV",
-    "COINGECKO_SYMBOL": "nerve-finance",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 56
   },
   "ftm_woofy": {
     "TITLE": "FTM's Wandering Woofy",
@@ -551,42 +467,6 @@
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 1
   },
-  "matic_woofy": {
-    "TITLE": "Matic's Wandering Woofy",
-    "LOGO": "🧭🐶",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xEAFB3Ee25B5a9a1b35F193A4662E3bDba7A95BEb",
-    "WANT_ADDR": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
-    "WANT_SYMBOL": "WOOFY",
-    "COINGECKO_SYMBOL": "woofy",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "matic-idle-dai": {
-    "TITLE": "Matic's Magic Idle DAI",
-    "LOGO": "🏆🚀",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9Cfeb5e00a38ed1c9950dBadC0821ce4cb648a90",
-    "WANT_ADDR": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-    "WANT_SYMBOL": "DAI",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "purpletwister": {
-    "TITLE": "Purple Twister",
-    "LOGO": "🟣🧬",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xCcba0B868106d55704cb7ff19782C829dc949feB",
-    "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-    "WANT_SYMBOL": "WMATIC",
-    "COINGECKO_SYMBOL": "wmatic",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
   "ultrasoundmoney": {
     "TITLE": "Wrapped Ultra Sound Money",
     "LOGO": "🦇🔊",
@@ -610,18 +490,6 @@
     "COINGECKO_SYMBOL": "huobi-btc",
     "VAULT_STATUS": "stealth",
     "CHAIN_ID": 1
-  },
-  "dollarstorebento": {
-    "TITLE": "Dollar Store Bento",
-    "LOGO": "💵🍱",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x32A2d6F07079b6CdFe942B198773cDA1398544b1",
-    "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-    "WANT_SYMBOL": "USDC",
-    "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
   },
   "splitcameron": {
     "TITLE": "Split Cameron",
@@ -682,30 +550,6 @@
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
     "VAULT_STATUS": "withdraw",
     "CHAIN_ID": 250
-  },
-  "wether": {
-    "TITLE": "Wether",
-    "LOGO": "🧬🐑",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x9ecE944BBcd320F224293117E2780259411D34A3",
-    "WANT_ADDR": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-    "WANT_SYMBOL": "weth",
-    "COINGECKO_SYMBOL": "ethereum",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
-  },
-  "curvedaave": {
-    "TITLE": "Curved aave",
-    "LOGO": "🧬🐑",
-    "VAULT_ABI": "yVaultV2",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xccaC4F77f6984C989cc38EdED99e1c7A83a9c7f4",
-    "WANT_ADDR": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
-    "WANT_SYMBOL": "am3CRV",
-    "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "active",
-    "CHAIN_ID": 137
   },
   "daihard3": {
     "TITLE": "DAI Hard with a Vengeance",
@@ -1163,5 +1007,53 @@
     "COINGECKO_SYMBOL": "DAI",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 10
+  },
+  "v3-usdc": {
+    "TITLE": "V3-USDC",
+    "LOGO": "🔒3️⃣",
+    "VAULT_ABI": "v3-vault",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xcaa17796bb3d4a71005cebd817cfeebf85d581b7",
+    "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "comp-v3-usdc": {
+    "TITLE": "Compound V3 USDC",
+    "LOGO": "📈3️⃣",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xF32C48793CAe27880D18Ee4697fAB6D08748228E",
+    "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "aave-v3-usdc": {
+    "TITLE": "Aave V3 USDC",
+    "LOGO": "👻3️⃣",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x957a05cf4C5ED884029dd722227F2D3081392Af0",
+    "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "aave-v3-weth": {
+    "TITLE": "Aave V3 WETH",
+    "LOGO": "💰3️⃣",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x5f76526390d9cd9944d65C605C5006480FA1bFcB",
+    "WANT_ADDR": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }

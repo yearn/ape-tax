@@ -2,3 +2,4 @@
 public/sw*
 public/workbox*
 ipfs/*
+public/worker*
