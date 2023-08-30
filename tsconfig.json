@@ -44,6 +44,16 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".eslintrc.js", "*.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".eslintrc.js",
+    "*.js",
+    "worker/index.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

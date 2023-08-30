@@ -1,14 +1,17 @@
-import {Contract} from 'ethcall';
 import {ethers} from 'ethers';
-import yVaultABI from 'utils/ABI/yVault.abi.json';
-import {getProvider, performGet} from 'utils/utils';
+import {coinGeckoPricesSchema} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
-import {newEthCallProvider} from '@yearn-finance/web-lib/utils/web3/providers';
+import {getPublicClient} from '@wagmi/core';
+import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
+import {toAddress} from '@yearn-finance/web-lib/utils/address';
+import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 
-import type {Call} from 'ethcall';
-import type {BigNumber} from 'ethers';
+import {fetch} from '../../utils/fetch';
+
 import type {NextApiRequest, NextApiResponse} from 'next';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TTVL} from 'utils/types';
+import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -21,41 +24,59 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 	}
 }
 
-async function getTVL({network, rpc}: {network: number, rpc: string}): Promise<TTVL> {
-	let		provider = getProvider(network);
-	if (rpc !== undefined) {
-		provider = new ethers.providers.JsonRpcProvider(rpc);
-	}
-	const	ethcallProvider = await newEthCallProvider(provider);
-	const	_calls: Call[] = [];
-	const	_cgIDS: string[] = [];
-	let		_tvlEndorsed = 0;
-	let		_tvlExperimental = 0;
-	let		_tvlDeprecated = 0;
+async function getTVL({network}: {network: number}): Promise<TTVL> {
+	const client = getPublicClient({chainId: network || 1});
+
+	const multicallInstance = client.multicall;
+
+	console.log('hello');
+	console.log(`Network: ${network}`);
+
+	console.log(client);
+	console.log(multicallInstance);
+
+
+
+
+	const tvlCalls: ContractFunctionConfig[] = [];
+	const _cgIDS: string[] = [];
+	let _tvlEndorsed = 0;
+	let _tvlExperimental = 0;
+	let _tvlDeprecated = 0;
 
 	Object.values(vaults).forEach((v): void => {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	vaultContract = new Contract(v.VAULT_ADDR, yVaultABI as never);
-		_calls.push(...[
-			vaultContract.totalAssets(),
-			vaultContract.decimals()
-		]);
+		const vaultContract = {address: toAddress(v.VAULT_ADDR), abi: VAULT_ABI};
+		tvlCalls.push({...vaultContract, functionName: 'totalAssets'});
+		tvlCalls.push({...vaultContract, functionName: 'decimals'});
+
 		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});
-	const	callResult = await ethcallProvider.tryAll(_calls);
-	const	chunkedCallResult = chunk(callResult, 2);
-	const	prices = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${_cgIDS}&vs_currencies=usd`);
-	let		index = 0;
+
+	const callResult = await multicallInstance({contracts: tvlCalls as never[]});
+	const chunkedCallResult = chunk(callResult, 2);
+	const cgPricesQueryParams = new URLSearchParams({
+		ids: `${_cgIDS}`,
+		vs_currencies: 'usd'
+	});
+
+	const {data: cgPrices} = await fetch<TCoinGeckoPrices>({
+		endpoint: `https://api.coingecko.com/api/v3/simple/price?${cgPricesQueryParams}`,
+		schema: coinGeckoPricesSchema
+	});
+	
+	let index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([, v]): Promise<void> => {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const	[totalAssets, decimals] = chunkedCallResult[index] as [BigNumber, BigNumber];
-		const	price = prices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
-		const	dec = Number(decimals);
+		const totalAssets = decodeAsBigInt(chunkedCallResult[index][0]);
+		const decimals = decodeAsBigInt(chunkedCallResult[index][1]);
+		const price = cgPrices?.[v.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0;
+		const dec = Number(decimals);
 		index++;
 
 		if (v.VAULT_STATUS === 'endorsed') {
@@ -78,13 +99,13 @@ const tvlMapping: TNDict<TTVL> = {};
 const tvlMappingAccess: TNDict<number> = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<TNDict<TTVL>>): Promise<void> {
-	const	{network, rpc, revalidate} = req.query;
-	const	networkNumber = Number(network);
+	const {network, revalidate} = req.query;
+	const networkNumber = Number(network);
 
-	const	now = new Date().getTime();
-	const	lastAccess = tvlMappingAccess[networkNumber] || 0;
+	const now = new Date().getTime();
+	const lastAccess = tvlMappingAccess[networkNumber] || 0;
 	if (lastAccess === 0 || ((now - lastAccess) > 5 * 60 * 1000) || revalidate === 'true' || !tvlMapping[networkNumber]) {
-		const	result = await getTVL({network: networkNumber, rpc: rpc as string});
+		const result = await getTVL({network: networkNumber});
 		tvlMapping[networkNumber] = result;
 		tvlMappingAccess[networkNumber] = now;
 	}

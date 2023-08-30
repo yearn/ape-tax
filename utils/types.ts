@@ -6,8 +6,6 @@ export type Maybe<T> = T | null | undefined;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type Err = {error: never}
 
-export type TCallbackFunction = (arg: {error: unknown; data: any}) => void;
-
 export type TVault = {
 	TITLE: string;
 	LOGO: string;
@@ -29,35 +27,35 @@ export type TVault = {
 	ZAP_ADDR?: string;
 }
 
-export type TAPIVault = {
-	title: string;
-	logo: string;
-	displayName: string;
-	src: string;
-	status: string;
-	type: string;
-	address: string;
-	network: number;
-	APY?: {
-		week: string;
-		month: string;
-		inception: string;
-	}
-	data: {
-		apiVersion: string;
-		depositLimit: string;
-		totalAssets: string;
-		availableDepositLimit: string;
-		pricePerShare: string;
-		decimals: number;
-		activation: number;
-	};
-	want: {
-		address: string;
-		symbol: string;
-		cgID: string;
-	};
-}
+// export type TAPIVault = {
+// 	title: string;
+// 	logo: string;
+// 	displayName: string;
+// 	src: string;
+// 	status: string;
+// 	type: string;
+// 	address: string;
+// 	network: number;
+// 	APY?: {
+// 		week: string;
+// 		month: string;
+// 		inception: string;
+// 	}
+// 	data: {
+// 		apiVersion: string;
+// 		depositLimit: string;
+// 		totalAssets: string;
+// 		availableDepositLimit: string;
+// 		pricePerShare: string;
+// 		decimals: number;
+// 		activation: number;
+// 	};
+// 	want: {
+// 		address: string;
+// 		symbol: string;
+// 		cgID: string;
+// 	};
+// }
 
 export type TSpecificAPIResult = {
 	week: string;
@@ -80,6 +78,7 @@ export type TVaultData = {
 	balanceOf: TNormalizedBN;
 	wantBalance: TNormalizedBN;
 	allowance: TNormalizedBN;
+	allowanceYRouter: TNormalizedBN;
 	pricePerShare: TNormalizedBN;
 	apiVersion: string;
 	decimals: number;
@@ -106,10 +105,10 @@ export type TTVL = {
 	tvl: number;
 }
 
-export type TGauge = {
-	address: TAddress,
-	name: string,
-	symbol: string,
-	exists: boolean,
-	isAuraOK: boolean,
-}
+// export type TGauge = {
+// 	address: TAddress,
+// 	name: string,
+// 	symbol: string,
+// 	exists: boolean,
+// 	isAuraOK: boolean,
+// }
