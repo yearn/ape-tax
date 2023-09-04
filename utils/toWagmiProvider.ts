@@ -13,7 +13,6 @@ import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TTxResponse} from '@yearn-finance/web-lib/utils/web3/transaction';
 
-
 export type TWagmiProviderContract = {
 	walletClient: GetWalletClientResult,
 	chainId: number,

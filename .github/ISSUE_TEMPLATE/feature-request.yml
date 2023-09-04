@@ -1,0 +1,33 @@
+name: New Feature
+description: Hello, friend new feature for ape-tax? Please help us by answering the questions below. The more detail you can give us, the less 2am DMs you'll be getting from saltyfacu. Thanks!
+title: "FRP: "
+labels: ["enhancement"]
+projects: ["yearn/24"]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What is your proposal? 🚀
+      placeholder: |
+          - What is this new feature?
+          - What's the rationale behind it? 
+          - What info needs to be displayed? Where can we get it from?
+    validations:
+      required: true
+  - type: textarea
+    id: solve
+    attributes:
+      label: Solve
+      description: What does this solve? 🛠
+      placeholder: |
+          A clear and concise description about why this is nice to have.
+    validations:
+      required: true
+  - type: textarea
+    id: thoughts
+    attributes:
+      label: Thoughts
+      description: Any idea or thoughts for the ape-tax team?
+    validations:
+      required: false
