@@ -31,7 +31,7 @@ function Tag({status}: {status: string}): ReactElement {
 			<>
 				<span className={'ml-2 hidden rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:inline'}>
 					<a
-						href={'https://yearn.finance/vaults'}
+						href={'https://yearn.fi/vaults'}
 						target={'_blank'}
 						rel={'noopener noreferrer'}>
 						{'Use Production'}
@@ -39,7 +39,7 @@ function Tag({status}: {status: string}): ReactElement {
 				</span>
 				<span className={'ml-2 inline rounded-md bg-[#0657f9] px-2 py-1 font-mono text-xxs text-white lg:hidden'}>
 					<a
-						href={'https://yearn.finance/vaults'}
+						href={'https://yearn.fi/vaults'}
 						target={'_blank'}
 						rel={'noopener noreferrer'}>
 						{'Prod'}
@@ -178,7 +178,7 @@ function	Index(): ReactElement {
 		if (!isActive) {
 			return;
 		}
-		
+
 		const calls: ContractFunctionConfig[] = [];
 		vaultsInactive.forEach(({VAULT_ADDR}): void => {
 			const vaultContract = {address: toAddress(VAULT_ADDR), abi: erc20ABI};
@@ -187,15 +187,15 @@ function	Index(): ReactElement {
 
 		const needToWidthdraw: TVault[] = [];
 		const userBalances = await multicall({contracts: calls as never[], chainId: safeChainID});
-		
+
 		userBalances.forEach((balance, idx): void => {
 			if(!isZero(decodeAsBigInt(balance))){
 				needToWidthdraw.push(vaultsInactive[idx]);
 			}
 		});
-		
+
 		set_vaultsInactiveForUser(needToWidthdraw);
-		
+
 	}, [vaultsInactive, isActive, address, safeChainID]);
 
 	if (!isActive) {

@@ -1,10 +1,10 @@
 import {ethers} from 'ethers';
 import {coinGeckoPricesSchema} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
-import {getPublicClient} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
+import {getClient} from '@yearn-finance/web-lib/utils/wagmi/utils';
 
 import {fetch} from '../../utils/fetch';
 
@@ -25,19 +25,7 @@ async function asyncForEach<T>(array: T[], callback: (item: T, index: number, ar
 }
 
 async function getTVL({network}: {network: number}): Promise<TTVL> {
-	const client = getPublicClient({chainId: network || 1});
-
-	const multicallInstance = client.multicall;
-
-	console.log('hello');
-	console.log(`Network: ${network}`);
-
-	console.log(client);
-	console.log(multicallInstance);
-
-
-
-
+	const multicallInstance = getClient(network || 1).multicall;
 	const tvlCalls: ContractFunctionConfig[] = [];
 	const _cgIDS: string[] = [];
 	let _tvlEndorsed = 0;
@@ -66,7 +54,7 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		endpoint: `https://api.coingecko.com/api/v3/simple/price?${cgPricesQueryParams}`,
 		schema: coinGeckoPricesSchema
 	});
-	
+
 	let index = 0;
 
 	await asyncForEach(Object.entries(vaults), async ([, v]): Promise<void> => {
