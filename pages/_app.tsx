@@ -53,7 +53,7 @@ function App(props: AppProps): ReactElement {
 function	MyApp(props: AppProps): ReactElement {
 	return (
 		<WithYearn
-			supportedChains={[			
+			supportedChains={[
 				mainnet,
 				optimism,
 				polygon,
@@ -62,7 +62,9 @@ function	MyApp(props: AppProps): ReactElement {
 				localhost
 			]}
 			options={{
-				baseSettings: {yDaemonBaseURI: 'https://ydaemon.yearn.finance'},
+				baseSettings: {
+					yDaemonBaseURI: (process.env.YDAEMON_BASE_URI as string) || 'https://ydaemon.yearn.fi'
+				},
 				ui: {shouldUseThemes: false}
 			}}>
 			<FactoryContextApp>
