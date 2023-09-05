@@ -471,7 +471,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const vaultBalance = decodeAsBigInt(callResult[2]);
 		const totalAssets = decodeAsBigInt(callResult[3]);
 		const pricePerShare = decodeAsBigInt(callResult[4]);
-		const depositLimit = decodeAsBigInt(callResult[5]) === (maxUint256 - 1n) ?
+		const depositLimit = decodeAsBigInt(callResult[5]) >= (maxUint256 - 1n) ?
 			decodeAsBigInt(callResult[5]) : decodeAsBigInt(callResult[5]) + totalAssets;
 		const availableDepositLimit = decodeAsBigInt(callResult[6]);
 

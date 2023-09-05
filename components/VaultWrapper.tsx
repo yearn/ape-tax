@@ -100,7 +100,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		const wantAllowance = decodeAsBigInt(callResult[5]);
 		const allowanceYRouter = decodeAsBigInt(callResult[6]);
 		const apiVersion = callResult[7].result as string;
-		const depositLimit = decodeAsBigInt(callResult[8]) === (maxUint256 - 1n) ?
+		const depositLimit = decodeAsBigInt(callResult[8]) >= (maxUint256 - 1n) ?
 			decodeAsBigInt(callResult[8]) : decodeAsBigInt(callResult[8]) + totalAssets;
 		const availableDepositLimit = decodeAsBigInt(callResult[9]);
 

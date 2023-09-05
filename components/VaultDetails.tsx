@@ -79,7 +79,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{isZero(vaultData.depositLimit.raw) ? '-' :
-								vaultData.depositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
+								vaultData.depositLimit.raw >= (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
 									`${formatAmount(vaultData?.depositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
@@ -154,7 +154,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{isZero(vaultData.availableDepositLimit.raw) ? '-' :
-								vaultData.availableDepositLimit.raw === (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
+								vaultData.availableDepositLimit.raw >= (maxUint256 - 1n) ? `∞ ${vault.WANT_SYMBOL}` :
 									`${formatAmount(vaultData?.availableDepositLimit.normalized, 2)} ${vault.WANT_SYMBOL}`}
 						</Suspense>
 					</p>
