@@ -1034,25 +1034,25 @@
   },
   "aave-v3-usdc": {
     "TITLE": "Aave V3 USDC",
-    "LOGO": "👻3️⃣",
+    "LOGO": "👻👻",
     "VAULT_ABI": "v3-strategy",
     "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x957a05cf4C5ED884029dd722227F2D3081392Af0",
+    "VAULT_ADDR": "0xc5eb11591636ac0794c149ced926846105f61b17",
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
   },
-  "aave-v3-weth": {
-    "TITLE": "Aave V3 WETH",
-    "LOGO": "💰3️⃣",
+  "aave-v3-wmatic": {
+    "TITLE": "Aave V3 WMATIC",
+    "LOGO": "🟣👻",
     "VAULT_ABI": "v3-strategy",
     "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0x5f76526390d9cd9944d65C605C5006480FA1bFcB",
-    "WANT_ADDR": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-    "WANT_SYMBOL": "WETH",
-    "COINGECKO_SYMBOL": "weth",
+    "VAULT_ADDR": "0x671091c6ac6749e49f9dda0305db3844ac26932a",
+    "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    "WANT_SYMBOL": "WMATIC",
+    "COINGECKO_SYMBOL": "wmatic",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
   }
