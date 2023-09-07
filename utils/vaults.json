@@ -1034,7 +1034,7 @@
   },
   "aave-v3-usdc": {
     "TITLE": "Aave V3 USDC",
-    "LOGO": "👻👻",
+    "LOGO": "👻💰",
     "VAULT_ABI": "v3-strategy",
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0xc5eb11591636ac0794c149ced926846105f61b17",
@@ -1053,6 +1053,30 @@
     "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     "WANT_SYMBOL": "WMATIC",
     "COINGECKO_SYMBOL": "wmatic",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "tangible-v3-dai": {
+    "TITLE": "Tangible V3 DAI",
+    "LOGO": "🤲🏅",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x1506517dca666cae68a7a37683bd678a286e71ed",
+    "WANT_ADDR": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "tangible-v3-usdc": {
+    "TITLE": "Tangible V3 USDC",
+    "LOGO": "🤲🪙",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x94f73645Ee963bd483a80320fC8905d2C4f88990",
+    "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
   }
