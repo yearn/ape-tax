@@ -1,4 +1,4 @@
-import assert from 'assert';
+import {assert} from 'utils/assert';
 import {type ContractFunctionConfig, encodeFunctionData, hexToSignature, maxUint256} from 'viem';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
 import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';

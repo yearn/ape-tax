@@ -1,4 +1,4 @@
-import assert from 'assert';
+import {assert} from 'utils/assert';
 import {type Abi, BaseError, type SimulateContractParameters} from 'viem';
 import {captureException} from '@sentry/nextjs';
 import {type GetWalletClientResult, prepareWriteContract, waitForTransaction, type WalletClient, writeContract} from '@wagmi/core';
