@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, type ReactElement, useEffect, useState} from 'react';
 import {NextSeo} from 'next-seo';
 import VaultWrapper from 'components/VaultWrapper';
 import {useFactory} from 'contexts/useFactory';
@@ -7,7 +7,6 @@ import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
-import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
@@ -50,7 +49,9 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'text-4xl font-medium leading-11'}>{'❌🔌'}</p>
+					<p className={'text-4xl font-medium leading-11'}>
+						<span className={'font-bold text-[#e90000]'}>{'❌'}</span>{'🔌'}
+					</p>
 					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Not connected'}</p>
 					<button
 						onClick={openLoginModal}
@@ -81,7 +82,9 @@ function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TC
 						]
 					}} />
 				<div className={'mt-8 flex flex-col items-center justify-center'}>
-					<p className={'text-4xl font-medium leading-11'}>{'❌⛓'}</p>
+					<p className={'text-4xl font-medium leading-11'}>
+						<span className={'font-bold text-[#e90000]'}>{'❌'}</span>{'⛓'}
+					</p>
 					<p className={'text-4xl font-medium leading-11 text-neutral-700'}>{'Wrong Chain'}</p>
 					<button
 						onClick={(): void => onSwitchChain(currentVault.CHAIN_ID)}

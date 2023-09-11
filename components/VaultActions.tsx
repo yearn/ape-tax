@@ -1,8 +1,8 @@
-import {Fragment, useCallback, useState} from 'react';
+import {type ChangeEvent, Fragment, type ReactElement,useCallback, useState} from 'react';
 import {ethers} from 'ethers';
 import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawERC20} from 'utils/actions';
-import {maxUint256} from 'viem';
+import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
@@ -16,9 +16,7 @@ import {handleInputChangeEventValue} from '@yearn-finance/web-lib/utils/handlers
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
-import type {ChangeEvent, ReactElement} from 'react';
 import type {TVault, TVaultData} from 'utils/types';
-import type {ContractFunctionConfig} from 'viem';
 import type {TNDict} from '@yearn-finance/web-lib/types';
 import type {TransactionReceipt} from '@ethersproject/providers';
 
@@ -117,15 +115,15 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			<div className={vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}>
 				<div className={'mb-2 mr-2 flex flex-row items-center'} style={{height: '33px'}}>
 					<input
-						className={'border-neutral-500 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-500'}
-						style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
+						className={'border-neutral-500 bg-neutral-0/0 px-2 py-1.5 text-xs text-neutral-900'}
+						style={{height: '33px'}}
 						type={'text'}
 						value={zapAmount?.normalized}
 						onChange={(e: ChangeEvent<HTMLInputElement>): void => set_zapAmount(
 							handleInputChangeEventValue(e.target.value, vaultData.decimals)
 						)} />
-					<div className={'bg-neutral-50 border border-l-0 border-solid border-neutral-500 px-2 py-1.5 font-mono text-xs text-neutral-400'} style={{height: '33px'}}>
-						{chainCoin}&nbsp;
+					<div className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 text-xs'} style={{height: '33px'}}>
+						{chainCoin}
 					</div>
 				</div>
 			</div>
@@ -136,14 +134,13 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 							<button
 								onClick={onZapIn}
 								disabled={isZapIn || isZero(zapAmount.raw)}
-								className={`${isZapIn || isZero(zapAmount.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+								className={`${isZapIn || isZero(zapAmount.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-8 w-[6rem] border border-solid border-neutral-500 p-1.5 text-sm font-semibold text-neutral-900 transition-colors`}>
 								{'💰 Zap in'}
 							</button>
 						</> : <Fragment />
 				}
 				<Button
 					variant={'outlined'}
-					className={'bg-neutral-50 mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors hover:bg-neutral-100'}
 					isBusy={txStatusZapApproval.pending}
 					isDisabled={txStatusZapApproval.error || txStatusZapApproval.pending || (vaultData.allowanceZapOut && vaultData?.allowanceZapOut?.raw > 0n)}
 					onClick={onZapOutAllowance}>
@@ -152,7 +149,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 				<button
 					onClick={onZapOut}
 					disabled={isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw)}
-					className={`${isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 font-mono text-sm font-semibold transition-colors`}>
+					className={`${isZero(vaultData.balanceOf.raw) || isZero(vaultData?.allowanceZapOut?.raw) ? 'bg-neutral-50 cursor-not-allowed opacity-30' : 'bg-neutral-50 hover:bg-neutral-100'} mb-2 mr-2 border border-solid border-neutral-500 p-1.5 text-sm font-semibold text-neutral-900 transition-colors`}>
 					{'💸 Zap out'}
 				</button>
 			</div>
@@ -234,25 +231,25 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	return (
 		<div className={'flex w-full flex-col border border-dashed border-neutral-500 p-4'}>
 			<div className={'mb-2'}>
-				<p className={'font-mono text-xl font-semibold text-neutral-700'}>
+				<p className={'text-xl font-semibold text-neutral-900'}>
 					{'Deposit'}
 				</p>
 			</div>
-			<div className={'mb-6 font-mono text-sm font-medium text-neutral-500'}>
+			<div className={'mb-6 text-sm font-medium'}>
 				<div>
-					<p className={'inline text-neutral-700'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-					<p className={'inline text-neutral-500'}>{`${formatAmount(vaultData?.wantBalance.normalized, 6)}`}</p>
+					<p className={'inline text-neutral-900'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.wantBalance.normalized, 6)}`}</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-700'}>{`Your ${chainCoin} Balance: `}</p>
-					<p className={'inline text-neutral-500'}>{`${formatAmount(vaultData?.coinBalance.normalized, 2)}`}</p>
+					<p className={'inline text-neutral-900'}>{`Your ${chainCoin} Balance: `}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.coinBalance.normalized, 2)}`}</p>
 				</div>
 			</div>
 
 			<div className={'mb-2 flex w-full flex-row items-center'} style={{height: '33px'}}>
 				<input
-					className={'w-full border-neutral-500 bg-neutral-0/0 px-2 py-1.5 font-mono text-xs text-neutral-900'}
-					style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
+					className={'w-full border-neutral-500 bg-neutral-0/0 px-2 py-1.5 text-xs text-neutral-900'}
+					style={{height: '33px'}}
 					type={'text'}
 					value={amount?.normalized}
 					onChange={(e: ChangeEvent<HTMLInputElement>): void => set_amount(
@@ -260,7 +257,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 					)} />
 				<button
 					onClick={(): void => set_amount(vaultData.wantBalance)}
-					className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 font-mono text-xs text-neutral-700 transition-colors hover:bg-neutral-900 hover:text-neutral-0'}
+					className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 text-xs transition-colors hover:bg-neutral-900 hover:text-neutral-0'}
 					style={{height: '33px'}}>
 					{'max'}
 				</button>
@@ -371,26 +368,26 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 	return (
 		<div className={'flex w-full flex-col border border-dashed border-neutral-500 p-4'}>
 			<div className={'mb-2'}>
-				<p className={'font-mono text-xl font-semibold text-neutral-700'}>
+				<p className={'text-xl font-semibold text-neutral-900'}>
 					{'Withdraw'}
 				</p>
 			</div>
-			<div className={'mb-6 font-mono text-sm font-medium text-neutral-500'}>
+			<div className={'mb-6 text-sm font-medium'}>
 				<div>
-					<p className={'inline text-neutral-700'}>{'Your vault shares: '}</p>
-					<p className={'inline text-neutral-500'}>{`${formatAmount(vaultData?.balanceOf.normalized, 6)}`}</p>
+					<p className={'inline text-neutral-900'}>{'Your vault shares: '}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.balanceOf.normalized, 6)}`}</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-700'}>{'Your shares value: '}</p>
-					<p className={'inline text-neutral-500'}>{`$${vaultData.balanceOfValue === 0 ? '-' : formatAmount(vaultData?.balanceOfValue, 2)}`}</p>
+					<p className={'inline text-neutral-900'}>{'Your shares value: '}</p>
+					<p className={'ml-3 inline'}>{`$${vaultData.balanceOfValue === 0 ? '-' : formatAmount(vaultData?.balanceOfValue, 2)}`}</p>
 				</div>
 			</div>
 
 			<div className={'mb-2 flex w-full flex-row items-center'} style={{height: '33px'}}>
 				<input
-					className={'w-full border-neutral-500 bg-neutral-0/0 px-2 font-mono text-xs text-neutral-900'}
+					className={'w-full border-neutral-500 bg-neutral-0/0 px-2 text-xs text-neutral-900'}
 					disabled={vault.VAULT_STATUS === 'withdraw'}
-					style={{height: '33px', backgroundColor: 'rgba(0,0,0,0)'}}
+					style={{height: '33px'}}
 					type={'text'}
 					value={amount?.normalized}
 					onChange={(e: ChangeEvent<HTMLInputElement>): void => set_amount(
@@ -398,7 +395,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 					)} />
 				<button
 					onClick={(): void => set_amount(toNormalizedBN(vaultData.balanceOf.raw, vaultData.decimals))}
-					className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 font-mono text-xs text-neutral-700 transition-colors hover:bg-neutral-900 hover:text-neutral-0'}
+					className={'border border-l-0 border-solid border-neutral-500 bg-neutral-100 px-2 py-1.5 text-xs transition-colors hover:bg-neutral-900 hover:text-neutral-0'}
 					style={{height: '33px'}}>
 					{'max'}
 				</button>
@@ -508,9 +505,9 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 
 	return (
 		<section aria-label={'ACTIONS'} className={'my-4 mt-8'}>
-			<h1 className={'mb-6 font-mono text-2xl font-semibold text-neutral-900'}>{'APE-IN/OUT'}</h1>
+			<h1 className={'mb-6 text-2xl font-semibold text-neutral-900'}>{'APE-IN/OUT'}</h1>
 			<div className={vault.VAULT_STATUS === 'withdraw' ? '' : 'hidden'}>
-				<p className={'font-mono text-sm font-medium text-neutral-700'}>{'Deposit closed.'}</p>
+				<p className={'text-sm font-medium'}>{'Deposit closed.'}</p>
 			</div>
 
 			{vault.ZAP_ADDR ? <VaultActionZaps
@@ -520,7 +517,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 				onProceed={fetchPostDepositOrWithdraw}
 			/> : (<Fragment />)}
 
-			<div className={'grid w-full max-w-5xl grid-cols-2 gap-8'}>
+			<div className={'grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2'}>
 				{vaultData.depositLimit.raw > 0n && vault.VAULT_STATUS !== 'withdraw' ? (
 					<VaultActionApeIn
 						vault={vault}

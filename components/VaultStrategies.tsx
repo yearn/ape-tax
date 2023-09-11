@@ -1,4 +1,4 @@
-import {Fragment, useCallback, useEffect, useState} from 'react';
+import {Fragment, type ReactElement, useCallback, useEffect, useState} from 'react';
 import {harvestStrategy} from 'utils/actions';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, multicall, readContract} from '@wagmi/core';
@@ -10,7 +10,6 @@ import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toBigInt, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
-import type {ReactElement} from 'react';
 import type {TStrategyData, TVault, TVaultData} from 'utils/types';
 import type {ContractFunctionConfig} from 'viem';
 import type {TAddress, TDict} from '@yearn-finance/web-lib/types';
