@@ -1079,5 +1079,29 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "pearl-v3-dai": {
+    "TITLE": "Shiny Pearl",
+    "LOGO": "🌞🧜‍♀️",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xAC8Fe3BaB0Ef1Ea0f9F7A030585bd051693B651c",
+    "WANT_ADDR": "0xBD02973b441Aa83c8EecEA158b98B5984bb1036E",
+    "WANT_SYMBOL": "StableV1 AMM - USDR/DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "pearl-v3-usdc": {
+    "TITLE": "Pearly dollar",
+    "LOGO": "🧜‍♀️💸",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xA90317B5A98eD903e92f136bC9959636C10367eC",
+    "WANT_ADDR": "0xD17cb0f162f133e339C0BbFc18c36c357E681D6b",
+    "WANT_SYMBOL": "StableV1 AMM - USDC/USDR",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }
