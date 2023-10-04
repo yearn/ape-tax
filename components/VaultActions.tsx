@@ -238,7 +238,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 			<div className={'mb-6 text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{`Your ${vault.WANT_SYMBOL} Balance: `}</p>
-					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.wantBalance.normalized, 6)}`}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.wantBalance.normalized, 10)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{`Your ${chainCoin} Balance: `}</p>
