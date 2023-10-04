@@ -1017,7 +1017,7 @@
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "comp-v3-usdc": {
@@ -1029,7 +1029,7 @@
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "aave-v3-usdc": {
@@ -1041,7 +1041,7 @@
     "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "aave-v3-wmatic": {
@@ -1053,7 +1053,7 @@
     "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     "WANT_SYMBOL": "WMATIC",
     "COINGECKO_SYMBOL": "wmatic",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "tangible-v3-dai": {
@@ -1065,7 +1065,7 @@
     "WANT_ADDR": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
     "WANT_SYMBOL": "DAI",
     "COINGECKO_SYMBOL": "dai",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "tangible-v3-usdc": {
@@ -1077,7 +1077,7 @@
     "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     "WANT_SYMBOL": "USDC",
     "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "new",
+    "VAULT_STATUS": "active",
     "CHAIN_ID": 137
   },
   "pearl-v3-dai": {
