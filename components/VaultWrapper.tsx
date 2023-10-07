@@ -6,11 +6,11 @@ import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {ethers} from 'ethers';
 import STRATEGY_V3_BASE_ABI from 'utils/ABI/tokenizedStrategyV3.abi';
-import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
+import {YVAULT_ABI} from 'utils/ABI/yVaultv2.abi';
+import {YVAULT_V3_BASE_ABI} from 'utils/ABI/yVaultV3Base.abi';
 import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
@@ -57,7 +57,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		};
 		const vaultV2ContractMultiCall = {
 			address: toAddress(vault.VAULT_ADDR),
-			abi: VAULT_ABI
+			abi: YVAULT_ABI
 		};
 		const vaultV3ContractMultiCall = {
 			address: toAddress(vault.VAULT_ADDR),
@@ -89,7 +89,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
 		}
-			
+
 		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
 		const totalAssets = decodeAsBigInt(callResult[0]);
 		const pricePerShare = decodeAsBigInt(callResult[1]);
@@ -106,7 +106,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		const coinBalance = await fetchBalance({
 			address: address
 		});
-		
+
 		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 		const	numberDecimals = Number(decimals);
 
@@ -131,7 +131,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 
 		if (vault.ZAP_ADDR) {
 			const allowanceZapOut = await readContract({
-				abi: VAULT_ABI,
+				abi: YVAULT_ABI,
 				address: toAddress(vault.VAULT_ADDR),
 				functionName: 'allowance',
 				args: [address, toAddress(vault.ZAP_ADDR)]
@@ -154,7 +154,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
 			totalAUM: Number(v.totalAssets.normalized) * price
 		}));
-		
+
 	}, [prices, vault]);
 
 	return (

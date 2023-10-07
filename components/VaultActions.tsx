@@ -1,13 +1,13 @@
 import {type ChangeEvent, Fragment, type ReactElement,useCallback, useState} from 'react';
 import {ethers} from 'ethers';
-import YVAULT_V3_BASE_ABI from 'utils/ABI/yVaultV3Base.abi';
+import {YVAULTV3_ABI} from 'utils/ABI/yVaultv3.abi';
+import {YVAULT_V3_BASE_ABI} from 'utils/ABI/yVaultV3Base.abi';
 import {apeInVault, apeOutVault, approveERC20, depositERC20, withdrawERC20} from 'utils/actions';
 import {type ContractFunctionConfig, maxUint256} from 'viem';
 import {useNetwork} from 'wagmi';
 import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
 import {Button} from '@yearn-finance/web-lib/components/Button';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {isZeroAddress, toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
@@ -72,7 +72,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			amount: zapAmount.raw
 		});
 		set_isZapIn(false);
-		
+
 		if(result.isSuccessful){
 			onProceed();
 		}
@@ -104,7 +104,7 @@ function	VaultActionZaps({vault, vaultData, onUpdateVaultData, onProceed}: TVaul
 			amount: !isZero(zapAmount.raw) ? zapAmount.raw : vaultData.balanceOf.raw
 		});
 		set_isZapOut(false);
-		
+
 		if(result.isSuccessful){
 			onProceed();
 		}
@@ -184,7 +184,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 		}
 
 		const allowance = await readContract({
-			abi: VAULT_ABI,
+			abi: erc20ABI,
 			address: toAddress(vault.WANT_ADDR),
 			functionName: 'allowance',
 			args: [address, toAddress(vaultSpender)]
@@ -315,9 +315,9 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		if (!vault || isZeroAddress(address) || !address) {
 			return;
 		}
-		
+
 		const allowance = await readContract({
-			abi: VAULT_ABI,
+			abi: erc20ABI,
 			address: toAddress(vault.VAULT_ADDR),
 			functionName: 'allowance',
 			args: [address, toAddress(vaultSpender)]
@@ -345,7 +345,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 		}
 
 	}, [provider, vault.VAULT_ADDR, vaultSpender, fetchApproval]);
-		
+
 
 	async function	onWithdraw(): Promise<void> {
 		if(!provider){
@@ -443,7 +443,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 
 		const calls: ContractFunctionConfig[] = [];
 		const wantContractMultiCall = {address: toAddress(vault.WANT_ADDR), abi: erc20ABI};
-		const vaultV2ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: VAULT_ABI};
+		const vaultV2ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
 		const vaultV3ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_V3_BASE_ABI};
 		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
 		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
@@ -453,7 +453,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
-		
+
 		if (vault.VAULT_ABI.startsWith('v3')) {
 			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // === depositLimit
 			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // ok to have same in this case
@@ -461,7 +461,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
 			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
 		}
-		
+
 		const callResult = await multicall({contracts: calls as never[], chainId: chainId});
 		const wantAllowance = decodeAsBigInt(callResult[0]);
 		const wantBalance = decodeAsBigInt(callResult[1]);
@@ -493,7 +493,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 
 		if (vault.ZAP_ADDR) {
 			const allowanceZapOut = await readContract({
-				abi: VAULT_ABI,
+				abi: erc20ABI,
 				address: toAddress(vault.WANT_ADDR),
 				functionName: 'allowance',
 				args: [address, toAddress(vault.ZAP_ADDR)]

@@ -1,9 +1,9 @@
 import {ethers} from 'ethers';
 import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
-import YVAULT_ABI from 'utils/ABI/yVault.abi';
+import {YVAULTV3_ABI} from 'utils/ABI/yVaultv3.abi';
 import {fetchBlockTimestamp} from 'utils/utils';
 import vaults from 'utils/vaults.json';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
+import {erc20ABI} from 'wagmi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNumber';
@@ -38,7 +38,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
 
 		const calls: ContractFunctionConfig[] = [];
-		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
+		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 
 		const ppsData = await multicallInstance({contracts: calls as never[]});
@@ -56,7 +56,7 @@ async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
 		const blockOneMonthAgo = monthTimestamp.data?.result || 0;
 
 		const calls: ContractFunctionConfig[] = [];
-		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_ABI};
+		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
 		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
 
@@ -107,7 +107,7 @@ async function getCommunityVaults(): Promise<TVault[]> {
 	const vaultDetailsCalls = [];
 	for (const vault of deployedVaults) {
 		const VAULT_ADDRESS = toAddress(vault.result as string);
-		const vaultContract = {address: VAULT_ADDRESS, abi: VAULT_ABI};
+		const vaultContract = {address: VAULT_ADDRESS, abi: erc20ABI};
 		vaultDetailsCalls.push({...vaultContract, functionName: 'name'});
 		vaultDetailsCalls.push({...vaultContract, functionName: 'symbol'});
 		vaultDetailsCalls.push({...vaultContract, functionName: 'token'});
@@ -142,7 +142,7 @@ async function getCommunityVaults(): Promise<TVault[]> {
 async function getSpecificAPY({network, address}: {network: number, address: string}): Promise<TSpecificAPIResult> {
 	const multicallInstance = getClient(network || 1).multicall;
 	const apyCalls = [];
-	const vaultContract = {address: toAddress(address), abi: VAULT_ABI};
+	const vaultContract = {address: toAddress(address), abi: YVAULTV3_ABI};
 	apyCalls.push({...vaultContract, functionName: 'pricePerShare'});
 	apyCalls.push({...vaultContract, functionName: 'decimals'});
 	apyCalls.push({...vaultContract, functionName: 'activation'});

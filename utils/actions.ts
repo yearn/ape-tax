@@ -1,7 +1,6 @@
 import {assert} from 'utils/assert';
 import {type ContractFunctionConfig, encodeFunctionData, hexToSignature, maxUint256} from 'viem';
 import {erc20ABI, multicall, readContract, signTypedData} from '@wagmi/core';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {toBigInt} from '@yearn-finance/web-lib/utils/format.bigNumber';
@@ -11,7 +10,8 @@ import {assertAddress, handleTx, toWagmiProvider,type TWriteTransaction} from '.
 import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
 import STRATEGY_V3_BASE_ABI from './ABI/tokenizedStrategyV3.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
-import YVAULT_V3_BASE_ABI from './ABI/yVaultV3Base.abi';
+import {YVAULT_ABI} from './ABI/yVaultv2.abi';
+import {YVAULT_V3_BASE_ABI} from './ABI/yVaultV3Base.abi';
 
 import type {Connector} from 'wagmi';
 import type {TAddress} from '@yearn-finance/web-lib/types';
@@ -123,7 +123,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	if (props.isLegacy) {
 		return await handleTx(props, {
 			address: props.contractAddress,
-			abi: VAULT_ABI,
+			abi: YVAULT_ABI,
 			functionName: 'deposit',
 			args: [props.amount]
 		});
@@ -171,7 +171,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 			throw new Error('Failed to approve');
 		}
 	}
-	
+
 	return await handleTx(props, {
 		address: props.spenderAddress,
 		abi: YROUTER_ABI,
@@ -190,8 +190,8 @@ export async function	withdrawERC20(props: TWithdrawERC20Args): Promise<TTxRespo
 	assertAddress(props.contractAddress, 'receiverAddress');
 	assert(props.connector, 'No connector');
 	assert(props.amount > 0n, 'Amount is 0');
-	
-	let shouldRedeem = false; 
+
+	let shouldRedeem = false;
 	const signer = await props.connector.getWalletClient();
 	const signerAddress = signer.account.address;
 
@@ -203,7 +203,7 @@ export async function	withdrawERC20(props: TWithdrawERC20Args): Promise<TTxRespo
 	if (props.isLegacy) {
 		return await handleTx(props, {
 			address: props.contractAddress,
-			abi: VAULT_ABI,
+			abi: YVAULT_ABI,
 			functionName: 'withdraw',
 			args: [props.amount]
 		});
@@ -262,7 +262,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	assertAddress(props.routerAddress, 'routerAddress');
 	assert(props.connector, 'No connector');
 	assert(props.amount > 0n, 'Amount is 0');
-	
+
 	const signer = await props.connector.getWalletClient();
 	const chainId = await props.connector.getChainId();
 	const signerAddress = signer.account.address;
@@ -275,7 +275,7 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	if (props.isLegacy) {
 		return await handleTx(props, {
 			address: props.contractAddress,
-			abi: VAULT_ABI,
+			abi: YVAULT_ABI,
 			functionName: 'withdraw',
 			args: [props.amount]
 		});
@@ -301,8 +301,8 @@ export async function	withdrawWithPermitERC20(props: TWithdrawWithPermitERC20Arg
 	const tokenizedStrategyContract = {address: props.contractAddress, abi: STRATEGY_V3_BASE_ABI};
 
 	props.isV3Strategy ?
-		calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}) : 
-		calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'}); 
+		calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}) :
+		calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'name'});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'nonces', args: [signerAddress]});
 	calls.push({...vaultV3ContractMultiCall, functionName: 'previewWithdraw', args: [props.amount]});
