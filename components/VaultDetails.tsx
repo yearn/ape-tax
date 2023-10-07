@@ -36,12 +36,12 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 			}) as bigint;
 
 			const apySnapshot = formatToNormalizedValue(currentAPR, 18) * 100;
-		
+
 			set_oracleAPY(apySnapshot);
 		}
 	}, [aprOracleForChain, vault.VAULT_ABI, vault.VAULT_ADDR]);
 
-	useEffect((): void => { 
+	useEffect((): void => {
 		set_vaultAPY(vaultAPYSWR);
 		fetchOracleData();
 	}, [fetchOracleData, vaultAPYSWR, vaultData.totalAssets]);
@@ -138,7 +138,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</>
 				)}
 			</div>
-			
+
 			<div className={'mb-4 text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Price Per Share: '}</p>
@@ -159,7 +159,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</p>
 				</div>
 
-				{vaultData.progress > 0 ? (				
+				{vaultData.progress > 0 ? (
 					<div className={'progress-bar'}>
 						<span className={'-ml-2 mr-2 hidden md:inline'}>
 							&nbsp;{'['}&nbsp;
