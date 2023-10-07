@@ -1,7 +1,7 @@
 import {ethers} from 'ethers';
 import {coinGeckoPricesSchema,type TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import vaults from 'utils/vaults.json';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
+import {erc20ABI} from 'wagmi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
 import {getClient} from '@yearn-finance/web-lib/utils/wagmi/utils';
@@ -35,14 +35,13 @@ async function getTVL({network}: {network: number}): Promise<TTVL> {
 		if (v.CHAIN_ID !== network || v.VAULT_STATUS === 'stealth' || v.VAULT_TYPE === 'weird') {
 			return;
 		}
-		const vaultContract = {address: toAddress(v.VAULT_ADDR), abi: VAULT_ABI};
-		tvlCalls.push({...vaultContract, functionName: 'totalAssets'});
-		tvlCalls.push({...vaultContract, functionName: 'decimals'});
-
+		tvlCalls.push({address: toAddress(v.VAULT_ADDR), abi: erc20ABI, functionName: 'totalAssets'});
+		tvlCalls.push({address: toAddress(v.VAULT_ADDR), abi: erc20ABI, functionName: 'decimals'});
 		_cgIDS.push(v.COINGECKO_SYMBOL);
 	});
 
-	const callResult = await multicallInstance({contracts: tvlCalls as never[]});
+
+	const callResult = await multicallInstance({contracts: tvlCalls});
 	const chunkedCallResult = chunk(callResult, 2);
 	const cgPricesQueryParams = new URLSearchParams({
 		ids: `${_cgIDS}`,

@@ -1,4 +1,5 @@
 @import "@yearn-finance/web-lib/style.css";
+@import "@rainbow-me/rainbowkit/styles.css";
 
 * {@apply font-mono;}
 :root,

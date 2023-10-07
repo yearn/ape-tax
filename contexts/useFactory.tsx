@@ -1,10 +1,8 @@
 import {createContext, type ReactElement, useCallback, useContext, useEffect, useState} from 'react';
 import BALANCER_FACTORY_ABI from 'utils/ABI/balancerFactory.abi';
-import {multicall, readContract} from '@wagmi/core';
+import {erc20ABI, multicall, readContract} from '@wagmi/core';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
-import VAULT_ABI from '@yearn-finance/web-lib/utils/abi/vault.abi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import performBatchedUpdates from '@yearn-finance/web-lib/utils/performBatchedUpdates';
 
 import type {TVault} from 'utils/types';
 
@@ -33,10 +31,8 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 	***************************************************************************/
 	const getCommunityVaults = useCallback(async (): Promise<void> => {
 		if (safeChainID !== 1) {
-			performBatchedUpdates((): void => {
-				set_communityVaults([]);
-				set_nonce((n): number => n + 1);
-			});
+			set_communityVaults([]);
+			set_nonce((n): number => n + 1);
 			return;
 		}
 
@@ -58,13 +54,19 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 		const vaultDetailsCalls = [];
 		for (const vault of deployedVaults) {
 			const VAULT_ADDRESS = toAddress(vault.result as string);
-			const vaultContract = {address: VAULT_ADDRESS, abi: VAULT_ABI};
+			const vaultContract = {address: VAULT_ADDRESS, abi: erc20ABI};
 			vaultDetailsCalls.push({...vaultContract, functionName: 'name'});
 			vaultDetailsCalls.push({...vaultContract, functionName: 'symbol'});
 			vaultDetailsCalls.push({...vaultContract, functionName: 'token'});
 		}
 
-		const vaultDetails = await multicall({contracts: vaultDetailsCalls, chainId: safeChainID});
+		if (vaultDetailsCalls.length === 0) {
+			set_communityVaults([]);
+			set_nonce((n): number => n + 1);
+			return;
+		}
+
+		const vaultDetails = await multicall({contracts: vaultDetailsCalls as any[], chainId: safeChainID});
 		const vaults: TVault[] = [];
 		let		rIndex = 0;
 		for (let i = 0; i < numVaults; i++) {
@@ -87,10 +89,8 @@ export const FactoryContextApp = ({children}: {children: ReactElement}): ReactEl
 			});
 		}
 
-		performBatchedUpdates((): void => {
-			set_communityVaults(vaults);
-			set_nonce((n): number => n + 1);
-		});
+		set_communityVaults(vaults);
+		set_nonce((n): number => n + 1);
 	}, [safeChainID]);
 
 	useEffect((): void => {
