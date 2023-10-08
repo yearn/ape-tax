@@ -21,7 +21,7 @@ function	VaultWallet({vault, vaultData}: {vault: TVault, vaultData: TVaultData})
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Your vault shares: '}</p>
-					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.balanceOf.normalized, 2)}`}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.balanceOf.normalized, 10)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Your shares value: '}</p>

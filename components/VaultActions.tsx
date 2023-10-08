@@ -375,7 +375,7 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 			<div className={'mb-6 text-sm font-medium'}>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Your vault shares: '}</p>
-					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.balanceOf.normalized, 6)}`}</p>
+					<p className={'ml-3 inline'}>{`${formatAmount(vaultData?.balanceOf.normalized, 10)}`}</p>
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>{'Your shares value: '}</p>
