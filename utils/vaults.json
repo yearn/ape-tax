@@ -1103,5 +1103,17 @@
     "COINGECKO_SYMBOL": "usdc",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-v3-LST": {
+    "TITLE": "V3 Liquid Staking Token",
+    "LOGO": "🌊🌊",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x9CeDB174BD547f9a0f99Dca63660710d59B75AD4",
+    "WANT_ADDR": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    "WANT_SYMBOL": "WMATIC",
+    "COINGECKO_SYMBOL": "wmatic",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }
