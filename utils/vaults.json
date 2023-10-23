@@ -1115,5 +1115,17 @@
     "COINGECKO_SYMBOL": "wmatic",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-v3-wbtc": {
+    "TITLE": "WBTC Lender Borrower",
+    "LOGO": "♻️🤟🏻",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x62da0f17192213a3F8d69f42E365082fb1AD98C2",
+    "WANT_ADDR": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
+    "WANT_SYMBOL": "WBTC",
+    "COINGECKO_SYMBOL": "wrapped-bitcoin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }
