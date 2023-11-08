@@ -1008,18 +1008,6 @@
     "VAULT_STATUS": "new",
     "CHAIN_ID": 10
   },
-  "v3-usdc": {
-    "TITLE": "V3-USDC",
-    "LOGO": "🔒3️⃣",
-    "VAULT_ABI": "v3-vault",
-    "VAULT_TYPE": "experimental",
-    "VAULT_ADDR": "0xcaa17796bb3d4a71005cebd817cfeebf85d581b7",
-    "WANT_ADDR": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-    "WANT_SYMBOL": "USDC",
-    "COINGECKO_SYMBOL": "usd-coin",
-    "VAULT_STATUS": "withdraw",
-    "CHAIN_ID": 137
-  },
   "v3-usdc-A": {
     "TITLE": "V3-USDC-A",
     "LOGO": "🔒3️⃣",
@@ -1101,6 +1089,18 @@
     "WANT_ADDR": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
     "WANT_SYMBOL": "WBTC",
     "COINGECKO_SYMBOL": "wrapped-bitcoin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
+  },
+  "stargate-staker": {
+    "TITLE": "Stargate Staker USDC",
+    "LOGO": "✨🕺",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x9B10812cA07E59b109b6a815C6F2fB9072C7dCaD",
+    "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
   }
