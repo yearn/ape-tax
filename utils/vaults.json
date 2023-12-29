@@ -1127,5 +1127,17 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-V3-Stargate-DAI": {
+    "TITLE": "Stargate Staker DAI",
+    "LOGO": "👾",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x06eD7C67755344548FAFe1822bEE365C4208a57F",
+    "WANT_ADDR": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }
