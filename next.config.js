@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const runtimeCaching = require('next-pwa/cache');
-const withTM = require('next-transpile-modules')(['@yearn-finance/web-lib'], {resolveSymlinks: false});
 const withPWA = require('next-pwa')({
 	dest: './public/',
 	register: true,
@@ -9,11 +8,7 @@ const withPWA = require('next-pwa')({
 	buildExcludes: [/middleware-manifest.json$/]
 });
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-	enabled: process.env.ANALYZE === 'true'
-});
-
-module.exports = withTM(withBundleAnalyzer(withPWA({
+module.exports = withPWA({
 	async rewrites() {
 		return [
 			{
@@ -79,6 +74,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 		YEARN_BALANCER_FACTORY_ADDRESS: '0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709',
 		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D',
 		YEARN_ROUTER: {
+			1: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			137: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			43114: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			1337: '0x1112dbcf805682e828606f74ab717abf4b4fd8de'
@@ -88,7 +84,7 @@ module.exports = withTM(withBundleAnalyzer(withPWA({
 			1337: '0x02b0210fC1575b38147B232b40D7188eF14C04f2'
 		}
 	}
-})));
+});
 
 
 
