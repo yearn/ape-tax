@@ -1139,5 +1139,18 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-V3-Ajna-DAI": {
+    "TITLE": "Ajna DAI",
+    "LOGO": "🟡👁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xe24BA27551aBE96Ca401D39761cA2319Ea14e3CB",
+    "WANT_ADDR": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
+
 }
