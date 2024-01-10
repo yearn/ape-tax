@@ -5,7 +5,7 @@ import {fetchBlockTimestamp} from 'utils/utils';
 import vaults from 'utils/vaults.json';
 import {erc20ABI} from 'wagmi';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
+import {decodeAsBigInt, decodeAsNumber} from '@yearn-finance/web-lib/utils/decoder';
 import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {getClient} from '@yearn-finance/web-lib/utils/wagmi/utils';
 
@@ -14,66 +14,42 @@ import type {TSpecificAPIResult, TVault} from 'utils/types';
 import type {ContractFunctionConfig} from 'viem';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
-async function	prepareGrossData({vault, pricePerShare, decimals, activation}: {
+async function	prepareGrossData({vault, pricePerShare, decimals}: {
 	vault: TVault;
 	pricePerShare: bigint;
-	decimals: bigint;
-	activation: number;
+	decimals: number;
 }): Promise<TSpecificAPIResult> {
 	let	_grossAPRWeek = '-';
 	let	_grossAPRMonth = '-';
 	let	_grossAPRInception = '-';
-	const activationTimestamp = Number(activation);
 	const oneWeekAgo = Number((new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const oneMonthAgo = Number((new Date(Date.now() - 30.5 * 24 * 60 * 60 * 1000).valueOf() / 1000).toFixed(0));
 	const currentPrice = formatToNormalizedValue(pricePerShare, Number(decimals));
 	const multicallInstance = getClient(vault?.CHAIN_ID || 1).multicall;
 
-	if (activationTimestamp > oneWeekAgo) {
-		_grossAPRWeek = '-';
-		_grossAPRMonth = '-';
-	} else if (activationTimestamp > oneMonthAgo) {
+	const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
+	const blockOneWeekAgo = weekTimestamp.data?.result || 0;
 
-		const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
-		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
+	const monthTimestamp = await fetchBlockTimestamp(oneMonthAgo, vault?.CHAIN_ID || 1);
+	const blockOneMonthAgo = monthTimestamp.data?.result || 0;
 
-		const calls: ContractFunctionConfig[] = [];
-		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
-		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
+	const calls: ContractFunctionConfig[] = [];
+	const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
+	calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
+	calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
 
-		const ppsData = await multicallInstance({contracts: calls as never[]});
-		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
-		const pastPriceWeek = formatToNormalizedValue(_pastPricePerShareWeek, Number(decimals));
-		const weekRoi = (currentPrice / pastPriceWeek - 1);
+	const ppsData = await multicallInstance({contracts: calls as never[]});
+	const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
+	const _pastPricePerShareMonth = decodeAsBigInt(ppsData[1]);
 
-		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-		_grossAPRMonth = '-';
-	} else {
-		const weekTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
-		const blockOneWeekAgo = weekTimestamp.data?.result || 0;
-
-		const monthTimestamp = await fetchBlockTimestamp(oneWeekAgo, vault?.CHAIN_ID || 1);
-		const blockOneMonthAgo = monthTimestamp.data?.result || 0;
-
-		const calls: ContractFunctionConfig[] = [];
-		const yVaultContract = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
-		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneWeekAgo]});
-		calls.push({...yVaultContract, functionName: 'pricePerShare', args: [blockOneMonthAgo]});
-
-		const ppsData = await multicallInstance({contracts: calls as never[]});
-		const _pastPricePerShareWeek = decodeAsBigInt(ppsData[0]);
-		const _pastPricePerShareMonth = decodeAsBigInt(ppsData[1]);
-
-		const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
-		const pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, Number(decimals)));
-		const weekRoi = (currentPrice / pastPriceWeek - 1);
-		const monthRoi = (currentPrice / pastPriceMonth - 1);
-		_grossAPRWeek = (weekRoi ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-		_grossAPRMonth = (monthRoi ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
-	}
-
+	const pastPriceWeek = Number(ethers.utils.formatUnits(_pastPricePerShareWeek, Number(decimals)));
+	const pastPriceMonth = Number(ethers.utils.formatUnits(_pastPricePerShareMonth, Number(decimals)));
+	const weekRoi = pastPriceWeek === 0 ? 0 : ((currentPrice / pastPriceWeek) - 1);
+	const monthRoi = pastPriceMonth === 0 ? 0 : ((currentPrice / pastPriceMonth) - 1);
 	const inceptionROI = (currentPrice - 1);
-	_grossAPRInception = (inceptionROI ? `${(inceptionROI * 100).toFixed(4)}%` : '-');
+	_grossAPRWeek = (ppsData[0].status === 'success' ? `${((weekRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
+	_grossAPRMonth = (ppsData[1].status === 'success' ? `${((monthRoi * 100) / 7 * 365).toFixed(2)}%` : '-');
+	_grossAPRInception = `${(inceptionROI * 100).toFixed(4)}%`;
 
 	return {
 		week: _grossAPRWeek,
@@ -145,12 +121,12 @@ async function getSpecificAPY({network, address}: {network: number, address: str
 	const vaultContract = {address: toAddress(address), abi: YVAULTV3_ABI};
 	apyCalls.push({...vaultContract, functionName: 'pricePerShare'});
 	apyCalls.push({...vaultContract, functionName: 'decimals'});
-	apyCalls.push({...vaultContract, functionName: 'activation'});
 
 	const callResult = await multicallInstance({contracts: apyCalls});
 	const pricePerShare = decodeAsBigInt(callResult[0]);
-	const decimals = decodeAsBigInt(callResult[1]);
-	const activation = decodeAsBigInt(callResult[2]);
+	const decimals = decodeAsNumber(callResult[1]);
+
+	console.log(decimals);
 
 	let vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 	if (!vaultToUse) {
@@ -161,8 +137,7 @@ async function getSpecificAPY({network, address}: {network: number, address: str
 	return prepareGrossData({
 		vault: vaultToUse as TVault,
 		pricePerShare,
-		decimals,
-		activation: Number(activation)
+		decimals
 	});
 }
 
