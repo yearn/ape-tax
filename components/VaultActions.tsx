@@ -17,7 +17,6 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 import {defaultTxStatus} from '@yearn-finance/web-lib/utils/web3/transaction';
 
 import type {TVault, TVaultData} from 'utils/types';
-import type {TNDict} from '@yearn-finance/web-lib/types';
 import type {TransactionReceipt} from '@ethersproject/providers';
 
 
@@ -163,8 +162,7 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	/**************************************************************************
 	** Some basic variables around the vault
 	**************************************************************************/
-	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-	const	vaultSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
+	const	vaultSpender = vault.VAULT_ADDR;
 	const	{chain} = useNetwork();
 	const	chainCoin = chain?.nativeCurrency.symbol || 'ETH';
 
@@ -291,60 +289,18 @@ function	VaultActionApeIn({vault, vaultData, onUpdateVaultData, onProceed}: TVau
 	);
 }
 
-function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVaultActionInner): ReactElement {
-	const	{provider, address} = useWeb3();
+function	VaultActionApeOut({vault, vaultData, onProceed}: TVaultActionInner): ReactElement {
+	const	{provider} = useWeb3();
 
 	/**************************************************************************
 	** Some basic variables around the vault
 	**************************************************************************/
-	const	yearnRouterForChain = (process?.env?.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-	const	vaultSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
 
 	/**************************************************************************
 	** State management for our actions
 	**************************************************************************/
 	const	[amount, set_amount] = useState(toNormalizedBN(0));
-	const	[txStatusApproval, set_txStatusApproval] = useState(defaultTxStatus);
 	const	[txStatusWithdraw, set_txStatusWithdraw] = useState(defaultTxStatus);
-	const	shouldUseApproval = vaultSpender !== yearnRouterForChain;
-
-	/**************************************************************************
-	** We need to update the status when some events occurs
-	**************************************************************************/
-	const fetchApproval = useCallback(async (): Promise<void> => {
-		if (!vault || isZeroAddress(address) || !address) {
-			return;
-		}
-
-		const allowance = await readContract({
-			abi: erc20ABI,
-			address: toAddress(vault.VAULT_ADDR),
-			functionName: 'allowance',
-			args: [address, toAddress(vaultSpender)]
-		});
-
-		onUpdateVaultData((v): TVaultData => ({...v, allowanceYRouter: toNormalizedBN(allowance, v.decimals)}));
-
-	}, [address, onUpdateVaultData, vault, vaultSpender]);
-
-
-	/**************************************************************************
-	** We need to perform some specific actions
-	**************************************************************************/
-	const onApprove = useCallback(async (): Promise<void> => {
-		const result = await approveERC20({
-			connector: provider,
-			contractAddress: toAddress(vault.VAULT_ADDR),
-			spenderAddress: toAddress(vaultSpender),
-			amount: maxUint256 - 1n,
-			statusHandler: set_txStatusApproval
-		});
-
-		if(result.isSuccessful){
-			fetchApproval();
-		}
-
-	}, [provider, vault.VAULT_ADDR, vaultSpender, fetchApproval]);
 
 
 	async function	onWithdraw(): Promise<void> {
@@ -399,17 +355,6 @@ function	VaultActionApeOut({vault, vaultData, onUpdateVaultData, onProceed}: TVa
 					style={{height: '33px'}}>
 					{'max'}
 				</button>
-				{shouldUseApproval ? (
-					<Button
-						variant={'outlined'}
-						style={{height: '33px'}}
-						className={'!mb-0 !ml-2 whitespace-nowrap'}
-						isBusy={txStatusApproval.pending}
-						isDisabled={txStatusApproval.error || txStatusApproval.pending || vaultData.allowanceYRouter.raw > 0n}
-						onClick={onApprove}>
-						{vaultData.allowanceYRouter.raw > 0n ? '✅ Vault approved' : '🚀 Approve vault'}
-					</Button>
-				) : <Fragment />}
 			</div>
 
 			<Button
@@ -445,8 +390,7 @@ function	VaultAction({vault, vaultData, onUpdateVaultData}: TVaultAction): React
 		const wantContractMultiCall = {address: toAddress(vault.WANT_ADDR), abi: erc20ABI};
 		const vaultV2ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULTV3_ABI};
 		const vaultV3ContractMultiCall = {address: toAddress(vault.VAULT_ADDR), abi: YVAULT_V3_BASE_ABI};
-		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
+		const allowanceSpender = vault.VAULT_ADDR;
 
 		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
 		calls.push({...wantContractMultiCall, functionName: 'balanceOf', args: [address]});

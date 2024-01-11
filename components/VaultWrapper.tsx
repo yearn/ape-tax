@@ -18,7 +18,6 @@ import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
-import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
 	loaded: false,
@@ -64,9 +63,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			abi: YVAULT_V3_BASE_ABI
 		};
 		const tokenizedStrategyContract = {address: toAddress(vault.VAULT_ADDR), abi: STRATEGY_V3_BASE_ABI};
-
-		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
+		const allowanceSpender = vault.VAULT_ADDR;
 
 		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
 		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
@@ -74,7 +71,7 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...wantContractMultiCall, functionName: 'balanceOf', args: [address]});
 		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
-		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
+		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
 
 		if (vault.VAULT_ABI.startsWith('v3')) {
 			vault.VAULT_ABI === 'v3-vault' ?

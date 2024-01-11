@@ -11,6 +11,7 @@ import FACTORY_KEEPER_ABI from './ABI/factoryKeeper.abi';
 import STRATEGY_V3_BASE_ABI from './ABI/tokenizedStrategyV3.abi';
 import YROUTER_ABI from './ABI/yRouter.abi';
 import {YVAULT_ABI} from './ABI/yVaultv2.abi';
+import {YVAULTV3_ABI} from './ABI/yVaultv3.abi';
 import {YVAULT_V3_BASE_ABI} from './ABI/yVaultV3Base.abi';
 
 import type {Connector} from 'wagmi';
@@ -118,7 +119,6 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 	assert(props.connector, 'No connector');
 
 	const wagmiProvider = await toWagmiProvider(props.connector);
-	const {chainId} = wagmiProvider;
 
 	if (props.isLegacy) {
 		return await handleTx(props, {
@@ -129,55 +129,11 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 		});
 	}
 
-	const asset = await readContract({
-		...wagmiProvider,
-		abi: YVAULT_V3_BASE_ABI,
-		address: props.contractAddress,
-		functionName: 'asset'
-	}) as string;
-
-	const assetAddress = toAddress(asset);
-
-	const calls: ContractFunctionConfig[] = [];
-	const assetContract = {address: assetAddress, abi: erc20ABI};
-	const vaultV3Contract = {address: props.contractAddress, abi: YVAULT_V3_BASE_ABI};
-
-	calls.push({...assetContract, functionName: 'allowance', args: [props.spenderAddress, props.contractAddress]});
-	calls.push({...vaultV3Contract, functionName: 'previewDeposit', args: [props.amount]});
-
-	const callResult = await multicall({contracts: calls as never[], chainId: chainId});
-	const routerAllowance = decodeAsBigInt(callResult[0]);
-	let minOut = decodeAsBigInt(callResult[1]);
-
-	// 1% tolerance to minOut to avoid router rounding issues causing tx failure
-	const errorTolerance = minOut / 100n;
-	minOut = minOut - errorTolerance;
-
-	/**
-	 * The first interaction between the router and a specific vault will require a max approval for
-	 * the specific asset to the specifc vault. This should only every have to be done once per vault.
-	 * But is a check that should be run before sending a tx otherwise deposits will fail.
-	 */
-	if (routerAllowance < props.amount) {
-		const	approveResult = await handleTx(props, {
-			address: props.spenderAddress,
-			abi: YROUTER_ABI,
-			functionName: 'approve',
-			args: [assetAddress, props.contractAddress, maxUint256 - 1n],
-			value: 0n
-		});
-
-		if (!approveResult.isSuccessful) {
-			throw new Error('Failed to approve');
-		}
-	}
-
 	return await handleTx(props, {
 		address: props.spenderAddress,
-		abi: YROUTER_ABI,
-		functionName: 'depositToVault',
-		args: [props.contractAddress, props.amount, minOut],
-		value: 0n
+		abi: YVAULTV3_ABI,
+		functionName: 'deposit',
+		args: [props.amount, wagmiProvider.address]
 	});
 }
 
