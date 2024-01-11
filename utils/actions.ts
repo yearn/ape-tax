@@ -120,6 +120,7 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 
 	const wagmiProvider = await toWagmiProvider(props.connector);
 
+	console.log(`Deposit ${props.amount} to ${props.contractAddress}`);
 	if (props.isLegacy) {
 		return await handleTx(props, {
 			address: props.contractAddress,
@@ -129,8 +130,9 @@ export async function	depositERC20(props: TDepositERC20Args): Promise<TTxRespons
 		});
 	}
 
+	console.log(`Vault is a V3 vault. Calling ${props.contractAddress} with ${props.amount} and ${wagmiProvider.address}`);
 	return await handleTx(props, {
-		address: props.spenderAddress,
+		address: props.contractAddress,
 		abi: YVAULTV3_ABI,
 		functionName: 'deposit',
 		args: [props.amount, wagmiProvider.address]
