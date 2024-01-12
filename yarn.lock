@@ -2881,7 +2881,7 @@
     abitype "0.8.7"
     eventemitter3 "^4.0.7"
 
-"@wagmi/core@1.4.13", "@wagmi/core@^1.4.3", "@wagmi/core@^1.4.7":
+"@wagmi/core@1.4.13", "@wagmi/core@^1.4.7":
   version "1.4.13"
   resolved "https://registry.yarnpkg.com/@wagmi/core/-/core-1.4.13.tgz#8a29bb0370141d48232e3d0b60011dbd8f91a37d"
   integrity sha512-ytMCvXbBOgfDu9Qw67279wq/jNEe7EZLjLyekX7ROnvHRADqFr3lwZI6ih41UmtRZAmXAx8Ghyuqy154EjB5mQ==
@@ -3244,7 +3244,7 @@
     "@walletconnect/window-getters" "^1.0.1"
     tslib "1.14.1"
 
-"@yearn-finance/web-lib@^3.0.49":
+"@yearn-finance/web-lib@^3.0.78":
   version "3.0.85"
   resolved "https://registry.yarnpkg.com/@yearn-finance/web-lib/-/web-lib-3.0.85.tgz#d84e77d4b0f37404502168989057cdb964f46490"
   integrity sha512-KKZKEaIXXRxOBNVaZ+8NmdZ59WIhPQ7ngSpSk80LTUSbaxce6Pw5Jjcg4E5qOCFDnxlucAsDiDHC+snPALZMgg==
@@ -9464,7 +9464,7 @@ vary@^1:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-viem@^1.0.0, viem@^1.15.4, viem@^1.19.11, viem@^1.6.0:
+viem@^1.0.0, viem@^1.19.11, viem@^1.19.9, viem@^1.6.0:
   version "1.21.4"
   resolved "https://registry.yarnpkg.com/viem/-/viem-1.21.4.tgz#883760e9222540a5a7e0339809202b45fe6a842d"
   integrity sha512-BNVYdSaUjeS2zKQgPs+49e5JKocfo60Ib2yiXOWBT6LuVxY1I/6fFX3waEtpXvL1Xn4qu+BVitVtMh9lyThyhQ==
@@ -9478,7 +9478,7 @@ viem@^1.0.0, viem@^1.15.4, viem@^1.19.11, viem@^1.6.0:
     isows "1.0.3"
     ws "8.13.0"
 
-wagmi@^1.4.3, wagmi@^1.4.7:
+wagmi@^1.4.7:
   version "1.4.13"
   resolved "https://registry.yarnpkg.com/wagmi/-/wagmi-1.4.13.tgz#dc8dc077c7c2195877d7e33477b0417f5d2add4f"
   integrity sha512-AScVYFjqNt1wMgL99Bob7MLdhoTZ3XKiOZL5HVBdy4W1sh7QodA3gQ8IsmTuUrQ7oQaTxjiXEhwg7sWNrPBvJA==

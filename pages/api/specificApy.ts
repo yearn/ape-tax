@@ -126,8 +126,6 @@ async function getSpecificAPY({network, address}: {network: number, address: str
 	const pricePerShare = decodeAsBigInt(callResult[0]);
 	const decimals = decodeAsNumber(callResult[1]);
 
-	console.log(decimals);
-
 	let vaultToUse = Object.values(vaults).find((v): boolean => (v.VAULT_ADDR).toLowerCase() === address.toLowerCase());
 	if (!vaultToUse) {
 		const communityVaults = await getCommunityVaults();

@@ -4,21 +4,18 @@ import VaultActions from 'components/VaultActions';
 import VaultDetails from 'components/VaultDetails';
 import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
-import {ethers} from 'ethers';
-import STRATEGY_V3_BASE_ABI from 'utils/ABI/tokenizedStrategyV3.abi';
 import {YVAULT_ABI} from 'utils/ABI/yVaultv2.abi';
-import {YVAULT_V3_BASE_ABI} from 'utils/ABI/yVaultV3Base.abi';
-import {type ContractFunctionConfig, maxUint256} from 'viem';
-import {erc20ABI, fetchBalance, multicall, readContract} from '@wagmi/core';
+import {YVAULTV3_ABI} from 'utils/ABI/yVaultv3.abi';
+import {maxUint256} from 'viem';
+import {erc20ABI, fetchBalance, readContract, readContracts} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
-import {decodeAsBigInt} from '@yearn-finance/web-lib/utils/decoder';
-import {formatToNormalizedValue, toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import {decodeAsBigInt, decodeAsNumber, decodeAsString} from '@yearn-finance/web-lib/utils/decoder';
+import {toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 import type {TVault, TVaultData} from 'utils/types';
-import type {TNDict} from '@yearn-finance/web-lib/types';
 
 const		defaultVaultData: TVaultData = {
 	loaded: false,
@@ -42,7 +39,7 @@ const		defaultVaultData: TVaultData = {
 };
 
 function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;}): ReactElement {
-	const	{address, chainID} = useWeb3();
+	const	{address} = useWeb3();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);
 
 	const	prepareVaultData = useCallback(async (): Promise<void> => {
@@ -50,83 +47,57 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			return;
 		}
 
-		const calls: ContractFunctionConfig[] = [];
-		const wantContractMultiCall = {
-			address: toAddress(vault.WANT_ADDR),
-			abi: erc20ABI
-		};
-		const vaultV2ContractMultiCall = {
-			address: toAddress(vault.VAULT_ADDR),
-			abi: YVAULT_ABI
-		};
-		const vaultV3ContractMultiCall = {
-			address: toAddress(vault.VAULT_ADDR),
-			abi: YVAULT_V3_BASE_ABI
-		};
-		const tokenizedStrategyContract = {address: toAddress(vault.VAULT_ADDR), abi: STRATEGY_V3_BASE_ABI};
-
-		const	yearnRouterForChain = (process.env.YEARN_ROUTER as TNDict<string>)[vault.CHAIN_ID];
-		const	allowanceSpender = vault.VAULT_ABI.startsWith('v3') ? yearnRouterForChain : vault.VAULT_ADDR;
-
-		calls.push({...vaultV2ContractMultiCall, functionName: 'totalAssets'});
-		calls.push({...vaultV2ContractMultiCall, functionName: 'pricePerShare'});
-		calls.push({...vaultV2ContractMultiCall, functionName: 'decimals'});
-		calls.push({...vaultV2ContractMultiCall, functionName: 'balanceOf', args: [address]});
-		calls.push({...wantContractMultiCall, functionName: 'balanceOf', args: [address]});
-		calls.push({...wantContractMultiCall, functionName: 'allowance', args: [address, allowanceSpender]});
-		calls.push({...vaultV3ContractMultiCall, functionName: 'allowance', args: [address, yearnRouterForChain]});
-
-		if (vault.VAULT_ABI.startsWith('v3')) {
-			vault.VAULT_ABI === 'v3-vault' ?
-				calls.push({...vaultV3ContractMultiCall, functionName: 'api_version'}) : // v3 vault
-				calls.push({...tokenizedStrategyContract, functionName: 'apiVersion'}); // v3 strategy
-
-
-			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // === depositLimit
-			calls.push({...vaultV3ContractMultiCall, functionName: 'maxDeposit', args: [address]}); // ok to have same in this case
-		} else {
-			calls.push({...vaultV2ContractMultiCall, functionName: 'apiVersion'});
-			calls.push({...vaultV2ContractMultiCall, functionName: 'depositLimit'});
-			calls.push({...vaultV2ContractMultiCall, functionName: 'availableDepositLimit'});
-		}
-
-		const callResult = await multicall({contracts: calls as never[], chainId: chainID});
-		const totalAssets = decodeAsBigInt(callResult[0]);
-		const pricePerShare = decodeAsBigInt(callResult[1]);
-		const decimals = decodeAsBigInt(callResult[2]);
-		const balanceOf = decodeAsBigInt(callResult[3]);
-		const wantBalance = decodeAsBigInt(callResult[4]);
-		const wantAllowance = decodeAsBigInt(callResult[5]);
-		const allowanceYRouter = decodeAsBigInt(callResult[6]);
-		const apiVersion = callResult[7].result as string;
-		const depositLimit = decodeAsBigInt(callResult[8]) >= (maxUint256 - 1n) ?
-			decodeAsBigInt(callResult[8]) : decodeAsBigInt(callResult[8]) + totalAssets;
-		const availableDepositLimit = decodeAsBigInt(callResult[9]);
-
-		const coinBalance = await fetchBalance({
-			address: address
+		const data = await readContracts({
+			contracts: [
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'totalAssets'},
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'pricePerShare'},
+				{abi: erc20ABI, address: toAddress(vault.WANT_ADDR), functionName: 'decimals'},
+				{abi: erc20ABI, address: toAddress(vault.WANT_ADDR), functionName: 'balanceOf', args: [toAddress(address)]},
+				{abi: erc20ABI, address: toAddress(vault.WANT_ADDR), functionName: 'allowance', args: [toAddress(address), toAddress(vault.VAULT_ADDR)]},
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'balanceOf', args: [toAddress(address)]},
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'apiVersion'},
+				{abi: YVAULTV3_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'api_version'},
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'depositLimit'},
+				{abi: YVAULT_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'availableDepositLimit'},
+				{abi: YVAULTV3_ABI, address: toAddress(vault.VAULT_ADDR), functionName: 'maxDeposit', args: [toAddress(address)]}
+			]
 		});
-
-		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
-		const	numberDecimals = Number(decimals);
+		const coinBalance = await fetchBalance({address: address});
+		const decimals = decodeAsNumber(data[2]);
+		const totalAssets = toNormalizedBN(decodeAsBigInt(data[0]), decimals);
+		const pricePerShare = toNormalizedBN(decodeAsBigInt(data[1]), decimals);
+		const wantBalance = toNormalizedBN(decodeAsBigInt(data[3]), decimals);
+		const wantAllowance = toNormalizedBN(decodeAsBigInt(data[4]), decimals);
+		const balanceOf = toNormalizedBN(decodeAsBigInt(data[5]), decimals);
+		const apiVersion = decodeAsString(data[6], decodeAsString(data[7], '2'));
+		let depositLimit = toNormalizedBN(0n);
+		let availableDepositLimit = toNormalizedBN(0n);
+		if (vault.VAULT_ABI.startsWith('v3')) {
+			depositLimit = toNormalizedBN(decodeAsBigInt(data[10]), decimals);
+			availableDepositLimit = toNormalizedBN(decodeAsBigInt(data[10]), decimals);
+		} else {
+			depositLimit = toNormalizedBN(decodeAsBigInt(data[8]) >= (maxUint256 - 1n) ? decodeAsBigInt(data[8]) : decodeAsBigInt(data[8]) + totalAssets.raw, decimals);
+			availableDepositLimit = toNormalizedBN(decodeAsBigInt(data[9]), decimals);
+		}
+		const price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
 
 		set_vaultData({
 			loaded: true,
-			apiVersion: apiVersion,
-			decimals: numberDecimals,
-			depositLimit: toNormalizedBN(depositLimit, numberDecimals),
-			totalAssets: toNormalizedBN(totalAssets, numberDecimals),
-			availableDepositLimit: toNormalizedBN(availableDepositLimit, numberDecimals),
-			pricePerShare: toNormalizedBN(pricePerShare, numberDecimals),
+			apiVersion,
+			decimals,
+			depositLimit,
+			totalAssets,
+			availableDepositLimit,
+			pricePerShare,
 			coinBalance: toNormalizedBN(coinBalance.value, 18),
-			balanceOf: toNormalizedBN(balanceOf, numberDecimals),
-			balanceOfValue: Number((Number(ethers.utils.formatUnits(balanceOf, numberDecimals)) * Number(ethers.utils.formatUnits(pricePerShare, numberDecimals)) * price).toFixed(2) || 0),
-			wantBalance: toNormalizedBN(wantBalance, numberDecimals),
+			balanceOf,
+			balanceOfValue: Number(balanceOf.normalized) * Number(pricePerShare.normalized) * price,
+			wantBalance,
 			wantPrice: price,
-			totalAUM: formatToNormalizedValue(totalAssets, numberDecimals) * price,
-			progress: isZero(depositLimit) ? 1 : (Number(ethers.utils.formatUnits(depositLimit, numberDecimals)) - Number(ethers.utils.formatUnits(availableDepositLimit, numberDecimals))) / Number(ethers.utils.formatUnits(depositLimit, numberDecimals)),
-			allowance: toNormalizedBN(wantAllowance, numberDecimals),
-			allowanceYRouter: toNormalizedBN(allowanceYRouter, numberDecimals)
+			totalAUM: Number(totalAssets.normalized) * price,
+			progress: isZero(depositLimit.raw) ? 1 : (Number(depositLimit.normalized) - Number(availableDepositLimit.normalized)) / Number(depositLimit.normalized),
+			allowance: wantAllowance,
+			allowanceYRouter: wantAllowance
 		});
 
 		if (vault.ZAP_ADDR) {
@@ -136,10 +107,10 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 				functionName: 'allowance',
 				args: [address, toAddress(vault.ZAP_ADDR)]
 			});
-			set_vaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowanceZapOut, numberDecimals)}));
+			set_vaultData((v): TVaultData => ({...v, allowanceZapOut: toNormalizedBN(allowanceZapOut, decimals)}));
 		}
 
-	}, [vault, address, chainID, prices]);
+	}, [vault, address, prices]);
 
 	useEffect((): void => {
 		prepareVaultData();
