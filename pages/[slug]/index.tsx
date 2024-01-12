@@ -8,14 +8,18 @@ import {toAddress} from '@yearn-finance/web-lib/utils/address';
 
 import type {GetStaticPathsResult, GetStaticPropsResult} from 'next';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
+import type {TYDaemonPrices} from 'schemas/yDaemonPricesSchema';
 import type {TVault} from 'utils/types';
 import type {TDict} from '@yearn-finance/web-lib/types';
 
-function	Wrapper({vault, slug, prices}: {vault: TVault, slug: string, prices: TCoinGeckoPrices}): ReactElement {
+function	Wrapper({vault, slug, prices}: {
+	vault: TVault,
+	slug: string,
+	prices: {fromCoingecko: TCoinGeckoPrices; fromYDaemon: TYDaemonPrices;}
+}): ReactElement {
 	const	{isActive, chainID, onSwitchChain, openLoginModal} = useWeb3();
 	const	{communityVaults} = useFactory();
 	const	[currentVault, set_currentVault] = useState(vault);
-
 
 	useEffect((): void => {
 		if (!vault && communityVaults !== undefined) {

@@ -19,7 +19,7 @@ export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetc
 			closest:'before',
 			apikey: process.env.FTMSCAN_API || ''
 		});
-		
+
 		return fetch<TBlockTimestampDetails>({
 			endpoint: `https://api.ftmscan.com/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 			schema: blockTimestampResponseSchema
@@ -61,7 +61,7 @@ export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetc
 		timestamp: timestamp.toString(),
 		closest:'before',
 		apikey: process.env.ETHERSCAN_API || ''
-	});		
+	});
 	return fetch<TBlockTimestampDetails>({
 		endpoint: `https://api.etherscan.io/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
 		schema: blockTimestampResponseSchema
@@ -73,20 +73,3 @@ export async function asyncForEach<T>(array: T[], callback: (item: T, index: num
 		await callback(array[index], index, array);
 	}
 }
-
-// export function	parseMarkdown(markdownText: string): string {
-// 	const htmlText = markdownText
-// 		.replace(/\[(.*?)\]\((.*?)\)/gim, "<a class='hover:underline cursor-pointer' target='_blank' href='$2'>$1</a>");
-
-// 	return htmlText.trim();
-// }
-
-// export async function fetchCryptoPrice(from = '', to = 'usd'): Promise<any> {
-// 	const	result = await performGet(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
-// 	console.log(result);
-
-// 	if (result) {
-// 		return result;
-// 	}
-// 	return null;
-// }

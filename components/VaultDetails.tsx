@@ -66,7 +66,9 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					</p>
 				</div>
 				<div>
-					<p className={'inline text-neutral-900'}>{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : 'CoinGecko 🦎'}): `}</p>
+					<p className={'inline text-neutral-900'}>
+						{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : vaultData.priceSource === 'yDaemon' ? 'yDaemon 🪼' : vaultData.priceSource === 'Coingecko' ? 'CoinGecko 🦎' : 'unknown'}): `}
+					</p>
 					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
 							{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}

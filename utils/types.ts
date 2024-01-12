@@ -89,6 +89,7 @@ export type TVaultData = {
 
 	wantPriceError?: boolean;
 	allowanceZapOut?: TNormalizedBN;
+	priceSource?: 'Coingecko' | 'yDaemon';
 }
 
 export type TStrategyData = {
