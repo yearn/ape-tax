@@ -73,6 +73,7 @@ module.exports = withPWA({
 		AURA_BOOSTER_ADDRESS: '0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10',
 		YEARN_BALANCER_FACTORY_ADDRESS: '0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709',
 		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D',
+		YDAEMON_BASE_URI: process.env.YDAEMON_BASE_URI,
 		YEARN_ROUTER: {
 			1: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
 			137: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
@@ -85,42 +86,3 @@ module.exports = withPWA({
 		}
 	}
 });
-
-
-
-if (process.env.NODE_ENV === 'production') {
-	const {withSentryConfig} = require('@sentry/nextjs');
-
-	module.exports = withSentryConfig(
-		module.exports,
-		{
-			// For all available options, see:
-			// https://github.com/getsentry/sentry-webpack-plugin#options
-
-			// Suppresses source map uploading logs during build
-			silent: true,
-
-			org: 'xopowo-team',
-			project: 'ape-tax'
-		},
-		{
-			// For all available options, see:
-			// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-			// Upload a larger set of source maps for prettier stack traces (increases build time)
-			widenClientFileUpload: true,
-
-			// Transpiles SDK to be compatible with IE11 (increases bundle size)
-			transpileClientSDK: true,
-
-			// Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-			tunnelRoute: '/monitoring',
-
-			// Hides source maps from generated client bundles
-			hideSourceMaps: true,
-
-			// Automatically tree-shake Sentry logger statements to reduce bundle size
-			disableLogger: true
-		}
-	);
-}

@@ -15,9 +15,10 @@ import {toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
+import type {TYDaemonPrices} from 'schemas/yDaemonPricesSchema';
 import type {TVault, TVaultData} from 'utils/types';
 
-const		defaultVaultData: TVaultData = {
+const defaultVaultData: TVaultData = {
 	loaded: false,
 	depositLimit: toNormalizedBN(0),
 	totalAssets: toNormalizedBN(0),
@@ -38,7 +39,10 @@ const		defaultVaultData: TVaultData = {
 	apiVersion: '-'
 };
 
-function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;}): ReactElement {
+function	VaultWrapper({vault, prices}: {
+	vault: TVault;
+	prices: {fromCoingecko: TCoinGeckoPrices; fromYDaemon: TYDaemonPrices;}
+}): ReactElement {
 	const	{address} = useWeb3();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);
 
@@ -79,7 +83,16 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			depositLimit = toNormalizedBN(decodeAsBigInt(data[8]) >= (maxUint256 - 1n) ? decodeAsBigInt(data[8]) : decodeAsBigInt(data[8]) + totalAssets.raw, decimals);
 			availableDepositLimit = toNormalizedBN(decodeAsBigInt(data[9]), decimals);
 		}
-		const price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+
+		let price = 0;
+		let source: 'Coingecko' | 'yDaemon' | undefined = undefined;
+		if (prices.fromYDaemon[toAddress(vault.WANT_ADDR)] !== undefined) {
+			price = Number(toNormalizedBN(Number(prices.fromYDaemon[toAddress(vault.WANT_ADDR)]), 6).normalized);
+			source = 'yDaemon';
+		} else if (prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()] !== undefined) {
+			price = Number(prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0);
+			source = 'Coingecko';
+		}
 
 		set_vaultData({
 			loaded: true,
@@ -97,7 +110,8 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 			totalAUM: Number(totalAssets.normalized) * price,
 			progress: isZero(depositLimit.raw) ? 1 : (Number(depositLimit.normalized) - Number(availableDepositLimit.normalized)) / Number(depositLimit.normalized),
 			allowance: wantAllowance,
-			allowanceYRouter: wantAllowance
+			allowanceYRouter: wantAllowance,
+			priceSource: source
 		});
 
 		if (vault.ZAP_ADDR) {
@@ -117,13 +131,23 @@ function	VaultWrapper({vault, prices}: {vault: TVault; prices: TCoinGeckoPrices;
 	}, [prepareVaultData]);
 
 	useEffect((): void => {
-		const	price = prices?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+		let price = 0;
+		let source: 'Coingecko' | 'yDaemon' | undefined = undefined;
+		if (prices.fromYDaemon[toAddress(vault.WANT_ADDR)] !== undefined) {
+			price = Number(toNormalizedBN(Number(prices.fromYDaemon[toAddress(vault.WANT_ADDR)]), 6).normalized);
+			source = 'yDaemon';
+		} else if (prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()] !== undefined) {
+			price = Number(prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0);
+			source = 'Coingecko';
+		}
+
 		set_vaultData((v): TVaultData => ({
 			...v,
 			wantPrice: price,
 			wantPriceError: false,
 			balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
-			totalAUM: Number(v.totalAssets.normalized) * price
+			totalAUM: Number(v.totalAssets.normalized) * price,
+			priceSource: source
 		}));
 
 	}, [prices, vault]);
