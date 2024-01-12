@@ -1,6 +1,5 @@
 import {assert} from 'utils/assert';
 import {type Abi, BaseError, type SimulateContractParameters} from 'viem';
-import {captureException} from '@sentry/nextjs';
 import {type GetWalletClientResult, prepareWriteContract, waitForTransaction, type WalletClient, writeContract} from '@wagmi/core';
 import {toast} from '@yearn-finance/web-lib/components/yToast';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
@@ -85,11 +84,6 @@ export async function handleTx<
 		toast({type: 'success', content: 'Transaction successful!'});
 		return ({isSuccessful: receipt.status === 'success', receipt});
 	} catch (error) {
-
-		if (process.env.NODE_ENV === 'production') {
-			captureException(error);
-		}
-
 		if (!(error instanceof BaseError)) {
 			return ({isSuccessful: false, error});
 		}

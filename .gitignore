@@ -34,6 +34,3 @@ tsconfig.tsbuildinfo
 **/public/sw.js.map
 **/public/workbox-*.js.map
 **/public/worker-*.js.map
-
-# Sentry Auth Token
-.sentryclirc
