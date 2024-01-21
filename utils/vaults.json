@@ -1151,5 +1151,17 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-V3-Ajna-USDC": {
+    "TITLE": "Ajna USDC",
+    "LOGO": "💵👁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xF54a15F6da443041Bb075959EA66EE47655DDFcA",
+    "WANT_ADDR": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 137
   }
 }
