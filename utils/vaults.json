@@ -1163,5 +1163,17 @@
     "COINGECKO_SYMBOL": "usdc",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-V3-Ajna-WETH": {
+    "TITLE": "Ajna WETH",
+    "LOGO": "🦇👁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x503e0BaB6acDAE73eA7fb7cf6Ae5792014dbe935",
+    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
