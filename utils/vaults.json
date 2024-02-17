@@ -1163,5 +1163,17 @@
     "COINGECKO_SYMBOL": "usdc",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 137
+  },
+  "yearn-V3-Morpho-USDC": {
+    "TITLE": "Morpho USDC",
+    "LOGO": "💵🦋",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xe7383FE1c0c2D26D3eD90049552a9822067ec333",
+    "WANT_ADDR": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usd-coin",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
