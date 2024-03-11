@@ -195,7 +195,7 @@ export async function	withdrawERC20(props: TWithdrawERC20Args): Promise<TTxRespo
 			address: props.contractAddress,
 			abi: YVAULT_V3_BASE_ABI,
 			functionName: 'redeem',
-			args: [amountToUse, signerAddress, signerAddress, 100n]
+			args: [amountToUse, signerAddress, signerAddress, 1n]
 		});
 	}
 	return await handleTx(props, {
