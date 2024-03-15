@@ -1175,5 +1175,17 @@
     "COINGECKO_SYMBOL": "weth",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-V3-EURe-1": {
+    "TITLE": "EURe-1",
+    "LOGO": "🇪🇺📧",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x5012C6bf79b3047ECFFf2F212DfFDA4d2128188f",
+    "WANT_ADDR": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+    "WANT_SYMBOL": "EURe",
+    "COINGECKO_SYMBOL": "monerium-eur-money",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 100
   }
 }
