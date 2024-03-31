@@ -1187,5 +1187,41 @@
     "COINGECKO_SYMBOL": "monerium-eur-money",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 100
+  },
+  "yearn-V3-Pendle-eETH": {
+    "TITLE": "Super Resteak: eETH LP (25 APR 2024) on Pendle",
+    "LOGO": "🥩🥩",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x074943fEfE3391D033A15557dfa1b6f246Ce5fD0",
+    "WANT_ADDR": "0xE11f9786B06438456b044B3E21712228ADcAA0D1",
+    "WANT_SYMBOL": "eETH LP (25 APR 2024)",
+    "COINGECKO_SYMBOL": "ether-fi-staked-eth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
+  },
+  "yearn-V3-Pendle-rsETH": {
+    "TITLE": "Super Resteak: Kelp rsETH LP (25 APR 2024) on Pendle",
+    "LOGO": "🥩🥩",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb119e90Beb09Fcf9ABc92c20a8D84fe8bdfcc6E3",
+    "WANT_ADDR": "0x6F02C88650837C8dfe89F66723c4743E9cF833cd",
+    "WANT_SYMBOL": "rsETH LP (25 APR 2024)",
+    "COINGECKO_SYMBOL": "kelp-dao-restaked-eth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
+  },
+  "yearn-V3-Pendle-mPendle": {
+    "TITLE": "Mega Hypnosis mPENDLE LP (26 SEP 2024)",
+    "LOGO": "😵‍💫😵‍💫",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xDfaa4001308F5eC4d06920cD0D2C649c6f930e2C",
+    "WANT_ADDR": "0xf617792eA9Dceb2208F4C440258B21d2f3FdB9A3",
+    "WANT_SYMBOL": "mPENDLE (26 SEP 2024)",
+    "COINGECKO_SYMBOL": "mpendle",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
   }
 }
