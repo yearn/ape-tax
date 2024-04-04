@@ -1235,5 +1235,5 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 42161
-  },
+  }
 }
