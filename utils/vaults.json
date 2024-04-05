@@ -1188,6 +1188,18 @@
     "VAULT_STATUS": "new",
     "CHAIN_ID": 100
   },
+  "yearn-V3-Ajna-EURe": {
+    "TITLE": "Ajna-EURe",
+    "LOGO": "🇪🇺👁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x39B68451F05Aaa020611CF887a7338f0991fFd60",
+    "WANT_ADDR": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+    "WANT_SYMBOL": "EURe",
+    "COINGECKO_SYMBOL": "monerium-eur-money",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 100
+  },
   "yearn-V3-Pendle-eETH": {
     "TITLE": "Super Resteak: eETH LP (25 APR 2024) on Pendle",
     "LOGO": "🥩🥩",
