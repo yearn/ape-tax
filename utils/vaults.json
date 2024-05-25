@@ -1259,5 +1259,17 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-V3-yPT-eETH": {
+    "TITLE": "Keep rollin rollin - yPT-eETH",
+    "LOGO": "🏎️🔁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x829a7e2AB5c8791e02FC6F949CD897D79be3653E",
+    "WANT_ADDR": "0x35fA164735182de50811E8e2E824cFb9B6118ac2",
+    "WANT_SYMBOL": "eETH",
+    "COINGECKO_SYMBOL": "ether-fi-staked-eth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
