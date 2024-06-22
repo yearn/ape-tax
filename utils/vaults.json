@@ -1259,5 +1259,29 @@
     "COINGECKO_SYMBOL": "usd-coin",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-V3-yPT-weETH": {
+    "TITLE": "Keep rollin' rollin' - yPT-weETH (auto-rolling Pendle PT)",
+    "LOGO": "🏎️🔁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x3cE71021cCA8a2902764a43C60ff5F8A312245f9",
+    "WANT_ADDR": "0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe",
+    "WANT_SYMBOL": "weETH",
+    "COINGECKO_SYMBOL": "wrapped-eeth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
+  },
+  "yearn-V3-yPT-USDe": {
+    "TITLE": "Athena Forever - yPT-USDe (auto-rolling Pendle PT)",
+    "LOGO": "🏛🔁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xaa4342C2693Ab5DE6D3663FE87d9a92Cf18CB9b6",
+    "WANT_ADDR": "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+    "WANT_SYMBOL": "USDe",
+    "COINGECKO_SYMBOL": "ethena-usde",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 42161
   }
 }
