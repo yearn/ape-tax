@@ -10,7 +10,7 @@ const currencyDetails: {[key: number]: {name: string, symbol: string}} = {
 
 const explorerDetails: {[key: number]: {name: string, url: string}} = {
 	1: {name: 'Etherscan', url: 'https://etherscan.io'},
-	10: {name: 'Optimism Explorer', url: 'https://explorer.optimism.io'},
+	10: {name: 'Optimism Explorer', url: 'https://optimistic.etherscan.io'},
 	137: {name: 'PolygonScan', url: 'https://polygonscan.com'},
 	250: {name: 'FTMScan', url: 'https://ftmscan.com'},
 	42161: {name: 'Arbiscan', url: 'https://arbiscan.io'}

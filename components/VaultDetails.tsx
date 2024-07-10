@@ -17,7 +17,7 @@ import type {TNDict} from '@yearn-finance/web-lib/types';
 
 function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}): ReactElement {
 	const	{chain} = useNetwork();
-	const	chainExplorer = chain?.blockExplorers?.default?.url || 'https://etherscan.io';
+	const	chainExplorer = chain?.blockExplorers?.etherscan?.url || chain?.blockExplorers?.default?.url || 'https://etherscan.io';
 	const	aprOracleForChain = (process?.env?.APR_ORACLE_V3 as TNDict<string>)[vault.CHAIN_ID];
 
 	const	{data: vaultAPYSWR, isLoading} = useSWR<Maybe<TSpecificAPIResult>>(`/api/specificApy?address=${vault?.VAULT_ADDR}&network=${vault?.CHAIN_ID}`, baseFetcher, {revalidateOnMount: true, revalidateOnReconnect: true, shouldRetryOnError: true});
