@@ -1283,5 +1283,29 @@
     "COINGECKO_SYMBOL": "ethena-usde",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 42161
+  }, 
+  "yearn-V3-Across-WETH-Lender": {
+    "TITLE": "Across WETH Lender",
+    "LOGO": "🌁🌉",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x9861708f2ad2BD1ed8D4D12436C0d8EB1ED36f1c",
+    "WANT_ADDR": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "weth",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "yearn-V3-Across-DAI-Lender": {
+    "TITLE": "Across DAI Lender",
+    "LOGO": "🌉🌁",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xd6671D1d0A3FE3a052a7e06cdc35587CC46BADF0",
+    "WANT_ADDR": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "WANT_SYMBOL": "DAI",
+    "COINGECKO_SYMBOL": "dai",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
