@@ -1307,5 +1307,29 @@
     "COINGECKO_SYMBOL": "dai",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-V3-SkyLender": {
+    "TITLE": "Sky Savings Rate USDS Lender",
+    "LOGO": "🌅🛟",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x91F008870eEF686b61a3775944D55a3FC53B7024",
+    "WANT_ADDR": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+    "WANT_SYMBOL": "USDS",
+    "COINGECKO_SYMBOL": "usds",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
+  },
+  "yearn-V3-SkyCompounder": {
+    "TITLE": "Sky Rewards USDS Compounder",
+    "LOGO": "🌅📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0x4cE9c93513DfF543Bc392870d57dF8C04e89Ba0a",
+    "WANT_ADDR": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+    "WANT_SYMBOL": "USDS",
+    "COINGECKO_SYMBOL": "usds",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 1
   }
 }
