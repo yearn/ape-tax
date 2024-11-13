@@ -1,62 +1,64 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-const runtimeCaching = require('next-pwa/cache');
-const withPWA = require('next-pwa')({
-	dest: './public/',
+const runtimeCaching = require("next-pwa/cache");
+const withPWA = require("next-pwa")({
+	dest: "./public/",
 	register: true,
 	skipWaiting: true,
 	runtimeCaching,
-	buildExcludes: [/middleware-manifest.json$/]
+	buildExcludes: [/middleware-manifest.json$/],
 });
 
 module.exports = withPWA({
 	async rewrites() {
 		return [
 			{
-				source: '/js/script.js',
-				destination: 'https://plausible.io/js/script.js'
+				source: "/js/script.js",
+				destination: "https://plausible.io/js/script.js",
 			},
 			{
-				source: '/api/event',
-				destination: 'https://plausible.io/api/event'
-			}
+				source: "/api/event",
+				destination: "https://plausible.io/api/event",
+			},
 		];
 	},
 	env: {
 		/* 🔵 - Yearn Finance **************************************************
-		** Stuff used for the SEO or some related elements, like the title, the
-		** github url etc.
-		** - WEBSITE_URI is used to display the og image and get the base URI
-		** - WEBSITE_NAME is used as name displayed on the top of the tab in
-		**   the browser.
-		** - WEBSITE_TITLE should be the name of your website. It may be used
-		**   by third parties to display your app name (coinbase for instance)
-		** - WEBSITE_DESCRIPTION is used in the meta tags
-		** - PROJECT_GITHUB_URL should be the link to your project on GitHub
-		**********************************************************************/
-		WEBSITE_URI: 'https://ape.tax/',
-		WEBSITE_NAME: 'ape.tax',
-		WEBSITE_TITLE: 'ape.tax',
-		WEBSITE_DESCRIPTION: 'Experimental Experiments Registry',
-		PROJECT_GITHUB_URL: 'https://github.com/saltyfacu/ape-tax',
+		 ** Stuff used for the SEO or some related elements, like the title, the
+		 ** github url etc.
+		 ** - WEBSITE_URI is used to display the og image and get the base URI
+		 ** - WEBSITE_NAME is used as name displayed on the top of the tab in
+		 **   the browser.
+		 ** - WEBSITE_TITLE should be the name of your website. It may be used
+		 **   by third parties to display your app name (coinbase for instance)
+		 ** - WEBSITE_DESCRIPTION is used in the meta tags
+		 ** - PROJECT_GITHUB_URL should be the link to your project on GitHub
+		 **********************************************************************/
+		WEBSITE_URI: "https://ape.tax/",
+		WEBSITE_NAME: "ape.tax",
+		WEBSITE_TITLE: "ape.tax",
+		WEBSITE_DESCRIPTION: "Experimental Experiments Registry",
+		PROJECT_GITHUB_URL: "https://github.com/saltyfacu/ape-tax",
 
 		/* 🔵 - Yearn Finance **************************************************
-		** Config over the RPC
-		**********************************************************************/
+		 ** Config over the RPC
+		 **********************************************************************/
 		WEB_SOCKET_URL: {
 			1: process.env.WS_URL_MAINNET,
 			10: process.env.WS_URL_OPTIMISM,
 			137: process.env.WS_URL_POLYGON,
 			250: process.env.WS_URL_FANTOM,
 			42161: process.env.WS_URL_ARBITRUM,
-			43114: process.env.WS_URL_AVALANCHE
+			43114: process.env.WS_URL_AVALANCHE,
+			8453: process.env.WS_URL_BASE,
 		},
 		JSON_RPC_URL: {
 			1: process.env.RPC_URL_MAINNET,
 			10: process.env.RPC_URL_OPTIMISM,
-			137: process.env.RPC_URL_POLYGON || 'https://polygon-rpc.com',
+			137: process.env.RPC_URL_POLYGON || "https://polygon-rpc.com",
 			250: process.env.RPC_URL_FANTOM,
 			42161: process.env.RPC_URL_ARBITRUM,
-			43114: process.env.RPC_URL_AVALANCHE
+			43114: process.env.RPC_URL_AVALANCHE,
+			8453: process.env.RPC_URL_BASE,
 		},
 		SECRET: process.env.SECRET,
 		FTMSCAN_API: process.env.FTMSCAN_API,
@@ -70,19 +72,25 @@ module.exports = withPWA({
 		ALCHEMY_KEY: process.env.ALCHEMY_KEY,
 		ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
 		INFURA_PROJECT_ID: process.env.INFURA_PROJECT_ID,
-		AURA_BOOSTER_ADDRESS: '0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10',
-		YEARN_BALANCER_FACTORY_ADDRESS: '0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709',
-		YEARN_FACTORY_KEEPER_WRAPPER: '0x256e6a486075fbAdbB881516e9b6b507fd082B5D',
+		AURA_BOOSTER_ADDRESS: "0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10",
+		YEARN_BALANCER_FACTORY_ADDRESS:
+			"0x03B0E3F8B22933C2b0A7Dfc46C2FdB746a106709",
+		YEARN_FACTORY_KEEPER_WRAPPER:
+			"0x256e6a486075fbAdbB881516e9b6b507fd082B5D",
 		YDAEMON_BASE_URI: process.env.YDAEMON_BASE_URI,
 		YEARN_ROUTER: {
-			1: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
-			137: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
-			43114: '0x1112dbcf805682e828606f74ab717abf4b4fd8de',
-			1337: '0x1112dbcf805682e828606f74ab717abf4b4fd8de'
+			1: "0x1112dbcf805682e828606f74ab717abf4b4fd8de",
+			137: "0x1112dbcf805682e828606f74ab717abf4b4fd8de",
+			43114: "0x1112dbcf805682e828606f74ab717abf4b4fd8de",
+			1337: "0x1112dbcf805682e828606f74ab717abf4b4fd8de",
+			8453: "0x1112dbcf805682e828606f74ab717abf4b4fd8de",
 		},
 		APR_ORACLE_V3: {
-			137: '0x02b0210fC1575b38147B232b40D7188eF14C04f2',
-			1337: '0x02b0210fC1575b38147B232b40D7188eF14C04f2'
-		}
-	}
+			1: "0x1981AD9F44F2EA9aDd2dC4AD7D075c102C70aF92",
+			137: "0x1981AD9F44F2EA9aDd2dC4AD7D075c102C70aF92",
+			43114: "0x1981AD9F44F2EA9aDd2dC4AD7D075c102C70aF92",
+			1337: "0x1981AD9F44F2EA9aDd2dC4AD7D075c102C70aF92",
+			8453: "0x1981AD9F44F2EA9aDd2dC4AD7D075c102C70aF92",
+		},
+	},
 });

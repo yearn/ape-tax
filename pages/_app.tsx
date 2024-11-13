@@ -5,7 +5,7 @@ import {useFetch} from 'hooks/useFetch';
 import {useYDaemonBaseURI} from 'hooks/useYDaemonBaseURI';
 import {yDaemonPricesChainSchema} from 'schemas/yDaemonPricesSchema';
 import vaults from 'utils/vaults.json';
-import {arbitrum, fantom, gnosis, mainnet, optimism, polygon} from 'viem/chains';
+import {arbitrum, base, fantom, gnosis, mainnet, optimism, polygon} from 'viem/chains';
 import useSWR from 'swr';
 import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
@@ -91,6 +91,7 @@ function	MyApp(props: AppProps): ReactElement {
 				fantom,
 				arbitrum,
 				gnosis,
+				base,
 				localhost
 			]}
 			options={{
