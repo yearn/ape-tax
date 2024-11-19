@@ -1399,7 +1399,31 @@
     "VAULT_TYPE": "experimental",
     "VAULT_ADDR": "0xEed00e00236cD7F36F2558D8b5fD05046449599D",
     "WANT_ADDR": "0x4200000000000000000000000000000000000006",
-    "WANT_SYMBOL": "ysWETH",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
+  },
+  "yearn-v3-BaseRewards": {
+    "TITLE": "New Base rewards",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xD95872cF52477DD9116DBD1c5A3d9d595D37024a",
+    "WANT_ADDR": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
+  },
+  "yearn-v3-LevMoonwellWETH": {
+    "TITLE": "LevMoonwellWETH",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb65f1e6394AaDC3dc1AD4B8E5cF79Bbb566Dc195",
+    "WANT_ADDR": "0x4200000000000000000000000000000000000006",
+    "WANT_SYMBOL": "WETH",
     "COINGECKO_SYMBOL": "usdc",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 8453  

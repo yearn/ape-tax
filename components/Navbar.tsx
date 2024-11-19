@@ -81,9 +81,7 @@ function	Navbar(): ReactElement {
 		}
 		const chainsForInjected = injectedConnector.chains;
 		const noTestnet = chainsForInjected.filter(({id}): boolean => id !== 1337);
-		const baseNetwork = {value: 8453, label: 'Base'};
 		return [
-			baseNetwork,
 			...noTestnet.map((network: Chain): TNetwork => (
 				{value: network.id, label: network.name}
 			))
