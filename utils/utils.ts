@@ -55,6 +55,20 @@ export async function fetchBlockTimestamp(timestamp: number, network = 1): TFetc
 		});
 	}
 
+	if(network === 8453) {
+		const blockTimestampQueryParams = new URLSearchParams({
+			module: 'block',
+			action: 'getblocknobytime',
+			timestamp: timestamp.toString(),
+			closest:'before',
+			apikey: process.env.BASESCAN_API || ''
+		});
+		return fetch<TBlockTimestampDetails>({
+			endpoint: `https://api.basescan.org/api?=${new URLSearchParams(blockTimestampQueryParams)}`,
+			schema: blockTimestampResponseSchema
+		});
+	}
+
 	const blockTimestampQueryParams = new URLSearchParams({
 		module: 'block',
 		action: 'getblocknobytime',

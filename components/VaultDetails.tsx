@@ -24,6 +24,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 	const	[vaultAPY, set_vaultAPY] = useState<Maybe<TSpecificAPIResult>>(null);
 	const	[oracleAPY, set_oracleAPY] = useState<number>(0);
+	const 	[strategyAPR, set_stratefyAPR] = useState<number>(0);
 
 	const	fetchOracleData = useCallback(async (): Promise<void> => {
 		if(vault.VAULT_ABI.startsWith('v3') && aprOracleForChain){
@@ -41,10 +42,27 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 		}
 	}, [aprOracleForChain, vault.VAULT_ABI, vault.VAULT_ADDR]);
 
+	const fetchStrategyData = useCallback(async (): Promise<void> => {
+		if(vault.VAULT_ABI.startsWith('v3') && aprOracleForChain){ 
+
+			const currentStrategyAPR = await readContract({
+				abi: APR_ORACLE_V3_ABI,
+				address: toAddress(aprOracleForChain),
+				functionName: 'getStrategyApr',
+				args: [toAddress(vault.VAULT_ADDR), 0n]
+			}) as bigint;
+
+			const apySnapshot = formatToNormalizedValue(currentStrategyAPR, 18) * 100;
+
+			set_stratefyAPR(apySnapshot);
+		}
+	}, [aprOracleForChain, vault.VAULT_ABI, vault.VAULT_ADDR]);
+
 	useEffect((): void => {
 		set_vaultAPY(vaultAPYSWR);
 		fetchOracleData();
-	}, [fetchOracleData, vaultAPYSWR, vaultData.totalAssets]);
+		fetchStrategyData();
+	}, [fetchOracleData, fetchStrategyData, vaultAPYSWR, vaultData.totalAssets]);
 
 	return (
 		<section aria-label={'DETAILS'}>
@@ -105,12 +123,22 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 
 			<div className={`mb-4 text-sm font-medium ${vault.VAULT_STATUS === 'withdraw' ? 'hidden' : ''}`}>
 				{oracleAPY > 0 ? (
-					<div>
-						<p className={'inline text-neutral-900'}>{'V3 Oracle APR (current snapshot): '}</p>
-						<p className={'ml-3 inline text-neutral-700'}>
-							{`${formatAmount(oracleAPY, 2, 6)} %`}
-						</p>
-					</div>
+					<>
+						<div>
+							<p className={'inline text-neutral-900'}>{'V3 Oracle APR (current snapshot): '}</p>
+							<p className={'ml-3 inline text-neutral-700'}>
+								{`${formatAmount(oracleAPY, 2, 6)} %`}
+							</p>
+						</div>
+						<div>
+							<p className={'inline text-neutral-900'}>{'Strategy APR: '}</p>
+							<p className={'ml-3 inline'}>
+								<Suspense wait={!vaultAPY && isLoading}>
+									{`${formatAmount(strategyAPR, 2, 6)} %`}
+								</Suspense>
+							</p>
+						</div>
+					</>
 				) : (
 					<>
 						<div>

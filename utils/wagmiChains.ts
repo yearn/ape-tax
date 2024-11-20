@@ -5,7 +5,8 @@ const currencyDetails: {[key: number]: {name: string, symbol: string}} = {
 	10: {name: 'Ether', symbol: 'ETH'},
 	137: {name: 'Matic', symbol: 'MATIC'},
 	250: {name: 'Fantom', symbol: 'FTM'},
-	42161: {name: 'Ether', symbol: 'ETH'}
+	42161: {name: 'Ether', symbol: 'ETH'},
+	8453: {name: 'Ether', symbol: 'ETH'}
 };
 
 const explorerDetails: {[key: number]: {name: string, url: string}} = {
@@ -13,7 +14,8 @@ const explorerDetails: {[key: number]: {name: string, url: string}} = {
 	10: {name: 'Optimism Explorer', url: 'https://optimistic.etherscan.io'},
 	137: {name: 'PolygonScan', url: 'https://polygonscan.com'},
 	250: {name: 'FTMScan', url: 'https://ftmscan.com'},
-	42161: {name: 'Arbiscan', url: 'https://arbiscan.io'}
+	42161: {name: 'Arbiscan', url: 'https://arbiscan.io'},
+	8453: {name: 'BaseScan', url: 'https://basescan.org/'}
 };
 
 const forkedChainID = Number(process.env.FORKED_CHAIN_ID);

@@ -1379,5 +1379,53 @@
     "COINGECKO_SYMBOL": "usdc",
     "VAULT_STATUS": "new",
     "CHAIN_ID": 1
+  },
+  "yearn-v3-AaveV3Lender": {
+    "TITLE": "AaveV3Lender",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb3F14E3fda2147fa7574fd003BA40Df266E0B90c",
+    "WANT_ADDR": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
+  },
+  "yearn-v3-CompV3-AERO-Borrower": {
+    "TITLE": "CompV3 WETH Lender AERO Borrower",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xEed00e00236cD7F36F2558D8b5fD05046449599D",
+    "WANT_ADDR": "0x4200000000000000000000000000000000000006",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
+  },
+  "yearn-v3-BaseRewards": {
+    "TITLE": "New Base rewards",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xD95872cF52477DD9116DBD1c5A3d9d595D37024a",
+    "WANT_ADDR": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "WANT_SYMBOL": "USDC",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
+  },
+  "yearn-v3-LevMoonwellWETH": {
+    "TITLE": "LevMoonwellWETH",
+    "LOGO": "💰📈",
+    "VAULT_ABI": "v3-strategy",
+    "VAULT_TYPE": "experimental",
+    "VAULT_ADDR": "0xb65f1e6394AaDC3dc1AD4B8E5cF79Bbb566Dc195",
+    "WANT_ADDR": "0x4200000000000000000000000000000000000006",
+    "WANT_SYMBOL": "WETH",
+    "COINGECKO_SYMBOL": "usdc",
+    "VAULT_STATUS": "new",
+    "CHAIN_ID": 8453  
   }
 }
