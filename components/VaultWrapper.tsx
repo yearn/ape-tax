@@ -6,6 +6,7 @@ import VaultStrategies from 'components/VaultStrategies';
 import VaultWallet from 'components/VaultWallet';
 import {YVAULT_ABI} from 'utils/ABI/yVaultv2.abi';
 import {YVAULTV3_ABI} from 'utils/ABI/yVaultv3.abi';
+import {buildYearnPriceKey} from 'utils/yearnPrices';
 import {maxUint256} from 'viem';
 import {erc20ABI, fetchBalance, readContract, readContracts} from '@wagmi/core';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
@@ -13,8 +14,6 @@ import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {decodeAsBigInt, decodeAsNumber, decodeAsString} from '@yearn-finance/web-lib/utils/decoder';
 import {toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
-
-import {buildYearnPriceKey} from 'utils/yearnPrices';
 
 import type {TAppPrices, TVault, TVaultData} from 'utils/types';
 

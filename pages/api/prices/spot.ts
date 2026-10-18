@@ -43,16 +43,20 @@ function parseCoins(value: string | string[] | undefined): string[] {
 		throw new Error(`A maximum of ${MAX_SPOT_TOKENS} tokens is allowed`);
 	}
 
-	return [...new Set(parsed.map((value): string => {
-		if (typeof value !== 'string') {
-			throw new Error('Each coin must be a token key string');
-		}
-		const match = TOKEN_KEY_PATTERN.exec(value);
-		if (!match || !SUPPORTED_CHAINS.has(match[1].toLowerCase())) {
-			throw new Error('Each coin must use a supported chain name and token address');
-		}
-		return `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
-	}))].sort((left, right): number => left.localeCompare(right));
+	return [
+		...new Set(
+			parsed.map((value): string => {
+				if (typeof value !== 'string') {
+					throw new Error('Each coin must be a token key string');
+				}
+				const match = TOKEN_KEY_PATTERN.exec(value);
+				if (!match || !SUPPORTED_CHAINS.has(match[1].toLowerCase())) {
+					throw new Error('Each coin must use a supported chain name and token address');
+				}
+				return `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
+			})
+		)
+	].sort((left, right): number => left.localeCompare(right));
 }
 
 function setCacheHeaders(response: NextApiResponse, cacheable: boolean): void {
@@ -127,7 +131,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			}
 			prices[coin] = point.price;
 
-			const timestamp = point.timestamp;
+			const {timestamp} = point;
 			if (
 				typeof timestamp !== 'number' ||
 				!Number.isFinite(timestamp) ||
