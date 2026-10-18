@@ -52,7 +52,7 @@ function parseCoins(value: string | string[] | undefined): string[] {
 			throw new Error('Each coin must use a supported chain name and token address');
 		}
 		return `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
-	}))].sort((left, right) => left.localeCompare(right));
+	}))].sort((left, right): number => left.localeCompare(right));
 }
 
 function setCacheHeaders(response: NextApiResponse, cacheable: boolean): void {
