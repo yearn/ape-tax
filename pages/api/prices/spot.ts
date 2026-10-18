@@ -21,9 +21,13 @@ const TOKEN_KEY_PATTERN = /^([a-z]+):(0x[a-fA-F0-9]{40})$/;
 
 type TPriceCoin = {
 	error?: {code?: unknown; message?: unknown};
-	prices?: Array<{price?: unknown; timestamp?: unknown}>;
+	prices?: {price?: unknown; timestamp?: unknown}[];
 };
-type TSpotResponse = {coins?: Record<string, TPriceCoin>};
+type TSpotResponse = {
+	coins?: {
+		[key: string]: TPriceCoin;
+	};
+};
 
 function parseCoins(value: string | string[] | undefined): string[] {
 	const rawCoins = Array.isArray(value) ? value[0] : value;
@@ -48,7 +52,7 @@ function parseCoins(value: string | string[] | undefined): string[] {
 			throw new Error('Each coin must use a supported chain name and token address');
 		}
 		return `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
-	}))].sort();
+	}))].sort((left, right) => left.localeCompare(right));
 }
 
 function setCacheHeaders(response: NextApiResponse, cacheable: boolean): void {
@@ -102,10 +106,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		const response = payload as TSpotResponse;
-		const prices: Record<string, number> = {};
+		const prices: {[key: string]: number} = {};
 		const missing: string[] = [];
 		const stale: string[] = [];
-		const errors: Record<string, {code: string; message: string}> = {};
+		const errors: {[key: string]: {code: string; message: string}} = {};
 		for (const coin of coins) {
 			const quote = response.coins?.[coin];
 			if (quote?.error) {
