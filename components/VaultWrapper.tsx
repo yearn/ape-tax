@@ -14,9 +14,9 @@ import {decodeAsBigInt, decodeAsNumber, decodeAsString} from '@yearn-finance/web
 import {toNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
 import {isZero} from '@yearn-finance/web-lib/utils/isZero';
 
-import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
-import type {TYDaemonPrices} from 'schemas/yDaemonPricesSchema';
-import type {TVault, TVaultData} from 'utils/types';
+import {buildYearnPriceKey} from 'utils/yearnPrices';
+
+import type {TAppPrices, TVault, TVaultData} from 'utils/types';
 
 const defaultVaultData: TVaultData = {
 	loaded: false,
@@ -41,7 +41,7 @@ const defaultVaultData: TVaultData = {
 
 function	VaultWrapper({vault, prices}: {
 	vault: TVault;
-	prices: {fromCoingecko: TCoinGeckoPrices; fromYDaemon: TYDaemonPrices;}
+	prices: TAppPrices
 }): ReactElement {
 	const	{address} = useWeb3();
 	const	[vaultData, set_vaultData] = useState<TVaultData>(defaultVaultData);
@@ -85,13 +85,18 @@ function	VaultWrapper({vault, prices}: {
 		}
 
 		let price = 0;
-		let source: 'Coingecko' | 'yDaemon' | undefined = undefined;
-		if (prices.fromYDaemon[toAddress(vault.WANT_ADDR)] !== undefined) {
-			price = Number(toNormalizedBN(Number(prices.fromYDaemon[toAddress(vault.WANT_ADDR)]), 6).normalized);
-			source = 'yDaemon';
-		} else if (prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()] !== undefined) {
-			price = Number(prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0);
-			source = 'Coingecko';
+		let source: 'Coingecko' | 'Yearn Price Service' | undefined;
+		const priceKey = buildYearnPriceKey(vault.CHAIN_ID, vault.WANT_ADDR);
+		const servicePrice = priceKey ? prices.fromYearnPrices[priceKey] : undefined;
+		if (typeof servicePrice === 'number' && Number.isFinite(servicePrice) && servicePrice >= 0) {
+			price = servicePrice;
+			source = 'Yearn Price Service';
+		} else {
+			const coingeckoPrice = prices.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+			if (typeof coingeckoPrice === 'number' && Number.isFinite(coingeckoPrice) && coingeckoPrice >= 0) {
+				price = coingeckoPrice;
+				source = 'Coingecko';
+			}
 		}
 
 		set_vaultData({
@@ -111,6 +116,7 @@ function	VaultWrapper({vault, prices}: {
 			progress: isZero(depositLimit.raw) ? 1 : (Number(depositLimit.normalized) - Number(availableDepositLimit.normalized)) / Number(depositLimit.normalized),
 			allowance: wantAllowance,
 			allowanceYRouter: wantAllowance,
+			wantPriceError: source === undefined,
 			priceSource: source
 		});
 
@@ -132,19 +138,24 @@ function	VaultWrapper({vault, prices}: {
 
 	useEffect((): void => {
 		let price = 0;
-		let source: 'Coingecko' | 'yDaemon' | undefined = undefined;
-		if (prices.fromYDaemon[toAddress(vault.WANT_ADDR)] !== undefined) {
-			price = Number(toNormalizedBN(Number(prices.fromYDaemon[toAddress(vault.WANT_ADDR)]), 6).normalized);
-			source = 'yDaemon';
-		} else if (prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()] !== undefined) {
-			price = Number(prices?.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd || 0);
-			source = 'Coingecko';
+		let source: 'Coingecko' | 'Yearn Price Service' | undefined;
+		const priceKey = buildYearnPriceKey(vault.CHAIN_ID, vault.WANT_ADDR);
+		const servicePrice = priceKey ? prices.fromYearnPrices[priceKey] : undefined;
+		if (typeof servicePrice === 'number' && Number.isFinite(servicePrice) && servicePrice >= 0) {
+			price = servicePrice;
+			source = 'Yearn Price Service';
+		} else {
+			const coingeckoPrice = prices.fromCoingecko?.[vault.COINGECKO_SYMBOL.toLowerCase()]?.usd;
+			if (typeof coingeckoPrice === 'number' && Number.isFinite(coingeckoPrice) && coingeckoPrice >= 0) {
+				price = coingeckoPrice;
+				source = 'Coingecko';
+			}
 		}
 
 		set_vaultData((v): TVaultData => ({
 			...v,
 			wantPrice: price,
-			wantPriceError: false,
+			wantPriceError: source === undefined,
 			balanceOfValue: Number(v.balanceOf.normalized) * Number(v.pricePerShare.normalized) * price,
 			totalAUM: Number(v.totalAssets.normalized) * price,
 			priceSource: source
