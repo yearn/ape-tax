@@ -48,7 +48,7 @@ function parseCoins(value: string | string[] | undefined): string[] {
 			throw new Error('Each coin must use a supported chain name and token address');
 		}
 		return `${match[1].toLowerCase()}:${match[2].toLowerCase()}`;
-	})].sort();
+	}))].sort();
 }
 
 function setCacheHeaders(response: NextApiResponse, cacheable: boolean): void {
