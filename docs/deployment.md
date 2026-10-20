@@ -46,9 +46,8 @@ Do not sync `deploy-configs` to Vercel. Verify the existing application values
 before enabling a new sync. The build runs remotely on Vercel with those values.
 
 Configure both identities and repository variables before expecting deployments
-to succeed. After a successful Actions preview, disable Vercel's automatic Git
-deployments in the project settings to avoid duplicate deployments. This PR does
-not change those external settings or provision Doppler resources.
+to succeed. `vercel.json` disables automatic Git deployments so GitHub Actions owns the
+deployments. Keep deployment credentials and the app sync configured in Doppler.
 
 See [the shared deployment guide](https://github.com/yearn/yearn-gha/blob/ca8eb206d09f5d3af56c9df14c3ab7b652cfafcc/specs/doppler-vercel.md)
 for the full setup and cutover procedure.
