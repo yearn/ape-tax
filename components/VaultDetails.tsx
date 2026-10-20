@@ -85,11 +85,11 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 				</div>
 				<div>
 					<p className={'inline text-neutral-900'}>
-						{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : vaultData.priceSource === 'yDaemon' ? 'yDaemon 🪼' : vaultData.priceSource === 'Coingecko' ? 'CoinGecko 🦎' : 'unknown'}): `}
+						{`${vault.WANT_SYMBOL} price (${vault?.PRICE_SOURCE ? vault.PRICE_SOURCE : vaultData.priceSource === 'Yearn Price Service' ? 'Yearn Price Service 💱' : vaultData.priceSource === 'Coingecko' ? 'CoinGecko 🦎' : 'unknown'}): `}
 					</p>
 					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`$${vaultData.wantPrice ? formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2) : '-'}`}
+							{`$${vaultData.wantPriceError ? 'Unavailable' : formatAmount(vaultData.wantPrice, vaultData.wantPrice < 10 ? 4 : 2)}`}
 						</Suspense>
 					</p>
 				</div>
@@ -115,7 +115,7 @@ function	VaultDetails({vault, vaultData}: {vault: TVault, vaultData: TVaultData}
 					<p className={'inline text-neutral-900'}>{'Total AUM: '}</p>
 					<p className={'ml-3 inline'}>
 						<Suspense wait={!vaultData.loaded}>
-							{`$${vaultData.totalAUM === 0 ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
+							{`$${vaultData.wantPriceError ? '-' : formatAmount(vaultData.totalAUM, 2)}`}
 						</Suspense>
 					</p>
 				</div>

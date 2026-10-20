@@ -1,14 +1,11 @@
 import Meta from 'components/Meta';
 import Navbar from 'components/Navbar';
 import {FactoryContextApp} from 'contexts/useFactory';
-import {useFetch} from 'hooks/useFetch';
-import {useYDaemonBaseURI} from 'hooks/useYDaemonBaseURI';
-import {yDaemonPricesChainSchema} from 'schemas/yDaemonPricesSchema';
+import {useYearnPrices} from 'hooks/useYearnPrices';
 import vaults from 'utils/vaults.json';
 import {arbitrum, base, fantom, gnosis, mainnet, optimism, polygon} from 'viem/chains';
 import useSWR from 'swr';
 import {WithYearn} from '@yearn-finance/web-lib/contexts/WithYearn';
-import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {baseFetcher} from '@yearn-finance/web-lib/utils/fetchers';
 
 import {localhost} from '../utils/wagmiChains';
@@ -16,19 +13,13 @@ import {localhost} from '../utils/wagmiChains';
 import type {AppProps} from 'next/app';
 import type {ReactElement} from 'react';
 import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
-import type {TYDaemonPrices, TYDaemonPricesChain} from 'schemas/yDaemonPricesSchema';
+import type {TAppPrices} from 'utils/types';
 
 import	'../style.css';
 
-function usePrices(): {fromCoingecko: TCoinGeckoPrices; fromYDaemon: TYDaemonPrices;} {
-	const {safeChainID} = useChainID();
-	const {yDaemonBaseUri: yDaemonBaseUriWithoutChain} = useYDaemonBaseURI();
+function usePrices(): TAppPrices {
 	const vaultsCGIds = [...new Set(Object.values(vaults).map((vault): string => vault.COINGECKO_SYMBOL.toLowerCase()))];
-
-	const {data: prices} = useFetch<TYDaemonPricesChain>({
-		endpoint: `${yDaemonBaseUriWithoutChain}/prices/all`,
-		schema: yDaemonPricesChainSchema
-	});
+	const yearnPrices = useYearnPrices();
 
 	const {data} = useSWR(
 		`https://api.coingecko.com/api/v3/simple/price?ids=${vaultsCGIds}&vs_currencies=usd`,
@@ -43,13 +34,21 @@ function usePrices(): {fromCoingecko: TCoinGeckoPrices; fromYDaemon: TYDaemonPri
 		}
 	);
 
-	return {fromCoingecko: data as TCoinGeckoPrices, fromYDaemon: prices?.[safeChainID] || {}};
+	return {
+		fromCoingecko: data as TCoinGeckoPrices,
+		fromYearnPrices: yearnPrices.prices,
+		priceServiceError: yearnPrices.error,
+		missingPriceKeys: yearnPrices.missing,
+		stalePriceKeys: yearnPrices.stale,
+		priceErrors: yearnPrices.errors
+	};
 
 }
 
 function App(props: AppProps): ReactElement {
 	const {Component, pageProps} = props;
 	const prices = usePrices();
+	const unavailableCount = prices.missingPriceKeys.length + prices.stalePriceKeys.length + Object.keys(prices.priceErrors).length;
 
 	return (
 		<>
@@ -62,6 +61,13 @@ function App(props: AppProps): ReactElement {
 					<Navbar />
 				</div>
 				<div className={'mb-8'}>
+					{(prices.priceServiceError || unavailableCount > 0) && (
+						<p role={'alert'} className={'mb-3 rounded bg-amber-100 px-3 py-2 text-sm text-amber-900'}>
+							{prices.priceServiceError
+								? 'Yearn Price Service is unavailable. CoinGecko prices are used where available.'
+								: `${unavailableCount} Yearn Price Service quotes are missing, stale, or unavailable. CoinGecko prices are used where available.`}
+						</p>
+					)}
 					<Component
 						router={props.router}
 						prices={prices}
@@ -95,9 +101,6 @@ function	MyApp(props: AppProps): ReactElement {
 				localhost
 			]}
 			options={{
-				baseSettings: {
-					yDaemonBaseURI: (process.env.YDAEMON_BASE_URI as string) || 'https://ydaemon.yearn.fi'
-				},
 				ui: {shouldUseThemes: false}
 			}}>
 			<FactoryContextApp>

@@ -1,5 +1,6 @@
 import type {TAddress} from '@yearn-finance/web-lib/types';
 import type {TNormalizedBN} from '@yearn-finance/web-lib/utils/format.bigNumber';
+import type {TCoinGeckoPrices} from 'schemas/coinGeckoSchemas';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type Maybe<T> = T | null | undefined;
@@ -59,8 +60,17 @@ export type TVaultData = {
 
 	wantPriceError?: boolean;
 	allowanceZapOut?: TNormalizedBN;
-	priceSource?: 'Coingecko' | 'yDaemon';
+	priceSource?: 'Coingecko' | 'Yearn Price Service';
 }
+
+export type TAppPrices = {
+	fromCoingecko: TCoinGeckoPrices;
+	fromYearnPrices: Record<string, number>;
+	priceServiceError?: Error;
+	missingPriceKeys: string[];
+	stalePriceKeys: string[];
+	priceErrors: Record<string, {code: string; message: string}>;
+};
 
 export type TStrategyData = {
 	address: TAddress;
