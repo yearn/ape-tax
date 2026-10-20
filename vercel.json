@@ -1,3 +1,6 @@
 {
-  "installCommand": "yarn install --frozen-lockfile"
+  "installCommand": "yarn install --frozen-lockfile",
+  "git": {
+    "deploymentEnabled": false
+  }
 }
