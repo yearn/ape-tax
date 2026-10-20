@@ -1,6 +1,9 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 
-const YEARN_PRICES_URL = 'https://prices.yearn.dev/api/prices/spot';
+const YEARN_PRICES_URL = new URL(
+	'/api/prices/spot',
+	process.env.YEARN_PRICES_BASE_URL || 'https://prices.yearn.dev'
+).toString();
 const MAX_SPOT_TOKENS = 50;
 const MAX_PRICE_AGE_SECONDS = 24 * 60 * 60;
 const SUPPORTED_CHAINS = new Set([
