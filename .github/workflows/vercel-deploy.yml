@@ -1,0 +1,26 @@
+name: Deploy to Vercel
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: vercel-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+  id-token: write
+  pull-requests: write
+
+cache-mode: none
+
+# Doppler identities and Vercel sync setup: docs/deployment.md
+jobs:
+  ape-tax:
+    uses: yearn/yearn-gha/.github/workflows/vercel-deploy.yml@ca8eb206d09f5d3af56c9df14c3ab7b652cfafcc
+    with:
+      project: ape-tax
+      identity-id: ${{ github.event_name == 'pull_request' && vars.DOPPLER_PREVIEW_IDENTITY_ID || vars.DOPPLER_PRODUCTION_IDENTITY_ID }}
