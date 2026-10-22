@@ -20,7 +20,7 @@ cache-mode: none
 # Doppler identities and Vercel sync setup: docs/deployment.md
 jobs:
   ape-tax:
-    uses: yearn/yearn-gha/.github/workflows/vercel-deploy.yml@ca8eb206d09f5d3af56c9df14c3ab7b652cfafcc
+    uses: yearn/yearn-gha/.github/workflows/vercel-deploy.yml@d50baefb52f5e6cf12284eeb4e547489befbe208
     with:
       project: ape-tax
       identity-id: ${{ github.event_name == 'pull_request' && vars.DOPPLER_PREVIEW_IDENTITY_ID || vars.DOPPLER_PRODUCTION_IDENTITY_ID }}
